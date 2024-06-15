@@ -6,8 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 @UtilityClass
 public class CC {
 
-    public static final String CHAT_BAR = translate("&7&m" + StringUtils.repeat("-", 24));
-    public static final String SCORE_BAR = translate("&7&m" + StringUtils.repeat("-", 16));
+    public static final String CHAT_BAR = translate("&7&m" + StringUtils.repeat("-", 48));
+    public static final String SCORE_BAR = translate("&7&m" + StringUtils.repeat("-", 22));
 
     /**
      * Translates color codes in a given string.

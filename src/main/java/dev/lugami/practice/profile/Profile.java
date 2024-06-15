@@ -17,21 +17,21 @@ public class Profile {
     public Profile(Player p) {
         this.player = p;
         this.UUID = p.getUniqueId();
-        this.state = ProfileState.SPAWN;
+        this.state = ProfileState.LOBBY;
         if (Budget.getInstance().getProfileStorage().findProfile(player) == null) Budget.getInstance().getProfileStorage().getProfiles().add(this);
     }
 
     public Profile(UUID u) {
         this.player = Bukkit.getPlayer(u);
         this.UUID = u;
-        this.state = ProfileState.SPAWN;
+        this.state = ProfileState.LOBBY;
         if (Budget.getInstance().getProfileStorage().findProfile(player) == null) Budget.getInstance().getProfileStorage().getProfiles().add(this);
     }
 
     public Profile(Player p, UUID u) {
         this.player = p;
         this.UUID = u;
-        this.state = ProfileState.SPAWN;
+        this.state = ProfileState.LOBBY;
         if (Budget.getInstance().getProfileStorage().findProfile(player) == null) Budget.getInstance().getProfileStorage().getProfiles().add(this);
     }
 
