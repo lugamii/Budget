@@ -39,7 +39,7 @@ dependency-reduced-pom.xml
 *.ipr
 *.iws
 .idea/
-!/.idea/
+.idea/shelf/
 
 #Libraries jar files
 libraries/*.jar
