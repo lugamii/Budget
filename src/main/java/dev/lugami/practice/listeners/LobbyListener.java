@@ -3,11 +3,9 @@ package dev.lugami.practice.listeners;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.storage.ProfileStorage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 public class LobbyListener implements Listener {
@@ -23,7 +21,7 @@ public class LobbyListener implements Listener {
         if (profile.getState() == ProfileState.LOBBY) {
             event.setCancelled(true);
             if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-                // TODO: Handle spawn
+                Budget.getInstance().getLobbyStorage().bringToLobby(player);
             }
         } else {
             // TODO: Handle other states

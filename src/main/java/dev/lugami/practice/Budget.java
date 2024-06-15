@@ -1,24 +1,21 @@
 package dev.lugami.practice;
 
+import com.jonahseguin.drink.CommandService;
+import com.jonahseguin.drink.Drink;
 import dev.lugami.practice.board.ScoreboardProvider;
-import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.commands.CommandBase;
+import dev.lugami.practice.storage.LobbyStorage;
 import dev.lugami.practice.storage.ProfileStorage;
 import dev.lugami.practice.utils.ClassUtils;
 import dev.lugami.practice.utils.ConfigUtil;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.IOException;
-import java.util.List;
 
 @Getter @Setter
 public class Budget extends JavaPlugin {
@@ -27,7 +24,9 @@ public class Budget extends JavaPlugin {
     private static Budget instance;
     private YamlConfiguration mainConfig;
     private ProfileStorage profileStorage;
+    private LobbyStorage lobbyStorage;
     private Assemble assemble;
+    private CommandService drink;
 
     @Override
     public void onEnable() {
@@ -35,6 +34,7 @@ public class Budget extends JavaPlugin {
         this.mainConfig = ConfigUtil.createConfig("config");
         this.setupListeners();
         this.setupManagers();
+        this.setupCommands();
     }
 
     @Override
@@ -54,8 +54,22 @@ public class Budget extends JavaPlugin {
 
     private void setupManagers() {
         this.profileStorage = new ProfileStorage();
+        this.lobbyStorage = new LobbyStorage();
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
         this.assemble.setAssembleStyle(AssembleStyle.MODERN);
+    }
+
+    private void setupCommands() {
+        drink = Drink.get(this);
+        for (Class<?> c : ClassUtils.getClasses(getFile(), "dev.lugami.practice.commands.impl")) {
+            try {
+                CommandBase command = (CommandBase) c.newInstance();
+                drink.register(command, command.getName(), command.getAliases());
+            } catch (Exception exception) {
+                getLogger().info("Error while loading the listener " + c.getSimpleName());
+            }
+        }
+        drink.registerCommands();
     }
 }

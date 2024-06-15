@@ -19,6 +19,7 @@ public class ProfileListener implements Listener {
         Player player = event.getPlayer();
         if (Budget.getInstance().getProfileStorage().findProfile(player) != null) return;
         Profile profile = new Profile(player);
+        Budget.getInstance().getLobbyStorage().bringToLobby(player);
         TaskUtil.runTaskLater(() -> {
             if (Budget.getInstance().getMainConfig().getBoolean("debug")) {
                 for (Player player1 : Bukkit.getOnlinePlayers()) {
