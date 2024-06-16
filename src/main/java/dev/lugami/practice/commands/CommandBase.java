@@ -13,4 +13,9 @@ public class CommandBase {
         this.aliases = a;
     }
 
+    public CommandBase(String n) {
+        this.name = n;
+        this.aliases = new String[]{};
+    }
+
 }

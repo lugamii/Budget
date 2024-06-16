@@ -10,16 +10,16 @@ import java.util.List;
 public class ScoreboardProvider implements AssembleAdapter {
     @Override
     public String getTitle(Player player) {
-        return "&6&lPractice";
+        return "&c&lPractice";
     }
 
     @Override
     public List<String> getLines(Player player) {
         List<String> lines = new ArrayList<>();
         lines.add(CC.SCORE_BAR);
-        lines.add("&6Scoreboard test");
+        lines.add("&fScoreboard test");
         lines.add("");
-        lines.add("&6www.angolanos.fun");
+        lines.add("&cwww.angolanos.fun");
         lines.add(CC.SCORE_BAR);
         return lines;
     }
