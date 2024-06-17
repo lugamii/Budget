@@ -2,6 +2,7 @@ package dev.lugami.practice.storage;
 
 import dev.lugami.practice.profile.Profile;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class ProfileStorage {
      * @return the Profile object if found, otherwise null
      */
     public Profile findProfile(String name) {
-        return profiles.stream().filter(profile -> profile.getPlayer().getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return profiles.stream().filter(profile -> profile.getPlayer().getName().equalsIgnoreCase(name)).findFirst().orElse(Bukkit.getPlayer(name) != null ? new Profile(Bukkit.getPlayer(name)) : null);
     }
 
     /**
@@ -30,7 +31,7 @@ public class ProfileStorage {
      * @return the Profile object if found, otherwise null
      */
     public Profile findProfile(Player player) {
-        return profiles.stream().filter(profile -> profile.getPlayer() == player).findFirst().orElse(null);
+        return profiles.stream().filter(profile -> profile.getPlayer() == player).findFirst().orElse(player != null ? new Profile(player) : null);
     }
 
     /**
@@ -40,6 +41,6 @@ public class ProfileStorage {
      * @return the Profile object if found, otherwise null
      */
     public Profile findProfile(UUID uuid) {
-        return profiles.stream().filter(profile -> profile.getUUID() == uuid).findFirst().orElse(null);
+        return profiles.stream().filter(profile -> profile.getUUID() == uuid).findFirst().orElse(Bukkit.getPlayer(uuid) != null ? new Profile(Bukkit.getPlayer(uuid)) : null);
     }
 }

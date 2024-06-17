@@ -5,6 +5,8 @@ import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.ConfigUtil;
 import dev.lugami.practice.utils.LocationUtil;
+import dev.lugami.practice.utils.PlayerUtils;
+import dev.lugami.practice.utils.TaskUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -19,20 +21,15 @@ public class LobbyStorage {
 
     public LobbyStorage() {
         lobbyLocation = LocationUtil.stringToLocation(Budget.getInstance().getMainConfig().getString("spawnLocation"));
-        if (lobbyLocation == null) {
-            lobbyLocation = Bukkit.getWorld("world").getSpawnLocation();
-            Budget.getInstance().getMainConfig().set("spawnLocation", LocationUtil.locationToString(lobbyLocation));
-            ConfigUtil.saveConfig(Budget.getInstance().getMainConfig(), "config");
-        }
     }
 
     public void bringToLobby(Player player) {
-        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        if (profile == null) {
-            profile = new Profile(player);
-        }
-        profile.setState(ProfileState.LOBBY);
-        player.teleport(lobbyLocation);
+        TaskUtil.runTaskLater(() -> {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+            profile.setState(ProfileState.LOBBY);
+            PlayerUtils.resetPlayer(player);
+            player.teleport(lobbyLocation);
+        }, 1L);
     }
 
 }

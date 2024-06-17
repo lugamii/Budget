@@ -16,14 +16,12 @@ public class LocationUtil {
         if (location == null) {
             return null;
         }
-        StringBuilder builder = new StringBuilder();
-        builder.append(location.getWorld().getName()).append(":");
-        builder.append(location.getX()).append(":");
-        builder.append(location.getY()).append(":");
-        builder.append(location.getZ()).append(":");
-        builder.append(location.getYaw()).append(":");
-        builder.append(location.getPitch());
-        return builder.toString();
+        return location.getWorld().getName() + ":" +
+               location.getX() + ":" +
+               location.getY() + ":" +
+               location.getZ() + ":" +
+               location.getYaw() + ":" +
+               location.getPitch();
     }
 
     /**

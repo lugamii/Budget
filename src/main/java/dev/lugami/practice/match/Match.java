@@ -1,20 +1,23 @@
 package dev.lugami.practice.match;
 
 import dev.lugami.practice.Budget;
-import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.arena.Arena;
+import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.event.MatchEndEvent;
+import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.TaskUtil;
+import dev.lugami.practice.utils.TimeUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import java.util.HashSet;
-import java.util.Set;
+
 import java.util.UUID;
 
 @Getter
@@ -22,12 +25,13 @@ import java.util.UUID;
 public class Match {
 
     private final UUID matchId;
-    private final Set<UUID> team1 = new HashSet<>();
-    private final Set<UUID> team2 = new HashSet<>();
+    private final Team team1;
+    private final Team team2;
     private final Kit kit;
     private final Arena arena;
     private MatchState state;
-    private UUID winner;
+    private Team winnerTeam;
+    private Long startedAt;
 
     public enum MatchState {
         WAITING,
@@ -41,6 +45,9 @@ public class Match {
         this.kit = kit;
         this.arena = arena;
         this.state = MatchState.WAITING;
+        this.team1 = new Team(null); // Initialize with null leader
+        this.team2 = new Team(null); // Initialize with null leader
+        Budget.getInstance().getMatchStorage().getMatches().add(this);
     }
 
     /**
@@ -50,7 +57,8 @@ public class Match {
      */
     public void addPlayerToTeam1(Player player) {
         if (state == MatchState.WAITING) {
-            team1.add(player.getUniqueId());
+            team1.addMember(player);
+            if (team1.getLeader() == null) team1.setLeader(player);
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
             profile.setState(ProfileState.FIGHTING);
             equipPlayer(player);
@@ -66,7 +74,8 @@ public class Match {
      */
     public void addPlayerToTeam2(Player player) {
         if (state == MatchState.WAITING) {
-            team2.add(player.getUniqueId());
+            team2.addMember(player);
+            if (team2.getLeader() == null) team2.setLeader(player);
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
             profile.setState(ProfileState.FIGHTING);
             equipPlayer(player);
@@ -89,10 +98,12 @@ public class Match {
                 public void run() {
                     if (countdown == 0) {
                         state = MatchState.IN_PROGRESS;
-                        Bukkit.broadcastMessage(ChatColor.GREEN + "The match has started!");
+                        sendMessage(ChatColor.GREEN + "The match has started!");
+                        (new MatchStartEvent(Match.this, team1, team2)).call();
+                        startedAt = System.currentTimeMillis();
                         this.cancel();
                     } else {
-                        Bukkit.broadcastMessage(ChatColor.YELLOW + "Match starting in " + countdown + " seconds...");
+                        sendMessage(ChatColor.YELLOW + "Match starting in " + countdown + " seconds...");
                         countdown--;
                     }
                 }
@@ -103,20 +114,22 @@ public class Match {
     }
 
     /**
-     * Ends the match, sets the winner, changes the state to ENDED, and announces the winner.
+     * Ends the match, sets the winner team, changes the state to ENDED, and announces the winner.
      *
-     * @param winnerId the UUID of the winning player
+     * @param winningTeam the winning team of the match
      */
-    public void end(UUID winnerId) {
+    public void end(Team winningTeam) {
         if (state == MatchState.IN_PROGRESS) {
             state = MatchState.ENDED;
-            this.winner = winnerId;
+            this.winnerTeam = winningTeam;
+            (new MatchEndEvent(this, winnerTeam, getOpponent(winnerTeam))).call();
             // Announce the winner and handle end match logic here
-            Player winnerPlayer = Bukkit.getPlayer(winnerId);
-            if (winnerPlayer != null) {
-                Bukkit.broadcastMessage(winnerPlayer.getName() + " has won the match!");
+            Player winnerLeader = winningTeam.getLeader();
+            if (winnerLeader != null) {
+                sendMessage(winnerLeader.getName() + (winningTeam.getSize() >= 2 ? "'s team" : "") + " has won the match!");
             }
             TaskUtil.runTaskLater(this::teleportTeamsToSpawn, 20 * 3);
+            Budget.getInstance().getMatchStorage().getMatches().remove(this);
         } else {
             throw new IllegalStateException("Match is not in progress.");
         }
@@ -135,36 +148,80 @@ public class Match {
     }
 
     private void teleportTeamsToArena() {
-        for (UUID playerId : team1) {
-            Player player = Bukkit.getPlayer(playerId);
-            if (player != null) {
-                player.teleport(arena.getPos1());
+        TaskUtil.runTaskLater(() -> {
+            for (UUID playerId : team1.getMembers()) {
+                Player player = Bukkit.getPlayer(playerId);
+                if (player != null) {
+                    Location location = new Location(arena.getPos1().getWorld(), arena.getPos1().getX(), arena.getPos1().getY(), arena.getPos1().getZ(), arena.getPos1().getYaw(), arena.getPos1().getPitch());
+                    location.add(0.0, 1.0, 0.0);
+                    player.teleport(location);
+                }
             }
-        }
-        for (UUID playerId : team2) {
-            Player player = Bukkit.getPlayer(playerId);
-            if (player != null) {
-                player.teleport(arena.getPos2());
+            for (UUID playerId : team2.getMembers()) {
+                Player player = Bukkit.getPlayer(playerId);
+                if (player != null) {
+                    Location location = new Location(arena.getPos2().getWorld(), arena.getPos2().getX(), arena.getPos2().getY(), arena.getPos2().getZ(), arena.getPos2().getYaw(), arena.getPos2().getPitch());
+                    location.add(0.0, 1.0, 0.0);
+                    player.teleport(location);
+                }
             }
-        }
+        }, 1L);
     }
 
     private void teleportTeamsToSpawn() {
-        for (UUID playerId : team1) {
-            Player player = Bukkit.getPlayer(playerId);
-            if (player != null) {
-                Budget.getInstance().getLobbyStorage().bringToLobby(player);
+        TaskUtil.runTaskLater(() -> {
+            for (UUID playerId : team1.getMembers()) {
+                Player player = Bukkit.getPlayer(playerId);
+                if (player != null) {
+                    Budget.getInstance().getLobbyStorage().bringToLobby(player);
+                }
             }
-        }
-        for (UUID playerId : team2) {
-            Player player = Bukkit.getPlayer(playerId);
-            if (player != null) {
-                Budget.getInstance().getLobbyStorage().bringToLobby(player);
+            for (UUID playerId : team2.getMembers()) {
+                Player player = Bukkit.getPlayer(playerId);
+                if (player != null) {
+                    Budget.getInstance().getLobbyStorage().bringToLobby(player);
+                }
             }
-        }
+        }, 1L);
     }
 
     public boolean isPlayerInMatch(Player player) {
-        return team1.contains(player.getUniqueId()) || team2.contains(player.getUniqueId());
+        return team1.contains(player) || team2.contains(player);
+    }
+
+    public void sendMessage(String message) {
+        for (UUID uuid : this.team1.getMembers()) {
+            if (Bukkit.getPlayer(uuid) == null) return;
+            Bukkit.getPlayer(uuid).sendMessage(CC.translate(message));
+        }
+        for (UUID uuid : this.team2.getMembers()) {
+            if (Bukkit.getPlayer(uuid) == null) return;
+            Bukkit.getPlayer(uuid).sendMessage(CC.translate(message));
+        }
+    }
+
+    public Team getTeam(Player player) {
+        if (team1.contains(player)) return team1;
+        else if (team2.contains(player)) return team2;
+        else return null;
+    }
+
+    public Team getOpponent(Team team) {
+        if (team1 == team) return team2;
+        else if (team2 == team) return team1;
+        else return null;
+    }
+
+    public String getDuration() {
+        switch (state) {
+            case COUNTDOWN:
+                return "Starting";
+            case IN_PROGRESS:
+                return TimeUtils.formatTime(System.currentTimeMillis() - startedAt);
+            case ENDED:
+                return "Ended";
+            default:
+                return "Waiting";
+        }
     }
 }

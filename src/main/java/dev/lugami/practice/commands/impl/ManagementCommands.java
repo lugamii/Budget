@@ -10,7 +10,6 @@ import dev.lugami.practice.utils.command.annotation.Require;
 import dev.lugami.practice.utils.command.annotation.Sender;
 import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
-import dev.lugami.practice.utils.menu.MenuManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -44,7 +43,6 @@ public class ManagementCommands extends CommandBase {
             player.closeInventory();
             player.sendMessage("You clicked the gold ingot!");
         }));
-        MenuManager.addMenu(menu);
         menu.open(p);
     }
 

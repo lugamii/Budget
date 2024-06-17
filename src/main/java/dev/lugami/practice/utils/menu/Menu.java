@@ -18,6 +18,9 @@ public class Menu {
     private final Inventory inventory;
     private final Map<Integer, Button> buttons;
 
+    @Getter
+    private static final Map<Player, Menu> openMenus = new HashMap<>();
+
     public Menu(String t, int s) {
         this.title = CC.translate(t);
         this.size = s;
@@ -36,16 +39,7 @@ public class Menu {
 
     public void open(Player player) {
         player.openInventory(inventory);
-        TaskUtil.runTaskLater(() -> {
-            if (Budget.getInstance().getMainConfig().getBoolean("debug")) {
-                for (Player player1 : Bukkit.getOnlinePlayers()) {
-                    if (!player1.isOp()) return;
-                    ArrayList<String> list = new ArrayList<>();
-                    MenuManager.getMenus().forEach(m -> list.add(m.getTitle() + "&7&o"));
-                    player1.sendMessage(CC.translate("&7&oDEBUG: Menu List: " + list));
-                }
-            }
-        }, 10L);
+        openMenus.put(player, this);
     }
 
     public void handleClick(int slot, Player player) {

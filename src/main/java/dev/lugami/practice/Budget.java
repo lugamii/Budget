@@ -2,10 +2,7 @@ package dev.lugami.practice;
 
 import dev.lugami.practice.board.ScoreboardProvider;
 import dev.lugami.practice.commands.CommandBase;
-import dev.lugami.practice.storage.ArenaStorage;
-import dev.lugami.practice.storage.KitStorage;
-import dev.lugami.practice.storage.LobbyStorage;
-import dev.lugami.practice.storage.ProfileStorage;
+import dev.lugami.practice.storage.*;
 import dev.lugami.practice.utils.ClassUtils;
 import dev.lugami.practice.utils.ConfigUtil;
 import dev.lugami.practice.utils.command.Drink;
@@ -29,6 +26,7 @@ public class Budget extends JavaPlugin {
     private LobbyStorage lobbyStorage;
     private KitStorage kitStorage;
     private ArenaStorage arenaStorage;
+    private MatchStorage matchStorage;
     private Assemble assemble;
     private CommandService drink;
 
@@ -65,6 +63,7 @@ public class Budget extends JavaPlugin {
         this.lobbyStorage = new LobbyStorage();
         this.kitStorage = new KitStorage();
         this.arenaStorage = new ArenaStorage();
+        this.matchStorage = new MatchStorage();
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
         this.assemble.setAssembleStyle(AssembleStyle.MODERN);

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class LobbyListener implements Listener {
 
@@ -15,17 +16,18 @@ public class LobbyListener implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
         Player player = (Player) event.getEntity();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        if (profile == null) {
-            profile = new Profile(player);
-        }
         if (profile.getState() == ProfileState.LOBBY) {
             event.setCancelled(true);
             if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
                 Budget.getInstance().getLobbyStorage().bringToLobby(player);
             }
-        } else {
-            // TODO: Handle other states
         }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        Budget.getInstance().getLobbyStorage().bringToLobby(player);
     }
 
 }

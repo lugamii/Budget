@@ -11,18 +11,13 @@ import dev.lugami.practice.utils.command.annotation.Command;
 import dev.lugami.practice.utils.command.annotation.Sender;
 import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
-import dev.lugami.practice.utils.menu.MenuManager;
-import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-
-import java.util.Map;
 
 public class DuelCommands extends CommandBase {
     public DuelCommands() {
         super("duel");
     }
-
 
     @Command(name = "", desc = "Sends a duel to a player")
     public void sendDuel(@Sender Player p1, Player target) {
@@ -34,17 +29,7 @@ public class DuelCommands extends CommandBase {
             p1.sendMessage(CC.translate("&cYou cannot duel yourself!"));
             return;
         }
-        Menu duelKitMenu = new Menu("&cSelect a kit", 27);
-        int slot = 0;
-        for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
-            duelKitMenu.setButton(slot++, new Button(new ItemBuilder(kit.getIcon() == null ? new ItemBuilder(Material.DIAMOND_SWORD).build() : kit.getIcon()).name("&c" + kit.getName()).build(), player -> {
-                DuelArenaMenu menu = new DuelArenaMenu(kit, target);
-                menu.open(player);
-                MenuManager.addMenu(menu);
-            }));
-        }
-        duelKitMenu.open(p1);
-        MenuManager.addMenu(duelKitMenu);
+        new DuelKitMenu(p1, target).open(p1);
     }
 
     @Command(name = "accept", desc = "Accepts a duel")
@@ -65,33 +50,56 @@ public class DuelCommands extends CommandBase {
         }
     }
 
-    @Getter
-    private static class DuelArenaMenu extends Menu {
+    private static class DuelKitMenu extends Menu {
+        private final Player p1;
+        private final Player target;
 
-        private static Kit kit = null;
-        private static Player target = null;
-
-        public DuelArenaMenu() {
-            super("&cSelect a arena", 27);
+        public DuelKitMenu(Player p1, Player target) {
+            super("&cSelect a kit", 27);
+            this.p1 = p1;
+            this.target = target;
+            initialize();
         }
 
-        public DuelArenaMenu(Kit kit, Player player) {
-            super("&cSelect a arena", 27);
+        private void initialize() {
+            int slot = 0;
+            for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
+                setButton(slot++, new Button(
+                        new ItemBuilder(kit.getIcon() != null ? kit.getIcon() : new ItemBuilder(Material.DIAMOND_SWORD).build())
+                                .name("&c" + kit.getName())
+                                .build(),
+                        player -> new DuelArenaMenu(kit, target).open(player)
+                ));
+            }
+        }
+    }
+
+    private static class DuelArenaMenu extends Menu {
+        private final Kit kit;
+        private final Player target;
+
+        public DuelArenaMenu(Kit kit, Player target) {
+            super("&cSelect an arena", 27);
             this.kit = kit;
-            this.target = player;
+            this.target = target;
+            initialize();
+        }
+
+        private void initialize() {
             int slot = 0;
             for (Arena arena : Budget.getInstance().getArenaStorage().getArenas()) {
                 if (arena.getWhitelistedKits().contains(kit.getName())) {
-                    setButton(slot++, new Button(new ItemBuilder(Material.PAPER).name("&c" + arena.getName()).build(), p1 -> {
-                        DuelRequest duelRequest = new DuelRequest(player, target, this.kit, arena);
-                        duelRequest.sendDuelRequest();
-                        player.closeInventory();
-                    }));
+                    setButton(slot++, new Button(
+                            new ItemBuilder(Material.PAPER)
+                                    .name("&c" + arena.getName())
+                                    .build(),
+                            p1 -> {
+                                new DuelRequest(p1, target, kit, arena).sendDuelRequest();
+                                p1.closeInventory();
+                            }
+                    ));
                 }
             }
         }
-
-
     }
-
 }

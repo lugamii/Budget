@@ -1,14 +1,12 @@
 package dev.lugami.practice.listeners;
 
-import dev.lugami.practice.Budget;
 import dev.lugami.practice.utils.menu.Menu;
-import dev.lugami.practice.utils.menu.MenuManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.Plugin;
 
 public class MenuListener implements Listener {
 
@@ -24,7 +22,7 @@ public class MenuListener implements Listener {
             return;
         }
 
-        event.setCancelled(true); // Prevent item moving
+        event.setCancelled(true);
 
         Inventory inventory = event.getClickedInventory();
         if (inventory == null) {
@@ -32,11 +30,18 @@ public class MenuListener implements Listener {
         }
 
         String title = inventory.getTitle();
-        for (Menu menu : MenuManager.getMenus()) {
-            if (menu.getTitle().equals(title)) {
-                menu.handleClick(event.getSlot(), player);
-                return;
-            }
+        Menu menu = Menu.getOpenMenus().get(player);
+        if (menu.getTitle().equals(title)) {
+            menu.handleClick(event.getSlot(), player);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player)) return;
+        Player player = (Player) event.getPlayer();
+        if (Menu.getOpenMenus().get(player) != null) {
+            Menu.getOpenMenus().remove(player);
         }
     }
 
