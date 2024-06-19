@@ -47,21 +47,16 @@ public class MatchListener implements Listener {
 
     @EventHandler
     public void onMatchEnd(MatchEndEvent event) {
-        event.getWinner().getMembers().forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
-            player.sendMessage("");
-            player.sendMessage(CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : "")));
-            player.sendMessage(CC.translate("&bInventories: &a" + event.getWinner().getLeader().getName() + "&7, " + event.getLoser().getLeader().getName()));
-            player.sendMessage("");
-        });
 
-        event.getLoser().getMembers().forEach(uuid -> {
-            Player player = Bukkit.getPlayer(uuid);
-            player.sendMessage("");
-            player.sendMessage(CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : "")));
-            player.sendMessage(CC.translate("&bInventories: &a" + event.getWinner().getLeader().getName() + "&7, " + event.getLoser().getLeader().getName()));
-            player.sendMessage("");
-        });
+        event.getWinner().sendMessage("");
+        event.getWinner().sendMessage(CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : "")));
+        event.getWinner().sendMessage(CC.translate("&bInventories: &a" + event.getWinner().getLeader().getName() + "&7, " + event.getLoser().getLeader().getName()));
+        event.getWinner().sendMessage("");
+
+        event.getLoser().sendMessage("");
+        event.getLoser().sendMessage(CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : "")));
+        event.getLoser().sendMessage(CC.translate("&bInventories: &a" + event.getWinner().getLeader().getName() + "&7, " + event.getLoser().getLeader().getName()));
+        event.getLoser().sendMessage("");
     }
 
 }

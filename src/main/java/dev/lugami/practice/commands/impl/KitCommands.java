@@ -81,7 +81,7 @@ public class KitCommands extends CommandBase {
             return;
         }
         player.getInventory().setContents(kit.getInventory());
-        player.getInventory().setArmorContents(kit.getInventory());
+        player.getInventory().setArmorContents(kit.getArmor());
     }
 
 

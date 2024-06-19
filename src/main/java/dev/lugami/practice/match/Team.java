@@ -1,5 +1,6 @@
 package dev.lugami.practice.match;
 
+import dev.lugami.practice.utils.CC;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,5 +46,17 @@ public class Team {
 
     public boolean isEmpty() {
         return members.isEmpty();
+    }
+
+    public void sendMessage(String message) {
+        List<Player> sentPlayers = new ArrayList<>();
+        for (UUID uuid : getMembers()) {
+            if (Bukkit.getPlayer(uuid) == null) return;
+            Player player = Bukkit.getPlayer(uuid);
+            if (!sentPlayers.contains(player)) {
+                player.sendMessage(CC.translate(message));
+                sentPlayers.add(player);
+            }
+        }
     }
 }
