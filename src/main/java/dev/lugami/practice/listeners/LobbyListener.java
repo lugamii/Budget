@@ -3,9 +3,12 @@ package dev.lugami.practice.listeners;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -28,6 +31,16 @@ public class LobbyListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Budget.getInstance().getLobbyStorage().bringToLobby(player);
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (event.getPlayer().getGameMode() != GameMode.CREATIVE || !event.getPlayer().isOp()) event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (event.getPlayer().getGameMode() != GameMode.CREATIVE || !event.getPlayer().isOp()) event.setCancelled(true);
     }
 
 }

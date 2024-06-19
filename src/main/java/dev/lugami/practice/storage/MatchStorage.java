@@ -5,6 +5,7 @@ import dev.lugami.practice.match.Match;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -17,20 +18,11 @@ public class MatchStorage {
     private final List<Match> matches = new ArrayList<>();
 
     public Match findMatch(UUID uuid) {
-        return matches.stream().filter(
-                        match ->
-                                match.getMatchId() == uuid ||
-                                match.getTeam1().getMembers().contains(uuid) ||
-                                match.getTeam2().getMembers().contains(uuid))
-                        .findFirst().orElse(null);
+        return matches.stream().filter(match -> match.getMatchId() == uuid || match.isPlayerInMatch(Bukkit.getPlayer(uuid))).findFirst().orElse(null);
     }
 
     public Match findMatch(Player player) {
-        return matches.stream().filter(
-                        match ->
-                                match.getTeam1().getMembers().contains(player.getUniqueId()) ||
-                                match.getTeam2().getMembers().contains(player.getUniqueId()))
-                .findFirst().orElse(null);
+        return matches.stream().filter(match -> match.isPlayerInMatch(player)).findFirst().orElse(null);
     }
 
     public int getInFights() {

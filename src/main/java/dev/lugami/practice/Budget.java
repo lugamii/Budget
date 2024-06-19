@@ -21,7 +21,7 @@ public class Budget extends JavaPlugin {
 
     @Getter
     private static Budget instance;
-    private YamlConfiguration mainConfig, kitConfig, arenaConfig;
+    private YamlConfiguration mainConfig, kitConfig, arenaConfig, scoreboardConfig;
     private ProfileStorage profileStorage;
     private LobbyStorage lobbyStorage;
     private KitStorage kitStorage;
@@ -36,6 +36,7 @@ public class Budget extends JavaPlugin {
         this.mainConfig = ConfigUtil.createConfig("config");
         this.kitConfig = ConfigUtil.createConfig("kits");
         this.arenaConfig = ConfigUtil.createConfig("arenas");
+        this.scoreboardConfig = ConfigUtil.createConfig("scoreboard");
         this.setupListeners();
         this.setupManagers();
         this.setupCommands();
@@ -45,7 +46,8 @@ public class Budget extends JavaPlugin {
     public void onDisable() {
         this.kitStorage.save();
         this.arenaStorage.save();
-        ConfigUtil.saveConfig(mainConfig, "config");
+        ConfigUtil.saveConfig(mainConfig);
+        ConfigUtil.saveConfig(scoreboardConfig);
     }
 
     private void setupListeners() {

@@ -15,19 +15,58 @@ import java.util.List;
 public class ScoreboardProvider implements AssembleAdapter {
     @Override
     public String getTitle(Player player) {
-        return "&c&lPractice";
+        return Budget.getInstance().getScoreboardConfig().getString("TITLE");
     }
 
     @Override
     public List<String> getLines(Player player) {
         List<String> lines = new ArrayList<>();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        lines.add(CC.SCORE_BAR);
         if (profile == null) {
             lines.add("&fYour profile was not loaded");
-
         } else {
-            if (profile.getState() == ProfileState.LOBBY) {
+            switch (profile.getState()) {
+                case LOBBY:
+                    for (String line : Budget.getInstance().getScoreboardConfig().getStringList("LOBBY")) {
+                        line = line.replace("<online>", "" + Bukkit.getOnlinePlayers().size()).replace("<fighting>", "" + Budget.getInstance().getMatchStorage().getInFights());
+                        lines.add(line);
+                    }
+                    break;
+                case FIGHTING:
+                    Match match = Budget.getInstance().getMatchStorage().findMatch(player);
+                    if (match == null) {
+                        lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WAITING"));
+                        break;
+                    } else {
+                        switch (match.getState()) {
+                            default:
+                                lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WAITING"));
+                                break;
+                            case COUNTDOWN:
+                                for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-STARTING")) {
+                                    line = line.replace("<opponent>", "" + match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : ""));
+                                    lines.add(line);
+                                }
+                                break;
+                            case IN_PROGRESS:
+                                for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
+                                    line = line.
+                                            replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
+                                            replace("<duration>", match.getDuration());
+                                    lines.add(line);
+                                }
+                                break;
+                            case ENDED:
+                                if (match.getWinnerTeam() == match.getTeam(player)) {
+                                    lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WON"));
+                                } else {
+                                    lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-LOST"));
+                                }
+                                break;
+                        }
+                    }
+            }
+            /*if (profile.getState() == ProfileState.LOBBY) {
                 lines.add("&cOnline: &f" + Bukkit.getOnlinePlayers().size());
                 lines.add("&cPlaying: &f" + Budget.getInstance().getMatchStorage().getInFights());
             } else if (profile.getState() == ProfileState.FIGHTING) {
@@ -54,13 +93,13 @@ public class ScoreboardProvider implements AssembleAdapter {
                                 lines.add("&cYou lost!");
                             }
                             break;
+                        default:
+                            lines.add("&fTrying to find your match...");
+                            break;
                     }
                 }
-            }
+            }*/
         }
-        lines.add("");
-        lines.add("&cwww.angolanos.fun");
-        lines.add(CC.SCORE_BAR);
         return lines;
     }
 

@@ -11,11 +11,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 
 @UtilityClass
 public class ConfigUtil {
 
     private final File pluginDataFolder = Budget.getInstance().getDataFolder();
+    private final Map<YamlConfiguration, String> configMap = new HashMap<>();
 
     /**
      * Creates a new configuration file with the given name.
@@ -39,7 +42,9 @@ public class ConfigUtil {
                 e.printStackTrace();
             }
         }
-        return loadConfig(name);
+        YamlConfiguration configuration = loadConfig(name);
+        configMap.put(configuration, name);
+        return configuration;
     }
 
     /**
@@ -77,6 +82,22 @@ public class ConfigUtil {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Saves the given YamlConfiguration
+     *
+     * @param config the YamlConfiguration object
+     */
+    public void saveConfig(YamlConfiguration config) {
+        String name = configMap.getOrDefault(config, config.getName());
+        File configFile = new File(pluginDataFolder, name + ".yml");
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * Deletes the configuration file with the given name.

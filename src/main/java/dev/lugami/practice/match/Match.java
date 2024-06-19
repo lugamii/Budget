@@ -18,6 +18,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -47,7 +49,6 @@ public class Match {
         this.state = MatchState.WAITING;
         this.team1 = new Team(null);
         this.team2 = new Team(null);
-        Budget.getInstance().getMatchStorage().getMatches().add(this);
     }
 
     /**
@@ -57,6 +58,7 @@ public class Match {
      */
     public void addPlayerToTeam1(Player player) {
         if (state == MatchState.WAITING) {
+            if (team1.contains(player) || team2.contains(player)) return;
             team1.addMember(player);
             if (team1.getLeader() == null) team1.setLeader(player);
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
@@ -74,6 +76,7 @@ public class Match {
      */
     public void addPlayerToTeam2(Player player) {
         if (state == MatchState.WAITING) {
+            if (team1.contains(player) || team2.contains(player)) return;
             team2.addMember(player);
             if (team2.getLeader() == null) team2.setLeader(player);
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
@@ -88,6 +91,7 @@ public class Match {
      * Starts the match with a 5-second countdown, changing the state to COUNTDOWN and then to IN_PROGRESS.
      */
     public void start() {
+        Budget.getInstance().getMatchStorage().getMatches().add(this);
         if (state == MatchState.WAITING) {
             state = MatchState.COUNTDOWN;
             teleportTeamsToArena();
@@ -107,7 +111,7 @@ public class Match {
                         countdown--;
                     }
                 }
-            }.runTaskTimer(Budget.getInstance(), 0L, 20L); // Adjust "YourPluginName" to your plugin's name
+            }.runTaskTimer(Budget.getInstance(), 0L, 20L);
         } else {
             throw new IllegalStateException("Match already started or ended.");
         }
@@ -193,14 +197,8 @@ public class Match {
     }
 
     public void sendMessage(String message) {
-        for (UUID uuid : this.team1.getMembers()) {
-            if (Bukkit.getPlayer(uuid) == null) return;
-            Bukkit.getPlayer(uuid).sendMessage(CC.translate(message));
-        }
-        for (UUID uuid : this.team2.getMembers()) {
-            if (Bukkit.getPlayer(uuid) == null) return;
-            Bukkit.getPlayer(uuid).sendMessage(CC.translate(message));
-        }
+        team1.sendMessage(message);
+        team2.sendMessage(message);
     }
 
     public Team getTeam(Player player) {
