@@ -1,6 +1,7 @@
 package dev.lugami.practice.utils.menu;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.TaskUtil;
 import lombok.Getter;
@@ -38,6 +39,10 @@ public class Menu {
     }
 
     public void open(Player player) {
+        if (!player.hasPermission("budget.menu.bypass") && Budget.getInstance().getProfileStorage().findProfile(player).getState() != ProfileState.LOBBY) {
+            player.sendMessage(CC.translate("&cYou cannot do this right now."));
+            return;
+        }
         player.openInventory(inventory);
         openMenus.put(player, this);
     }

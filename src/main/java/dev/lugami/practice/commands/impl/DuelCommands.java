@@ -19,7 +19,7 @@ public class DuelCommands extends CommandBase {
         super("duel");
     }
 
-    @Command(name = "", desc = "Sends a duel to a player")
+    @Command(name = "", desc = "Sends a duel to a player", usage = "<target>")
     public void sendDuel(@Sender Player p1, Player target) {
         if (target == null) {
             p1.sendMessage(CC.translate("&cCould not find that player."));

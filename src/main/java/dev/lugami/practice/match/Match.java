@@ -45,8 +45,8 @@ public class Match {
         this.kit = kit;
         this.arena = arena;
         this.state = MatchState.WAITING;
-        this.team1 = new Team(null); // Initialize with null leader
-        this.team2 = new Team(null); // Initialize with null leader
+        this.team1 = new Team(null);
+        this.team2 = new Team(null);
         Budget.getInstance().getMatchStorage().getMatches().add(this);
     }
 
@@ -128,8 +128,10 @@ public class Match {
             if (winnerLeader != null) {
                 sendMessage(winnerLeader.getName() + (winningTeam.getSize() >= 2 ? "'s team" : "") + " has won the match!");
             }
-            TaskUtil.runTaskLater(this::teleportTeamsToSpawn, 20 * 3);
-            Budget.getInstance().getMatchStorage().getMatches().remove(this);
+            TaskUtil.runTaskLater(() -> {
+                this.teleportTeamsToSpawn();
+                Budget.getInstance().getMatchStorage().getMatches().remove(this);
+            }, 20 * 3);
         } else {
             throw new IllegalStateException("Match is not in progress.");
         }
@@ -182,6 +184,7 @@ public class Match {
                     Budget.getInstance().getLobbyStorage().bringToLobby(player);
                 }
             }
+
         }, 1L);
     }
 

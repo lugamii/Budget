@@ -6,12 +6,15 @@ import lombok.Setter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-@Getter @Setter
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
 public class DrinkHelpService {
 
     private final DrinkCommandService commandService;
@@ -21,22 +24,36 @@ public class DrinkHelpService {
         this.commandService = commandService;
         this.helpFormatter = (sender, container) -> {
             sender.sendMessage(CC.CHAT_BAR);
-            sender.sendMessage(CC.translate("&c" + commandService.getPlugin().getName() + " &7» &c" + StringUtils.capitalize(container.getName()) + " &7Commands"));
-            sender.sendMessage(CC.CHAT_BAR);
+            List<DrinkCommand> commands = new ArrayList<>();
             if (!(sender instanceof Player)) {
                 for (DrinkCommand c : container.getCommands().values()) {
-                    sender.sendMessage(CC.translate(" &7* &c/" + container.getName() + (!c.getName().isEmpty() ? " &c" + c.getName() : "") + " &8<&7" + c.getMostApplicableUsage() + "&8> &8(&7&o" + c.getDescription() + "&8)"));
+                    if (!sender.hasPermission(c.getPermission())) continue;
+                    else {
+                        sender.sendMessage(CC.translate(" &7* &c/" + container.getName() + (!c.getName().isEmpty() ? " &c" + c.getName() : "") + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)"));
+                        commands.add(c);
+                    }
+
+                    if (commands.isEmpty()) {
+                        sender.sendMessage(CC.translate("&cYou don't have permissions for any of the commands here."));
+                    }
                 }
                 return;
             }
-            for (DrinkCommand c : container.getCommands().values()) {
-                TextComponent msg = new TextComponent(net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
-                        " &7* &c/" + container.getName() + (!c.getName().isEmpty() ? " &c" + c.getName() : "") + " &8<&7" + c.getMostApplicableUsage() + "&8> &8(&7&o" + c.getDescription() + "&8)"));
-                msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.GRAY + "/" + container.getName() + " " + c.getName() + " - " + ChatColor.WHITE + c.getDescription())));
-                msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + container.getName() + " " + c.getName()));
 
+            for (DrinkCommand c : container.getCommands().values()) {
                 Player player = (Player) sender;
-                player.spigot().sendMessage(msg);
+                if (!player.hasPermission(c.getPermission())) continue;
+                else {
+                    TextComponent msg = new TextComponent(net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
+                            " &7* &c/" + container.getName() + (!c.getName().isEmpty() ? " &c" + c.getName() : "") + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)"));
+                    msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.GRAY + "/" + container.getName() + " " + c.getName() + " - " + ChatColor.WHITE + c.getDescription())));
+                    msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + container.getName() + " " + c.getName()));
+                    player.spigot().sendMessage(msg);
+                    commands.add(c);
+                }
+                if (commands.isEmpty()) {
+                    player.sendMessage(CC.translate("&cYou don't have permissions for any of the commands here."));
+                }
             }
             sender.sendMessage(CC.CHAT_BAR);
         };
