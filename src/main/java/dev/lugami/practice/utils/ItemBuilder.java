@@ -19,6 +19,7 @@ import java.util.List;
 public class ItemBuilder {
 
     private final ItemStack itemStack;
+    private final boolean unbreakable;
 
     /**
      * Constructs an ItemBuilder with the given Material.
@@ -27,6 +28,7 @@ public class ItemBuilder {
      */
     public ItemBuilder(Material material) {
         this.itemStack = new ItemStack(material);
+        this.unbreakable = false;
     }
 
     /**
@@ -36,6 +38,29 @@ public class ItemBuilder {
      */
     public ItemBuilder(ItemStack itemStack) {
         this.itemStack = itemStack;
+        this.unbreakable = false;
+    }
+
+    /**
+     * Constructs an ItemBuilder with the given Material.
+     *
+     * @param material The material type of the ItemStack to create.
+     * @param unbreak If it's unbreakable or not
+     */
+    public ItemBuilder(Material material, boolean unbreak) {
+        this.itemStack = new ItemStack(material);
+        this.unbreakable = unbreak;
+    }
+
+    /**
+     * Constructs an ItemBuilder with an existing ItemStack.
+     *
+     * @param itemStack The ItemStack to modify.
+     * @param unbreak If it's unbreakable or not
+     */
+    public ItemBuilder(ItemStack itemStack, boolean unbreak) {
+        this.itemStack = itemStack;
+        this.unbreakable = unbreak;
     }
 
     /**
@@ -180,6 +205,11 @@ public class ItemBuilder {
      * @return The constructed ItemStack.
      */
     public ItemStack build() {
+        if (itemStack.getType() != Material.AIR) {
+            ItemMeta meta = getItemMeta();
+            meta.spigot().setUnbreakable(unbreakable);
+            itemStack.setItemMeta(meta);
+        }
         return itemStack;
     }
 

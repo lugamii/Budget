@@ -15,15 +15,27 @@ public class ArenaStorage {
 
     private final List<Arena> arenas = new ArrayList<>();
 
+    /**
+     * Constructor that initializes the arena storage and loads arenas from the configuration.
+     */
     public ArenaStorage() {
-        load();
+        loadArenas();
     }
 
+    /**
+     * Finds an arena by its name.
+     *
+     * @param name The name of the arena.
+     * @return The found arena, or null if not found.
+     */
     public Arena getByName(String name) {
-        return arenas.stream().filter(kit -> kit.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return this.arenas.stream().filter(kit -> kit.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
-    public void load() {
+    /**
+     * Loads arenas from the configuration file.
+     */
+    public void loadArenas() {
         YamlConfiguration config = Budget.getInstance().getArenaConfig();
         for (String key : config.getKeys(false)) {
             String path = key + ".";
@@ -38,7 +50,10 @@ public class ArenaStorage {
         }
     }
 
-    public void save() {
+    /**
+     * Saves the current arenas to the configuration file.
+     */
+    public void saveArenas() {
         YamlConfiguration config = Budget.getInstance().getArenaConfig();
         for (Arena arena : this.arenas) {
             String path = arena.getName() + ".";
@@ -51,5 +66,4 @@ public class ArenaStorage {
         }
         ConfigUtil.saveConfig(config, "arenas");
     }
-
 }

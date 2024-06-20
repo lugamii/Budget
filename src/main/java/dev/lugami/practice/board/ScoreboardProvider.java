@@ -5,6 +5,7 @@ import dev.lugami.practice.match.Match;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.TimeUtils;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -29,6 +30,12 @@ public class ScoreboardProvider implements AssembleAdapter {
                 case LOBBY:
                     for (String line : Budget.getInstance().getScoreboardConfig().getStringList("LOBBY")) {
                         line = line.replace("<online>", "" + Bukkit.getOnlinePlayers().size()).replace("<fighting>", "" + Budget.getInstance().getMatchStorage().getInFights());
+                        lines.add(line);
+                    }
+                    break;
+                case QUEUEING:
+                    for (String line : Budget.getInstance().getScoreboardConfig().getStringList("QUEUEING")) {
+                        line = line.replace("<online>", "" + Bukkit.getOnlinePlayers().size()).replace("<fighting>", "" + Budget.getInstance().getMatchStorage().getInFights()).replace("<queue>", Budget.getInstance().getQueueStorage().findQueue(player).getKit().getName()).replace("<elapsed>", Budget.getInstance().getQueueStorage().findQueue(player).getDuration(player));
                         lines.add(line);
                     }
                     break;

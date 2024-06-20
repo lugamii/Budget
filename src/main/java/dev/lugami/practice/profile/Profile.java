@@ -2,6 +2,7 @@ package dev.lugami.practice.profile;
 
 import dev.lugami.practice.Budget;
 import lombok.Data;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -12,6 +13,7 @@ public class Profile {
 
     private final Player player;
     private final UUID UUID;
+    @Setter
     private ProfileState state;
 
     public Profile(Player p) {

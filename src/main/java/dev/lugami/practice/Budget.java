@@ -3,8 +3,10 @@ package dev.lugami.practice;
 import dev.lugami.practice.board.ScoreboardProvider;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.storage.*;
+import dev.lugami.practice.task.MatchSnapshotTask;
 import dev.lugami.practice.utils.ClassUtils;
 import dev.lugami.practice.utils.ConfigUtil;
+import dev.lugami.practice.utils.TaskUtil;
 import dev.lugami.practice.utils.command.Drink;
 import dev.lugami.practice.utils.command.command.CommandService;
 import io.github.thatkawaiisam.assemble.Assemble;
@@ -12,11 +14,15 @@ import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-@Getter @Setter
+@Getter
+@Setter
 public class Budget extends JavaPlugin {
 
     @Getter
@@ -27,6 +33,8 @@ public class Budget extends JavaPlugin {
     private KitStorage kitStorage;
     private ArenaStorage arenaStorage;
     private MatchStorage matchStorage;
+    private HotbarStorage hotbarStorage;
+    private QueueStorage queueStorage;
     private Assemble assemble;
     private CommandService drink;
 
@@ -40,12 +48,14 @@ public class Budget extends JavaPlugin {
         this.setupListeners();
         this.setupManagers();
         this.setupCommands();
+        this.setupTasks();
+        this.clearEntities();
     }
 
     @Override
     public void onDisable() {
-        this.kitStorage.save();
-        this.arenaStorage.save();
+        this.kitStorage.saveKits();
+        this.arenaStorage.saveArenas();
         ConfigUtil.saveConfig(mainConfig);
         ConfigUtil.saveConfig(scoreboardConfig);
     }
@@ -66,6 +76,8 @@ public class Budget extends JavaPlugin {
         this.kitStorage = new KitStorage();
         this.arenaStorage = new ArenaStorage();
         this.matchStorage = new MatchStorage();
+        this.hotbarStorage = new HotbarStorage();
+        this.queueStorage = new QueueStorage();
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
         this.assemble.setAssembleStyle(AssembleStyle.MODERN);
@@ -82,5 +94,20 @@ public class Budget extends JavaPlugin {
             }
         }
         drink.registerCommands();
+    }
+
+    public void clearEntities() {
+        TaskUtil.runTaskAsynchronously(() -> {
+            for (World world : Bukkit.getWorlds()) {
+                for (Entity entity : world.getEntities()) {
+                    if (entity.getType() == EntityType.PLAYER) return;
+                    entity.remove();
+                }
+            }
+        });
+    }
+
+    private void setupTasks() {
+        TaskUtil.runTaskTimer(new MatchSnapshotTask(), 0, 2);
     }
 }

@@ -15,15 +15,27 @@ public class KitStorage {
 
     private final List<Kit> kits = new ArrayList<>();
 
+    /**
+     * Constructor that initializes the kit storage and loads kits from the configuration.
+     */
     public KitStorage() {
-        load();
+        loadKits();
     }
 
+    /**
+     * Finds a kit by its name.
+     *
+     * @param name The name of the kit.
+     * @return The found kit, or null if not found.
+     */
     public Kit getByName(String name) {
-        return kits.stream().filter(kit -> kit.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return this.kits.stream().filter(kit -> kit.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
-    public void load() {
+    /**
+     * Loads kits from the configuration file.
+     */
+    public void loadKits() {
         YamlConfiguration config = Budget.getInstance().getKitConfig();
         for (String key : config.getKeys(false)) {
             String path = key + ".";
@@ -36,7 +48,10 @@ public class KitStorage {
         }
     }
 
-    public void save() {
+    /**
+     * Saves the current kits to the configuration file.
+     */
+    public void saveKits() {
         YamlConfiguration config = Budget.getInstance().getKitConfig();
         for (Kit kit : this.kits) {
             String path = kit.getName() + ".";
@@ -47,5 +62,4 @@ public class KitStorage {
         }
         ConfigUtil.saveConfig(config, "kits");
     }
-
 }

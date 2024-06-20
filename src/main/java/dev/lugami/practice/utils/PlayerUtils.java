@@ -31,9 +31,7 @@ public class PlayerUtils {
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setSaturation(20f);
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.removePotionEffect(effect.getType());
-        }
+        for (PotionEffect effect : player.getActivePotionEffects()) player.removePotionEffect(effect.getType());
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.updateInventory();
@@ -94,9 +92,16 @@ public class PlayerUtils {
         }
     }
 
-    public void respawnPlayer(Player paramPlayer) {
-        if (paramPlayer.isDead()) {
-            ((CraftPlayer) paramPlayer).getHandle().playerConnection.a(new PacketPlayInClientCommand(PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN));
+    /**
+     * Respawns a given player.
+     *
+     * @param player The player to be respawned
+     */
+    public void respawnPlayer(Player player) {
+        if (player.isDead()) {
+            ((CraftPlayer) player).getHandle().playerConnection.a(
+                    new PacketPlayInClientCommand(PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN)
+            );
         }
     }
 }

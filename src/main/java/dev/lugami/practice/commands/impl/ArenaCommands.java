@@ -32,7 +32,7 @@ public class ArenaCommands extends CommandBase {
             return;
         }
         Budget.getInstance().getArenaStorage().getArenas().remove(arena);
-        Budget.getInstance().getArenaStorage().save();
+        Budget.getInstance().getArenaStorage().saveArenas();
         player.sendMessage(CC.translate("&aSuccessfully deleted the arena " + name + "!"));
     }
 
@@ -120,7 +120,7 @@ public class ArenaCommands extends CommandBase {
     @Command(name = "save", desc = "Saves all arenas.")
     @Require("budget.arena.save")
     public void save(@Sender Player player) {
-        Budget.getInstance().getArenaStorage().save();
+        Budget.getInstance().getArenaStorage().saveArenas();
         player.sendMessage(CC.translate("&aSuccessfully saved all arenas!"));
     }
 

@@ -2,6 +2,7 @@ package dev.lugami.practice.listeners;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.profile.Profile;
+import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.PlayerUtils;
 import dev.lugami.practice.utils.TaskUtil;
@@ -38,7 +39,13 @@ public class ProfileListener implements Listener {
         event.setQuitMessage(null);
         Player player = event.getPlayer();
         if (Budget.getInstance().getProfileStorage().findProfile(player) == null) return;
-        Budget.getInstance().getProfileStorage().getProfiles().remove(Budget.getInstance().getProfileStorage().findProfile(player));
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (profile.getState() == ProfileState.QUEUEING) {
+            if (Budget.getInstance().getQueueStorage().findQueue(player) != null) {
+                Budget.getInstance().getQueueStorage().findQueue(player).remove(player);
+            }
+        }
+        Budget.getInstance().getProfileStorage().getProfiles().remove(profile);
         TaskUtil.runTaskLater(() -> {
             if (Budget.getInstance().getMainConfig().getBoolean("debug")) {
                 for (Player player1 : Bukkit.getOnlinePlayers()) {
@@ -80,5 +87,7 @@ public class ProfileListener implements Listener {
             }
         }
     }
+
+
 
 }

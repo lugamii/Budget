@@ -31,7 +31,7 @@ public class KitCommands extends CommandBase {
             return;
         }
         Budget.getInstance().getKitStorage().getKits().remove(kit);
-        Budget.getInstance().getKitStorage().save();
+        Budget.getInstance().getKitStorage().saveKits();
         player.sendMessage(CC.translate("&aSuccessfully deleted the kit " + name + "!"));
     }
 
@@ -88,7 +88,7 @@ public class KitCommands extends CommandBase {
     @Command(name = "save", desc = "Saves all kits.")
     @Require("budget.kit.save")
     public void save(@Sender Player player) {
-        Budget.getInstance().getKitStorage().save();
+        Budget.getInstance().getKitStorage().saveKits();
         player.sendMessage(CC.translate("&aSuccessfully saved all kits!"));
     }
 }

@@ -6,6 +6,17 @@ LOBBY:
   - ""
   - "&blugami.dev/budget"
   - "&7&m----------------------"
+QUEUEING:
+  - "&7&m----------------------"
+  - "&fOnline: &b<online>"
+  - "&fFighting: &b<fighting>"
+  - ""
+  - "&bQueue:"
+  - "<queue>"
+  - "Time: &b<elapsed>"
+  - ""
+  - "&blugami.dev/budget"
+  - "&7&m----------------------"
 MATCH-WAITING:
   - "&7&m----------------------"
   - "&fWaiting..."
