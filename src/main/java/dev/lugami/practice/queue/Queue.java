@@ -37,8 +37,10 @@ public class Queue {
 
     public void remove(Player player) {
         if (this.players.contains(player)) {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
             this.players.remove(player);
             this.addedOn.remove(player);
+            profile.setState(ProfileState.LOBBY);
             Budget.getInstance().getHotbarStorage().resetHotbar(player);
             player.sendMessage(CC.translate("&cYou have been removed from the " + kit.getName() + " queue."));
         } else {

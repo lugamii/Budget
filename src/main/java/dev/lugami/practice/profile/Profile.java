@@ -1,6 +1,7 @@
 package dev.lugami.practice.profile;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.utils.Cooldown;
 import lombok.Data;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -13,13 +14,14 @@ public class Profile {
 
     private final Player player;
     private final UUID UUID;
-    @Setter
     private ProfileState state;
+    private Cooldown enderpearlCooldown;
 
     public Profile(Player p) {
         this.player = p;
         this.UUID = p.getUniqueId();
         this.state = ProfileState.LOBBY;
+        this.enderpearlCooldown = new Cooldown(0);
         Budget.getInstance().getProfileStorage().getProfiles().add(this);
     }
 
@@ -27,6 +29,7 @@ public class Profile {
         this.player = Bukkit.getPlayer(u);
         this.UUID = u;
         this.state = ProfileState.LOBBY;
+        this.enderpearlCooldown = new Cooldown(0);
         Budget.getInstance().getProfileStorage().getProfiles().add(this);
     }
 
@@ -34,6 +37,7 @@ public class Profile {
         this.player = p;
         this.UUID = u;
         this.state = ProfileState.LOBBY;
+        this.enderpearlCooldown = new Cooldown(0);
         Budget.getInstance().getProfileStorage().getProfiles().add(this);
     }
 

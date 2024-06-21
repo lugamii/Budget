@@ -2,6 +2,7 @@ package dev.lugami.practice.storage;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.arena.Arena;
+import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.utils.ConfigUtil;
 import dev.lugami.practice.utils.LocationUtil;
 import lombok.Getter;
@@ -9,6 +10,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Getter
 public class ArenaStorage {
@@ -31,6 +35,27 @@ public class ArenaStorage {
     public Arena getByName(String name) {
         return this.arenas.stream().filter(kit -> kit.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
+
+    /**
+     * Gets a random arena from the list.
+     *
+     * @return The found arena
+     */
+    public Arena getRandomArena() {
+        return this.arenas.get(ThreadLocalRandom.current().nextInt(this.arenas.size()));
+    }
+
+    /**
+     * Gets a random arena from the list, with a given kit.
+     *
+     * @param kit The kit to check for
+     * @return The found arena
+     */
+    public Arena getRandomArena(Kit kit) {
+        List<Arena> arenas1 = this.arenas.stream().filter(arena -> arena.getWhitelistedKits().contains(kit.getName())).collect(Collectors.toList());
+        return arenas1.get(ThreadLocalRandom.current().nextInt(this.arenas.size()));
+    }
+
 
     /**
      * Loads arenas from the configuration file.

@@ -92,6 +92,7 @@ public class Match {
      */
     public void start() {
         Budget.getInstance().getMatchStorage().getMatches().add(this);
+        sendMessage(ChatColor.GOLD + "A duel between " + team1.getLeader().getName() + (team1.getSize() >= 2 ? "'s team" : "") + " and " + team2.getLeader().getName() + (team2.getSize() >= 2 ? "'s team" : "") + " is starting!");
         if (state == MatchState.WAITING) {
             state = MatchState.COUNTDOWN;
             teleportTeamsToArena();

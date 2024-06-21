@@ -7,11 +7,10 @@ import dev.lugami.practice.match.Team;
 import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.utils.CC;
-import dev.lugami.practice.utils.Clickable;
-import dev.lugami.practice.utils.PlayerUtils;
+import dev.lugami.practice.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +18,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -39,6 +39,26 @@ public class MatchListener implements Listener {
             Team team = match.getTeam(player);
             match.end(match.getOpponent(team));
             event.getDrops().clear();
+        }
+    }
+
+    @EventHandler
+    public void onEnderPearl(ProjectileLaunchEvent event) {
+        if (!(event.getEntity().getShooter() instanceof Player) || !(event.getEntity() instanceof EnderPearl)) {
+            return;
+        }
+        EnderPearl enderPearl = (EnderPearl) event.getEntity();
+        Player player = (Player) enderPearl.getShooter();
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (profile.getState() == ProfileState.FIGHTING) {
+            if (!profile.getEnderpearlCooldown().hasExpired()) {
+                event.setCancelled(true);
+                player.sendMessage(CC.translate("&cYou're still on cooldown. Remaining: " + profile.getEnderpearlCooldown().getTimeLeft()));
+                InventoryWrapper wrapper = new InventoryWrapper(player.getInventory());
+                wrapper.addItem(new ItemStack(Material.ENDER_PEARL));
+            } else {
+                profile.setEnderpearlCooldown(new Cooldown(15_000));
+            }
         }
     }
 

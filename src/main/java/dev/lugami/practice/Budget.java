@@ -3,7 +3,9 @@ package dev.lugami.practice;
 import dev.lugami.practice.board.ScoreboardProvider;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.storage.*;
+import dev.lugami.practice.task.MatchEnderpearlTask;
 import dev.lugami.practice.task.MatchSnapshotTask;
+import dev.lugami.practice.task.QueueTask;
 import dev.lugami.practice.utils.ClassUtils;
 import dev.lugami.practice.utils.ConfigUtil;
 import dev.lugami.practice.utils.TaskUtil;
@@ -14,12 +16,16 @@ import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -49,7 +55,8 @@ public class Budget extends JavaPlugin {
         this.setupManagers();
         this.setupCommands();
         this.setupTasks();
-        this.clearEntities();
+        this.setupGameRules();
+        TaskUtil.runTaskLater(this::clearItems, 20 * 5);
     }
 
     @Override
@@ -96,18 +103,30 @@ public class Budget extends JavaPlugin {
         drink.registerCommands();
     }
 
-    public void clearEntities() {
-        TaskUtil.runTaskAsynchronously(() -> {
-            for (World world : Bukkit.getWorlds()) {
-                for (Entity entity : world.getEntities()) {
-                    if (entity.getType() == EntityType.PLAYER) return;
-                    entity.remove();
-                }
-            }
-        });
+    public void clearItems() {
+        int i = 0;
+
+        World world = getServer().getWorld("world");
+        List<Entity> entities = world.getEntities();
+
+        for (Entity entity : entities) {
+            entity.remove();
+            i = i + 1;
+        }
+
+        getLogger().info("Cleared up " + i + " entities!");
     }
 
     private void setupTasks() {
-        TaskUtil.runTaskTimer(new MatchSnapshotTask(), 0, 2);
+        TaskUtil.runTaskTimerAsynchronously(new MatchSnapshotTask(), 0, 2);
+        TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
+        TaskUtil.runTaskTimerAsynchronously(new MatchEnderpearlTask(), 0, 2);
+    }
+
+    private void setupGameRules() {
+        getServer().getWorlds().forEach(world -> {
+            world.setGameRuleValue("doMobSpawning", "false");
+            world.setGameRuleValue("doDaylightCycle", "false");
+        });
     }
 }

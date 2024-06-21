@@ -18,6 +18,7 @@ public class HotbarListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (event.getItem() == null) return;
         if (profile.getState() == ProfileState.LOBBY || profile.getState() == ProfileState.QUEUEING) {
             Budget.getInstance().getHotbarStorage().getByState(profile.getState()).forEach(hotbarItem -> {
                 if (event.getItem().isSimilar(hotbarItem.getItemStack()) && event.getAction().name().contains("RIGHT_")) {

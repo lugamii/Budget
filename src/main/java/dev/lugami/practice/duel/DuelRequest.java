@@ -58,7 +58,6 @@ public class DuelRequest {
                 match.addPlayerToTeam1(requester);
                 match.addPlayerToTeam2(target);
                 match.start();
-                match.sendMessage(ChatColor.GOLD + "A duel between " + requester.getName() + " and " + target.getName() + " is starting!");
             } else {
                 target.sendMessage(ChatColor.RED + "The requester is no longer online.");
             }
