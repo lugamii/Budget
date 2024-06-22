@@ -51,6 +51,8 @@ public class Profile {
         } else {
             Document options = (Document) document.get("options");
             this.profileOptions.getSettingsMap().put(Setting.SCOREBOARD, options.getBoolean("showScoreboard"));
+            this.profileOptions.getSettingsMap().put(Setting.DUEL_REQUESTS, options.getBoolean("duelRequests"));
+            this.profileOptions.getSettingsMap().put(Setting.ARENA_SELECTOR, options.getBoolean("arenaSelector"));
         }
     }
 
@@ -60,6 +62,8 @@ public class Profile {
 
         Document optionsDocument = new Document();
         optionsDocument.put("showScoreboard", profileOptions.getSettingsMap().get(Setting.SCOREBOARD));
+        optionsDocument.put("duelRequests", profileOptions.getSettingsMap().get(Setting.DUEL_REQUESTS));
+        optionsDocument.put("arenaSelector", profileOptions.getSettingsMap().get(Setting.ARENA_SELECTOR));
         document.put("options", optionsDocument);
 
         collection.replaceOne(Filters.eq("uuid", this.UUID.toString()), document, new ReplaceOptions().upsert(true));
