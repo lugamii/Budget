@@ -50,9 +50,9 @@ public class Profile {
             this.save();
         } else {
             Document options = (Document) document.get("options");
-            this.profileOptions.getSettingsMap().put(Setting.SCOREBOARD, options.getBoolean("showScoreboard"));
-            this.profileOptions.getSettingsMap().put(Setting.DUEL_REQUESTS, options.getBoolean("duelRequests"));
-            this.profileOptions.getSettingsMap().put(Setting.ARENA_SELECTOR, options.getBoolean("arenaSelector"));
+            this.profileOptions.getSettingsMap().put(Setting.SCOREBOARD, (boolean) options.getOrDefault("showScoreboard", Setting.SCOREBOARD.isDefaultToggled()));
+            this.profileOptions.getSettingsMap().put(Setting.DUEL_REQUESTS, (boolean) options.getOrDefault("duelRequests", Setting.DUEL_REQUESTS.isDefaultToggled()));
+            this.profileOptions.getSettingsMap().put(Setting.ARENA_SELECTOR, (boolean) options.getOrDefault("arenaSelector", Setting.ARENA_SELECTOR.isDefaultToggled()));
         }
     }
 
