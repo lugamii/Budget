@@ -9,11 +9,12 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class QueueStorage {
 
-    private final List<Queue> queues = new ArrayList<>();
+    private final List<Queue> queues = new CopyOnWriteArrayList<>();
 
     /**
      * Constructor that initializes the queue storage and loads queues from kits.

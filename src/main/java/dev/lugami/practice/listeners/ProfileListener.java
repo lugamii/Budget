@@ -46,6 +46,7 @@ public class ProfileListener implements Listener {
             }
         }
         Budget.getInstance().getProfileStorage().getProfiles().remove(profile);
+        profile.save();
         TaskUtil.runTaskLater(() -> {
             if (Budget.getInstance().getMainConfig().getBoolean("debug")) {
                 for (Player player1 : Bukkit.getOnlinePlayers()) {

@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class LobbyListener implements Listener {
@@ -41,6 +42,16 @@ public class LobbyListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if (event.getPlayer().getGameMode() != GameMode.CREATIVE || !event.getPlayer().isOp()) event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
+        Player player = (Player) event.getEntity();
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (profile.getState() == ProfileState.LOBBY) {
+            event.setFoodLevel(20);
+            event.setCancelled(true);
+        }
     }
 
 }

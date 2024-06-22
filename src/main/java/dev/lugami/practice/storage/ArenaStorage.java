@@ -11,13 +11,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Getter
 public class ArenaStorage {
 
-    private final List<Arena> arenas = new ArrayList<>();
+    private final List<Arena> arenas = new CopyOnWriteArrayList<>();
 
     /**
      * Constructor that initializes the arena storage and loads arenas from the configuration.

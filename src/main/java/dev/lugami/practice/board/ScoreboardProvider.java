@@ -3,9 +3,7 @@ package dev.lugami.practice.board;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.Match;
 import dev.lugami.practice.profile.Profile;
-import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.utils.CC;
-import dev.lugami.practice.utils.TimeUtils;
+import dev.lugami.practice.settings.Setting;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,6 +24,9 @@ public class ScoreboardProvider implements AssembleAdapter {
         if (profile == null) {
             lines.add("&fYour profile was not loaded");
         } else {
+            if (!profile.getProfileOptions().getSettingsMap().get(Setting.SCOREBOARD)) {
+                return new ArrayList<>();
+            }
             switch (profile.getState()) {
                 case LOBBY:
                     for (String line : Budget.getInstance().getScoreboardConfig().getStringList("LOBBY")) {

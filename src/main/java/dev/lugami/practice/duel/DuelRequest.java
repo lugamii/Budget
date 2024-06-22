@@ -4,6 +4,7 @@ import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.match.Match;
 import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.Clickable;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -39,22 +40,24 @@ public class DuelRequest {
         DuelRequest duelRequest = new DuelRequest(requester, target, kit, arena);
         duelRequests.put(target.getUniqueId(), duelRequest);
         requester.sendMessage(CC.translate("&aDuel request sent successfully to " + target.getName() + " on arena " + arena.getName() + " with kit " + kit.getName() + "!"));
-        target.sendMessage(ChatColor.GREEN + requester.getName() + " has challenged you to a duel with kit " + kit.getName() + " in arena " + arena.getName() + ".");
-        target.sendMessage(ChatColor.YELLOW + "Type /duel accept to accept the duel or /duel decline to decline the duel.");
+        target.sendMessage(CC.translate("&b" + requester.getName() + " &fhas challenged you to a duel with kit &b" + kit.getName() + " &fin arena &b" + arena.getName() + "."));
+        Clickable clickable = new Clickable();
+        clickable.add("&a[Click to accept]", "&aClick to accept " + requester.getName() + "'s duel!", "/duel accept");
+        clickable.add(" &for ");
+        clickable.add("&c[Click to decline]", "&cClick to decline " + requester.getName() + "'s duel!", "/duel decline");
+        clickable.sendToPlayer(target);
     }
 
     /**
      * Accepts a duel request and starts the match if the request is valid and not expired.
      */
     public void acceptDuelRequest() {
-        DuelRequest duelRequest = duelRequests.remove(target.getUniqueId());
-
-        if (duelRequest != null && System.currentTimeMillis() - duelRequest.getRequestTime() < 30000) { // Request is valid for 60 seconds
-            Player requester = duelRequest.getRequester();
-            Player target = duelRequest.getTarget();
+        if (System.currentTimeMillis() - getRequestTime() < 30000) { // Request is valid for 60 seconds
+            Player requester = getRequester();
+            Player target = getTarget();
 
             if (requester != null) {
-                Match match = new Match(duelRequest.getKit(), duelRequest.getArena());
+                Match match = new Match(getKit(), getArena());
                 match.addPlayerToTeam1(requester);
                 match.addPlayerToTeam2(target);
                 match.start();
@@ -71,17 +74,11 @@ public class DuelRequest {
      * Declines a duel request and notifies both players.
      */
     public void declineDuelRequest() {
-        DuelRequest duelRequest = duelRequests.remove(target.getUniqueId());
-
-        if (duelRequest != null) {
-            Player requester = duelRequest.getRequester();
-            if (requester != null) {
-                requester.sendMessage(ChatColor.RED + target.getName() + " has declined your duel request.");
-            }
-            target.sendMessage(ChatColor.GREEN + "You have declined the duel request from " + (requester != null ? requester.getName() : "someone") + ".");
-        } else {
-            target.sendMessage(ChatColor.RED + "You have no duel requests to decline.");
+        Player requester = getRequester();
+        if (requester != null) {
+            requester.sendMessage(ChatColor.RED + target.getName() + " has declined your duel request.");
         }
+        target.sendMessage(ChatColor.GREEN + "You have declined the duel request from " + (requester != null ? requester.getName() : "someone") + ".");
     }
 
     /**

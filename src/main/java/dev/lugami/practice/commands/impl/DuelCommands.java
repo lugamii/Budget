@@ -6,6 +6,8 @@ import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.duel.DuelRequest;
 import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.menus.DuelKitMenu;
+import dev.lugami.practice.profile.Profile;
+import dev.lugami.practice.settings.Setting;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.command.annotation.Command;
@@ -30,7 +32,17 @@ public class DuelCommands extends CommandBase {
             p1.sendMessage(CC.translate("&cYou cannot duel yourself!"));
             return;
         }
-        new DuelKitMenu(target).open(p1);
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(target);
+        if (!profile.getProfileOptions().getSettingsMap().get(Setting.DUEL_REQUESTS)) {
+            p1.sendMessage(CC.translate("&cThis player is not accepting duel requests."));
+            return;
+        }
+
+        if (!profile.isBusy()) {
+            new DuelKitMenu(target).open(p1);
+        } else {
+            p1.sendMessage(CC.translate("&c" + target.getName() + " is not in lobby."));
+        }
     }
 
     @Command(name = "accept", desc = "Accepts a duel")

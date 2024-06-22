@@ -9,7 +9,6 @@ import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -28,6 +27,17 @@ public class PlayerUtils {
      * @param player The player to reset.
      */
     public void resetPlayer(Player player) {
+        resetPlayer(player, true);
+    }
+
+    /**
+     * Resets a player's state to the default.
+     *
+     * @param player The player to reset.
+     * @param show If we should show the player after resetting him or
+     *             keep his visibility state.
+     */
+    public void resetPlayer(Player player, boolean show) {
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setSaturation(20f);
@@ -46,6 +56,7 @@ public class PlayerUtils {
         player.setMaximumNoDamageTicks(20);
         player.setNoDamageTicks(0);
         player.setRemainingAir(player.getMaximumAir());
+        if (show) showPlayer(player);
     }
 
     /**
@@ -102,6 +113,32 @@ public class PlayerUtils {
             ((CraftPlayer) player).getHandle().playerConnection.a(
                     new PacketPlayInClientCommand(PacketPlayInClientCommand.EnumClientCommand.PERFORM_RESPAWN)
             );
+        }
+    }
+
+    /**
+     * Hides a player from all other players.
+     *
+     * @param player The player to hide.
+     */
+    public void hidePlayer(Player player) {
+        for (Player other : Bukkit.getOnlinePlayers()) {
+            if (!other.equals(player)) {
+                other.hidePlayer(player);
+            }
+        }
+    }
+
+    /**
+     * Shows a player to all other players.
+     *
+     * @param player The player to show.
+     */
+    public void showPlayer(Player player) {
+        for (Player other : Bukkit.getOnlinePlayers()) {
+            if (!other.equals(player)) {
+                other.showPlayer(player);
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Item;
@@ -22,21 +23,30 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
 
 public class MatchListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
+        Location location = player.getLocation().clone();
         event.setDeathMessage(null);
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (profile.getState() == ProfileState.FIGHTING) {
-            Match match = Budget.getInstance().getMatchStorage().findMatch(player);
-            MatchSnapshot snap = new MatchSnapshot(player, player.getInventory().getArmorContents(), player.getInventory().getContents());
-            Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
+            player.setHealth(20);
             PlayerUtils.respawnPlayer(player);
-            PlayerUtils.resetPlayer(player);
+            player.setFireTicks(0);
+            PlayerUtils.hidePlayer(player);
+            Match match = Budget.getInstance().getMatchStorage().findMatch(player);
             Team team = match.getTeam(player);
+            MatchSnapshot snap = new MatchSnapshot(player, match.getOpponent(team).getLeader(), player.getInventory().getArmorContents(), player.getInventory().getContents());
+            Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
+            player.setVelocity(new Vector());
+            player.teleport(location);
+            PlayerUtils.resetPlayer(player, false);
             match.end(match.getOpponent(team));
             event.getDrops().clear();
         }

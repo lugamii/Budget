@@ -12,11 +12,15 @@ public class MatchEnderpearlTask extends BukkitRunnable {
     @Override
     public void run() {
         for (Player player : Budget.getInstance().getServer().getOnlinePlayers()) {
-            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-            if (profile.getState() == ProfileState.FIGHTING) {
-                handleFightingPlayer(player, profile);
-            } else {
-                resetPlayerCooldownDisplay(player);
+            try {
+                Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+                if (profile.getState() == ProfileState.FIGHTING) {
+                    handleFightingPlayer(player, profile);
+                } else {
+                    resetPlayerCooldownDisplay(player);
+                }
+            } catch (Exception ex) {
+                return;
             }
         }
     }

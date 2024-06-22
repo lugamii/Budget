@@ -3,6 +3,7 @@ package dev.lugami.practice.storage;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.hotbar.HotbarItem;
 import dev.lugami.practice.menus.QueueMenu;
+import dev.lugami.practice.menus.settings.SettingsMenu;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.Queue;
@@ -29,7 +30,7 @@ public class HotbarStorage {
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.EMERALD, true).name("&bLeaderboards").build(), ActionUtils.UNFINISHED),
-            new HotbarItem(new ItemBuilder(Material.WATCH, true).name("&bSettings").build(), ActionUtils.UNFINISHED)
+            new HotbarItem(new ItemBuilder(Material.WATCH, true).name("&bSettings").build(), player -> new SettingsMenu(player).open(player))
     );
 
     private final List<HotbarItem> queueItems = Arrays.asList(

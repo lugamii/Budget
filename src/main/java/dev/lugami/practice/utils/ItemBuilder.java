@@ -101,7 +101,7 @@ public class ItemBuilder {
             coloredLore = new ArrayList<>();
         }
 
-        coloredLore.addAll(Arrays.asList(lore));
+        coloredLore.addAll(CC.translate(Arrays.asList(lore)));
         meta.setLore(coloredLore);
         itemStack.setItemMeta(meta);
         return this;
@@ -121,7 +121,7 @@ public class ItemBuilder {
             coloredLore = new ArrayList<>();
         }
 
-        coloredLore.addAll(lore);
+        coloredLore.addAll(CC.translate(lore));
         meta.setLore(coloredLore);
         itemStack.setItemMeta(meta);
         return this;

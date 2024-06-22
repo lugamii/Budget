@@ -1,5 +1,10 @@
 package dev.lugami.practice;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoDatabase;
 import dev.lugami.practice.board.ScoreboardProvider;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.storage.*;
@@ -16,16 +21,9 @@ import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -43,6 +41,7 @@ public class Budget extends JavaPlugin {
     private QueueStorage queueStorage;
     private Assemble assemble;
     private CommandService drink;
+    private MongoDatabase mongoDatabase;
 
     @Override
     public void onEnable() {
@@ -56,7 +55,7 @@ public class Budget extends JavaPlugin {
         this.setupCommands();
         this.setupTasks();
         this.setupGameRules();
-        TaskUtil.runTaskLater(this::clearItems, 20 * 5);
+        this.setupMongo();
     }
 
     @Override
@@ -103,24 +102,10 @@ public class Budget extends JavaPlugin {
         drink.registerCommands();
     }
 
-    public void clearItems() {
-        int i = 0;
-
-        World world = getServer().getWorld("world");
-        List<Entity> entities = world.getEntities();
-
-        for (Entity entity : entities) {
-            entity.remove();
-            i = i + 1;
-        }
-
-        getLogger().info("Cleared up " + i + " entities!");
-    }
-
     private void setupTasks() {
         TaskUtil.runTaskTimerAsynchronously(new MatchSnapshotTask(), 0, 2);
-        TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new MatchEnderpearlTask(), 0, 2);
+        TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
     }
 
     private void setupGameRules() {
@@ -128,5 +113,16 @@ public class Budget extends JavaPlugin {
             world.setGameRuleValue("doMobSpawning", "false");
             world.setGameRuleValue("doDaylightCycle", "false");
         });
+    }
+
+    private void setupMongo() {
+        if (mainConfig.getBoolean("mongo.auth.enabled")) {
+            MongoCredential credential = MongoCredential.createCredential(
+                    mainConfig.getString("mongo.auth.username"), "admin",
+                    mainConfig.getString("mongo.auth.password").toCharArray());
+            mongoDatabase = new MongoClient(new ServerAddress(mainConfig.getString("mongo.ip"), mainConfig.getInt("mongo.port")), credential, MongoClientOptions.builder().build()).getDatabase(mainConfig.getString("mongo.database"));
+        } else {
+            mongoDatabase = new MongoClient(mainConfig.getString("mongo.ip"), mainConfig.getInt("mongo.port")).getDatabase(mainConfig.getString("mongo.database"));
+        }
     }
 }

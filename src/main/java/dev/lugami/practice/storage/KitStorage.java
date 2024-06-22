@@ -9,11 +9,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class KitStorage {
 
-    private final List<Kit> kits = new ArrayList<>();
+    private final List<Kit> kits = new CopyOnWriteArrayList<>();
 
     /**
      * Constructor that initializes the kit storage and loads kits from the configuration.

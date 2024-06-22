@@ -1,9 +1,14 @@
 package dev.lugami.practice.profile;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.settings.ProfileSettings;
+import dev.lugami.practice.settings.Setting;
 import dev.lugami.practice.utils.Cooldown;
 import lombok.Data;
-import lombok.Setter;
+import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -12,33 +17,60 @@ import java.util.UUID;
 @Data
 public class Profile {
 
+    private static MongoCollection<Document> collection = Budget.getInstance().getMongoDatabase().getCollection("profiles");
+
     private final Player player;
     private final UUID UUID;
     private ProfileState state;
     private Cooldown enderpearlCooldown;
+    private ProfileSettings profileOptions;
 
-    public Profile(Player p) {
-        this.player = p;
-        this.UUID = p.getUniqueId();
-        this.state = ProfileState.LOBBY;
-        this.enderpearlCooldown = new Cooldown(0);
-        Budget.getInstance().getProfileStorage().getProfiles().add(this);
+    public Profile(Player player) {
+        this(player, player.getUniqueId());
     }
 
-    public Profile(UUID u) {
-        this.player = Bukkit.getPlayer(u);
-        this.UUID = u;
-        this.state = ProfileState.LOBBY;
-        this.enderpearlCooldown = new Cooldown(0);
-        Budget.getInstance().getProfileStorage().getProfiles().add(this);
+    public Profile(UUID uuid) {
+        this(Bukkit.getPlayer(uuid), uuid);
     }
 
-    public Profile(Player p, UUID u) {
-        this.player = p;
-        this.UUID = u;
+    public Profile(Player player, UUID uuid) {
+        this.player = player;
+        this.UUID = uuid;
         this.state = ProfileState.LOBBY;
         this.enderpearlCooldown = new Cooldown(0);
+        this.profileOptions = new ProfileSettings(this);
         Budget.getInstance().getProfileStorage().getProfiles().add(this);
+        load();
+    }
+
+    public void load() {
+        Document document = collection.find(Filters.eq("uuid", this.UUID.toString())).first();
+
+        if (document == null) {
+            this.save();
+        } else {
+            Document options = (Document) document.get("options");
+            this.profileOptions.getSettingsMap().put(Setting.SCOREBOARD, options.getBoolean("showScoreboard"));
+        }
+    }
+
+    public void save() {
+        Document document = new Document();
+        document.put("uuid", this.UUID.toString());
+
+        Document optionsDocument = new Document();
+        optionsDocument.put("showScoreboard", profileOptions.getSettingsMap().get(Setting.SCOREBOARD));
+        document.put("options", optionsDocument);
+
+        collection.replaceOne(Filters.eq("uuid", this.UUID.toString()), document, new ReplaceOptions().upsert(true));
+    }
+
+    public boolean isBusy() {
+        return state != ProfileState.LOBBY;
+    }
+
+    public boolean isFighting() {
+        return state == ProfileState.FIGHTING;
     }
 
 }

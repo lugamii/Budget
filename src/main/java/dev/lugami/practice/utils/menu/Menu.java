@@ -3,11 +3,13 @@ package dev.lugami.practice.utils.menu;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.InventoryWrapper;
 import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.TaskUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -67,12 +69,24 @@ public class Menu {
      * @param player the player to open the menu for
      */
     public void open(Player player) {
-        if (!player.hasPermission("budget.menu.bypass") && Budget.getInstance().getProfileStorage().findProfile(player).getState() != ProfileState.LOBBY) {
-            player.sendMessage(CC.translate("&cYou cannot do this right now."));
-            return;
+        if (this.getInventory().getSize() != 0) {
+            InventoryWrapper wrapper = new InventoryWrapper(this.getInventory());
+            wrapper.clear();
+            buttons.clear();
         }
-        player.openInventory(inventory);
-        openMenus.put(player, this);
+        this.initialize();
+        TaskUtil.runTaskLater(() -> {
+            if (!player.hasPermission("budget.menu.bypass") && Budget.getInstance().getProfileStorage().findProfile(player).getState() != ProfileState.LOBBY) {
+                player.sendMessage(CC.translate("&cYou cannot do this right now."));
+                return;
+            }
+            if (player.getOpenInventory() != null) {
+                ((CraftPlayer) player).getHandle().p();
+                openMenus.remove(player);
+            }
+            player.openInventory(inventory);
+            openMenus.put(player, this);
+        }, 1);
     }
 
     /**

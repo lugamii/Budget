@@ -1,2 +1,10 @@
 debug: false
 spawnLocation: world:0.0:0.0:0.0:0.0:0.0
+mongo:
+  ip: "127.0.0.1"
+  port: 27017
+  database: "Budget"
+  auth:
+    enabled: false
+    username: ""
+    password: ""

@@ -133,7 +133,7 @@ public class Match {
             Player winnerLeader = winningTeam.getLeader();
             if (winnerLeader != null) {
                 sendMessage(winnerLeader.getName() + (winningTeam.getSize() >= 2 ? "'s team" : "") + " has won the match!");
-                MatchSnapshot snap = new MatchSnapshot(winnerLeader, winnerLeader.getInventory().getArmorContents(), winnerLeader.getInventory().getContents());
+                MatchSnapshot snap = new MatchSnapshot(winnerLeader, getOpponent(winnerTeam).getLeader(), winnerLeader.getInventory().getArmorContents(), winnerLeader.getInventory().getContents());
                 Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
             }
             TaskUtil.runTaskLater(() -> {

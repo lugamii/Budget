@@ -5,14 +5,14 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class ProfileStorage {
 
-    private final List<Profile> profiles = new ArrayList<>();
+    private final List<Profile> profiles = new CopyOnWriteArrayList<>();
 
     /**
      * Finds a profile by the player's name.

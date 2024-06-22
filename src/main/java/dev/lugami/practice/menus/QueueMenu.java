@@ -12,9 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueueMenu extends Menu {
+
+    /**
+     * Constructs a new Menu with the specified title and size.
+     */
     public QueueMenu() {
-        super("&b", 36);
-        this.initialize();
+        super("&bQueues", 36);
     }
 
     @Override

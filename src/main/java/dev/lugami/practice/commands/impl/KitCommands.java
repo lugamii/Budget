@@ -7,6 +7,8 @@ import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.command.annotation.Command;
 import dev.lugami.practice.utils.command.annotation.Require;
 import dev.lugami.practice.utils.command.annotation.Sender;
+import dev.lugami.practice.utils.menu.Button;
+import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.entity.Player;
 
 public class KitCommands extends CommandBase {
@@ -80,8 +82,17 @@ public class KitCommands extends CommandBase {
             player.sendMessage(CC.translate("&cThat kit doesn't exist."));
             return;
         }
-        player.getInventory().setContents(kit.getInventory());
-        player.getInventory().setArmorContents(kit.getArmor());
+        try {
+            player.getInventory().setContents(kit.getInventory());
+            player.getInventory().setArmorContents(kit.getArmor());
+        } catch (IllegalArgumentException ex) {
+            Budget.getInstance().getLogger().warning("Kit has length of " + kit.getInventory().length + ", causing an error!");
+            Menu menu = new Menu(kit.getName() + "'s inventory", kit.getInventory().length);
+            for (int i = 0; i < menu.getSize(); i++) {
+                menu.setButton(i, new Button(kit.getInventory()[i]));
+            }
+            menu.open(player);
+        }
     }
 
 

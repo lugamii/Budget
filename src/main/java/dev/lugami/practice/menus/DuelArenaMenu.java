@@ -14,11 +14,13 @@ public class DuelArenaMenu extends Menu {
     private final Kit kit;
     private final Player target;
 
+    /**
+     * Constructs a new Menu with the specified title and size.
+     */
     public DuelArenaMenu(Kit kit, Player target) {
         super("&bSelect an arena", 36);
         this.kit = kit;
         this.target = target;
-        this.initialize();
     }
 
     @Override

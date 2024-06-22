@@ -3,6 +3,9 @@ package dev.lugami.practice.utils;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @UtilityClass
 public class CC {
 
@@ -23,6 +26,21 @@ public class CC {
             translator.append(c);
         }
         return translator.toString();
+    }
+
+    /**
+     * Translates color codes in a given string list.
+     * The method replaces all instances of '&' with '§', which is used by Minecraft for color codes.
+     *
+     * @param strings the list to translate
+     * @return the translated string with color codes
+     */
+    public List<String> translate(List<String> strings) {
+        List<String> list = new ArrayList<>();
+        for (String string : strings) {
+            list.add(CC.translate(string));
+        }
+        return list;
     }
 
 }

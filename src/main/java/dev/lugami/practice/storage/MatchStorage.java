@@ -11,14 +11,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class MatchStorage {
 
-    private final List<Match> matches = new ArrayList<>();
-    private final List<MatchSnapshot> snapshots = new ArrayList<>();
+    private final List<Match> matches = new CopyOnWriteArrayList<>();
+    private final List<MatchSnapshot> snapshots = new CopyOnWriteArrayList<>();
 
     /**
      * Finds a match by the unique identifier (UUID).
@@ -82,15 +84,19 @@ public class MatchStorage {
      * @return The number of players in fights.
      */
     public int getInFights(Kit kit) {
-        int i = 0;
-        for (Profile profile : Budget.getInstance().getProfileStorage().getProfiles()) {
-            if (profile.getState() == ProfileState.FIGHTING) {
-                Match match = findMatch(profile.getPlayer());
-                if (match.getKit() == kit) {
-                    i++;
+        try {
+            int i = 0;
+            for (Profile profile : Budget.getInstance().getProfileStorage().getProfiles()) {
+                if (profile.getState() == ProfileState.FIGHTING) {
+                    Match match = findMatch(profile.getPlayer());
+                    if (match.getKit() == kit) {
+                        i++;
+                    }
                 }
             }
+            return i;
+        } catch (ConcurrentModificationException ex) {
+            return matches.size() * 2;
         }
-        return i;
     }
 }

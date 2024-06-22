@@ -18,6 +18,7 @@ public class ItemUtils {
         StringBuilder builder = new StringBuilder();
 
         for (ItemStack itemStack : source) {
+            if (itemStack.getType() == Material.AIR) continue;
             builder.append(serializeItemStack(itemStack));
             builder.append(";");
         }
@@ -31,6 +32,7 @@ public class ItemUtils {
         String[] split = source.split(";");
 
         for (String piece : split) {
+            if (deserializeItemStack(piece).getType() == Material.AIR) continue;
             items.add(deserializeItemStack(piece));
         }
 
@@ -83,7 +85,8 @@ public class ItemUtils {
         if (!enchantments.isEmpty()) {
             builder.append(":e@");
             for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-                builder.append(entry.getKey().getName()).append("@").append(entry.getValue()).append(";");
+                builder.append("e@");
+                builder.append(entry.getKey().getName()).append("@").append(entry.getValue()).append(":");
             }
             // Remove the last semicolon
             builder.deleteCharAt(builder.length() - 1);

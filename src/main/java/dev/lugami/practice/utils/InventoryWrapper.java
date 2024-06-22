@@ -1,5 +1,6 @@
 package dev.lugami.practice.utils;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -9,8 +10,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
 
+@Getter
 public class InventoryWrapper {
 
+    /**
+     * -- GETTER --
+     *  Gets the underlying Bukkit inventory.
+     *
+     * @return The Bukkit inventory.
+     */
     private final Inventory inventory;
 
     /**
@@ -80,15 +88,6 @@ public class InventoryWrapper {
      */
     public ItemStack getItem(int slot) {
         return inventory.getItem(slot);
-    }
-
-    /**
-     * Gets the underlying Bukkit inventory.
-     *
-     * @return The Bukkit inventory.
-     */
-    public Inventory getInventory() {
-        return inventory;
     }
 
     /**
