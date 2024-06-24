@@ -7,6 +7,7 @@ import dev.lugami.practice.match.Team;
 import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.queue.QueueType;
 import dev.lugami.practice.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -99,17 +100,49 @@ public class MatchListener implements Listener {
 
     @EventHandler
     public void onMatchEnd(MatchEndEvent event) {
-        Clickable inventories = getClickable(event);
-        event.getWinner().sendMessage("");
-        event.getWinner().sendMessage(CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : "")));
-        event.getWinner().doAction(inventories::sendToPlayer);
-        event.getWinner().sendMessage("");
+        Match match = event.getMatch();
+        String eloMessage = null;
 
-        event.getLoser().sendMessage("");
-        event.getLoser().sendMessage(CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : "")));
-        event.getLoser().doAction(inventories::sendToPlayer);
-        event.getLoser().sendMessage("");
+        if (match.getQueueType() == QueueType.RANKED) {
+            eloMessage = handleRankedMatchEnd(match);
+        }
+
+        Clickable inventories = getClickable(event);
+        String winnerMessage = CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : ""));
+
+        sendMatchEndMessages(event.getWinner(), winnerMessage, inventories, eloMessage);
+        sendMatchEndMessages(event.getLoser(), winnerMessage, inventories, eloMessage);
     }
+
+    private String handleRankedMatchEnd(Match match) {
+        Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(match.getWinnerTeam().getLeader());
+        Profile profile2 = Budget.getInstance().getProfileStorage().findProfile(match.getOpponent(match.getWinnerTeam()).getLeader());
+
+        int player1ELO = profile1.getStatistics(match.getKit()).getElo();
+        int player2ELO = profile2.getStatistics(match.getKit()).getElo();
+
+        int[] eloChanges = EloCalculator.calculateElo(player1ELO, player2ELO, match.getWinnerTeam().getLeader() == profile1.getPlayer());
+        profile1.getStatistics(match.getKit()).setElo(eloChanges[0]);
+        profile2.getStatistics(match.getKit()).setElo(eloChanges[1]);
+
+        int p1EloChange = eloChanges[0] - player1ELO;
+        int p2EloChange = eloChanges[1] - player2ELO;
+
+        return "&aELO Changes: " + match.getWinnerTeam().getLeader().getName() + " +" + p1EloChange + " &7(" + eloChanges[0] + ") &7┃ &c" + match.getOpponent(match.getWinnerTeam()).getLeader().getName() + " " + p2EloChange + " &7(" + eloChanges[1] + ")";
+    }
+
+    private void sendMatchEndMessages(Team team, String winnerMessage, Clickable inventories, String eloMessage) {
+        team.sendMessage("");
+        team.sendMessage(winnerMessage);
+        team.doAction(inventories::sendToPlayer);
+
+        if (eloMessage != null) {
+            team.sendMessage(eloMessage);
+        }
+
+        team.sendMessage("");
+    }
+
 
     private static Clickable getClickable(MatchEndEvent event) {
         Clickable inventories = new Clickable("&bInventories: ");

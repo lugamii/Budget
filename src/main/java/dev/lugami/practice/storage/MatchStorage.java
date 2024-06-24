@@ -6,6 +6,7 @@ import dev.lugami.practice.match.Match;
 import dev.lugami.practice.match.MatchSnapshot;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.queue.QueueType;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -84,12 +85,23 @@ public class MatchStorage {
      * @return The number of players in fights.
      */
     public int getInFights(Kit kit) {
+        return getInFights(kit, QueueType.UNRANKED);
+    }
+
+    /**
+     * Gets the number of players currently in fights with a kit.
+     *
+     * @param kit The kit that should be checked for fights.
+     * @param queueType The queue type to check.
+     * @return The number of players in fights.
+     */
+    public int getInFights(Kit kit, QueueType queueType) {
         try {
             int i = 0;
             for (Profile profile : Budget.getInstance().getProfileStorage().getProfiles()) {
                 if (profile.getState() == ProfileState.FIGHTING) {
                     Match match = findMatch(profile.getPlayer());
-                    if (match.getKit() == kit) {
+                    if (match.getKit() == kit && match.getQueueType() == queueType) {
                         i++;
                     }
                 }

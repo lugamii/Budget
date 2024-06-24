@@ -7,6 +7,7 @@ import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.queue.QueueType;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.TaskUtil;
 import dev.lugami.practice.utils.TimeUtils;
@@ -31,6 +32,7 @@ public class Match {
     private final Team team2;
     private final Kit kit;
     private final Arena arena;
+    private final QueueType queueType;
     private MatchState state;
     private Team winnerTeam;
     private Long startedAt;
@@ -43,9 +45,14 @@ public class Match {
     }
 
     public Match(Kit kit, Arena arena) {
+        this(kit, arena, QueueType.UNRANKED);
+    }
+
+    public Match(Kit kit, Arena arena, QueueType queueType) {
         this.matchId = UUID.randomUUID();
         this.kit = kit;
         this.arena = arena;
+        this.queueType = queueType;
         this.state = MatchState.WAITING;
         this.team1 = new Team(null);
         this.team2 = new Team(null);
@@ -65,7 +72,7 @@ public class Match {
             profile.setState(ProfileState.FIGHTING);
             equipPlayer(player);
         } else {
-            throw new IllegalStateException("Cannot add players after the match has started.");
+            Budget.getInstance().getLogger().warning("Cannot add players after the match has started.");
         }
     }
 
@@ -83,7 +90,7 @@ public class Match {
             profile.setState(ProfileState.FIGHTING);
             equipPlayer(player);
         } else {
-            throw new IllegalStateException("Cannot add players after the match has started.");
+            Budget.getInstance().getLogger().warning("Cannot add players after the match has started.");
         }
     }
 
@@ -92,7 +99,7 @@ public class Match {
      */
     public void start() {
         Budget.getInstance().getMatchStorage().getMatches().add(this);
-        sendMessage(ChatColor.GOLD + "A duel between " + team1.getLeader().getName() + (team1.getSize() >= 2 ? "'s team" : "") + " and " + team2.getLeader().getName() + (team2.getSize() >= 2 ? "'s team" : "") + " is starting!");
+        sendMessage(ChatColor.GOLD + "A " + (queueType == QueueType.RANKED ? "ranked " : "unranked ") + "duel between " + team1.getLeader().getName() + (team1.getSize() >= 2 ? "'s team" : "") + " and " + team2.getLeader().getName() + (team2.getSize() >= 2 ? "'s team" : "") + " is starting!");
         if (state == MatchState.WAITING) {
             state = MatchState.COUNTDOWN;
             teleportTeamsToArena();
@@ -114,7 +121,7 @@ public class Match {
                 }
             }.runTaskTimer(Budget.getInstance(), 0L, 20L);
         } else {
-            throw new IllegalStateException("Match already started or ended.");
+            Budget.getInstance().getLogger().warning("Match already started or ended.");
         }
     }
 
@@ -127,12 +134,10 @@ public class Match {
         if (state == MatchState.IN_PROGRESS) {
             state = MatchState.ENDED;
             this.winnerTeam = winningTeam;
-            (new MatchEndEvent(this, winnerTeam, getOpponent(winnerTeam))).call();
-
-            // Announce the winner and handle end match logic here
             Player winnerLeader = winningTeam.getLeader();
             if (winnerLeader != null) {
                 sendMessage(winnerLeader.getName() + (winningTeam.getSize() >= 2 ? "'s team" : "") + " has won the match!");
+                (new MatchEndEvent(this, winnerTeam, getOpponent(winnerTeam))).call();
                 MatchSnapshot snap = new MatchSnapshot(winnerLeader, getOpponent(winnerTeam).getLeader(), winnerLeader.getInventory().getArmorContents(), winnerLeader.getInventory().getContents());
                 Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
             }
@@ -141,9 +146,11 @@ public class Match {
                 Budget.getInstance().getMatchStorage().getMatches().remove(this);
             }, 20 * 3);
         } else {
-            throw new IllegalStateException("Match is not in progress.");
+            Budget.getInstance().getLogger().warning("Match already ended.");
         }
     }
+
+
 
     /**
      * Equips the player with the items from the kit.

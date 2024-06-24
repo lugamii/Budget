@@ -42,6 +42,7 @@ public class KitStorage {
             String path = key + ".";
             Kit kit = new Kit(key);
             kit.setEnabled(config.getBoolean(path + "enabled"));
+            kit.setRanked(config.getBoolean(path + "ranked"));
             kit.setIcon(ItemUtils.deserializeItemStack(config.getString(path + "icon")));
             kit.setInventory(ItemUtils.deserializeInventory(config.getString(path + "inventory")));
             kit.setArmor(ItemUtils.deserializeInventory(config.getString(path + "armor")));
@@ -57,6 +58,7 @@ public class KitStorage {
         for (Kit kit : this.kits) {
             String path = kit.getName() + ".";
             config.set(path + "enabled", kit.isEnabled());
+            config.set(path + "ranked", kit.isRanked());
             config.set(path + "icon", ItemUtils.serializeItemStack(kit.getIcon()));
             config.set(path + "inventory", ItemUtils.serializeInventory(kit.getInventory()));
             config.set(path + "armor", ItemUtils.serializeInventory(kit.getArmor()));

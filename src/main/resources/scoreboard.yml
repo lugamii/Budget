@@ -12,7 +12,7 @@ QUEUEING:
   - "&fFighting: &b<fighting>"
   - ""
   - "&bQueue:"
-  - "<queue>"
+  - "<type> <queue>"
   - "Time: &b<elapsed>"
   - ""
   - "&blugami.dev/budget"

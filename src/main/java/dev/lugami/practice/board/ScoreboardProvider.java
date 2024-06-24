@@ -36,7 +36,7 @@ public class ScoreboardProvider implements AssembleAdapter {
                     break;
                 case QUEUEING:
                     for (String line : Budget.getInstance().getScoreboardConfig().getStringList("QUEUEING")) {
-                        line = line.replace("<online>", "" + Bukkit.getOnlinePlayers().size()).replace("<fighting>", "" + Budget.getInstance().getMatchStorage().getInFights()).replace("<queue>", Budget.getInstance().getQueueStorage().findQueue(player).getKit().getName()).replace("<elapsed>", Budget.getInstance().getQueueStorage().findQueue(player).getDuration(player));
+                        line = line.replace("<online>", "" + Bukkit.getOnlinePlayers().size()).replace("<fighting>", "" + Budget.getInstance().getMatchStorage().getInFights()).replace("<type>", Budget.getInstance().getQueueStorage().findQueue(player).isRanked() ? "Ranked" : "Unranked").replace("<queue>", Budget.getInstance().getQueueStorage().findQueue(player).getKit().getName()).replace("<elapsed>", Budget.getInstance().getQueueStorage().findQueue(player).getDuration(player));
                         lines.add(line);
                     }
                     break;

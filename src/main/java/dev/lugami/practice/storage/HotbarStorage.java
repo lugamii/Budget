@@ -7,6 +7,7 @@ import dev.lugami.practice.menus.settings.SettingsMenu;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.Queue;
+import dev.lugami.practice.queue.QueueType;
 import dev.lugami.practice.utils.ActionUtils;
 import dev.lugami.practice.utils.InventoryWrapper;
 import dev.lugami.practice.utils.ItemBuilder;
@@ -23,7 +24,7 @@ public class HotbarStorage {
 
     private final List<HotbarItem> lobbyItems = Arrays.asList(
             new HotbarItem(new ItemBuilder(Material.IRON_SWORD, true).name("&bUnranked").build(), player -> new QueueMenu().open(player)),
-            new HotbarItem(new ItemBuilder(Material.DIAMOND_SWORD, true).name("&bRanked").build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.DIAMOND_SWORD, true).name("&bRanked").build(), player -> new QueueMenu(QueueType.RANKED).open(player)),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.NAME_TAG).name("&bParty").build(), ActionUtils.UNFINISHED),

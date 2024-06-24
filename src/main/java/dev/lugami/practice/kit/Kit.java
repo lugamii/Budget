@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 public class Kit {
 
     private boolean enabled = true;
+    private boolean ranked = false;
     private String name;
     private ItemStack icon;
     private ItemStack[] inventory = new ItemStack[36];

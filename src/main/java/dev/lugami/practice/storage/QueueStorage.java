@@ -2,11 +2,16 @@ package dev.lugami.practice.storage;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.Match;
+import dev.lugami.practice.profile.Profile;
+import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.Queue;
+import dev.lugami.practice.queue.QueueType;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,7 +33,14 @@ public class QueueStorage {
      */
     private void loadQueues() {
         for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
-            if (kit.isEnabled()) this.queues.add(new Queue(kit));
+            if (kit.isEnabled()) {
+                // Unranked queue
+                this.queues.add(new Queue(kit, false));
+                // Ranked queue (if the kit supports ranked matches)
+                if (kit.isRanked()) {
+                    this.queues.add(new Queue(kit, true));
+                }
+            }
         }
     }
 
@@ -53,6 +65,26 @@ public class QueueStorage {
     }
 
     /**
+     * Finds a queue by the associated kit and queue type.
+     *
+     * @param kit The kit associated with the queue.
+     * @return The found queue, or null if not found.
+     */
+    public Queue findQueue(Kit kit, QueueType queueType) {
+        return this.queues.stream().filter(queue -> queue.getKit() == kit && queue.isRanked() == (queueType == QueueType.RANKED)).findFirst().orElse(null);
+    }
+
+    /**
+     * Finds a queue by the unique identifier (UUID).
+     *
+     * @param uuid The UUID of the queue.
+     * @return The found queue, or null if not found.
+     */
+    public Queue findQueue(UUID uuid , QueueType queueType) {
+        return this.queues.stream().filter(queue -> queue.getId() == uuid  && queue.isRanked() == (queueType == QueueType.RANKED)).findFirst().orElse(null);
+    }
+
+    /**
      * Finds a queue by the player currently in it.
      *
      * @param player The player in the queue.
@@ -62,5 +94,30 @@ public class QueueStorage {
         return this.queues.stream().filter(queue -> queue.getPlayers().contains(player)).findFirst().orElse(null);
     }
 
+    /**
+     * Gets the number of players currently in queue.
+     *
+     * @param kit The kit that should be checked for fights.
+     * @param queueType The queue type to check.
+     * @return The number of players in fights.
+     */
+    public int getInQueue(Kit kit, QueueType queueType) {
+        try {
+            int i = 0;
+            for (Profile profile : Budget.getInstance().getProfileStorage().getProfiles()) {
+                if (profile.getState() == ProfileState.QUEUEING) {
+                    Queue queue = this.findQueue(kit);
+                    if (queue.getEloMap().containsKey(profile.getPlayer()) && queueType == QueueType.RANKED) {
+                        i++;
+                    } else if (!queue.getEloMap().containsKey(profile.getPlayer()) && queueType == QueueType.UNRANKED) {
+                        i++;
+                    }
+                }
+            }
+            return i;
+        } catch (ConcurrentModificationException ex) {
+            return 0;
+        }
+    }
 
 }
