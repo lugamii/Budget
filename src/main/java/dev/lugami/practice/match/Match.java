@@ -8,7 +8,7 @@ import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.QueueType;
-import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.PlayerUtils;
 import dev.lugami.practice.utils.TaskUtil;
 import dev.lugami.practice.utils.TimeUtils;
 import lombok.Getter;
@@ -36,6 +36,7 @@ public class Match {
     private MatchState state;
     private Team winnerTeam;
     private Long startedAt;
+    private List<Player> spectators;
 
     public enum MatchState {
         WAITING,
@@ -56,6 +57,7 @@ public class Match {
         this.state = MatchState.WAITING;
         this.team1 = new Team(null);
         this.team2 = new Team(null);
+        this.spectators = new ArrayList<>();
     }
 
     /**
@@ -70,6 +72,7 @@ public class Match {
             if (team1.getLeader() == null) team1.setLeader(player);
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
             profile.setState(ProfileState.FIGHTING);
+            profile.setMatchState(MatchPlayerState.ALIVE);
             equipPlayer(player);
         } else {
             Budget.getInstance().getLogger().warning("Cannot add players after the match has started.");
@@ -88,9 +91,35 @@ public class Match {
             if (team2.getLeader() == null) team2.setLeader(player);
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
             profile.setState(ProfileState.FIGHTING);
+            profile.setMatchState(MatchPlayerState.ALIVE);
             equipPlayer(player);
         } else {
             Budget.getInstance().getLogger().warning("Cannot add players after the match has started.");
+        }
+    }
+
+    public void addSpectator(Player player, boolean silent) {
+        if (state != MatchState.ENDED) {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+            if (profile.isAtSpawn()) {
+                profile.setState(ProfileState.SPECTATING);
+                player.teleport(team1.getLeader());
+                PlayerUtils.joinSpectator(player);
+                this.spectators.add(player);
+                if (!silent) sendMessage("&b" + player.getName() + " &eis spectating the match.");
+            } else {
+                player.sendMessage(ChatColor.RED + "You cannot do this right now.");
+                return;
+            }
+        }
+    }
+
+    public void removeSpectator(Player player, boolean silent) {
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (this.spectators.contains(player) && profile.getState() == ProfileState.SPECTATING) {
+            Budget.getInstance().getLobbyStorage().bringToLobby(player);
+            this.spectators.remove(player);
+            if (!silent) sendMessage("&b" + player.getName() + " &cis no longer spectating the match.");
         }
     }
 
@@ -136,6 +165,8 @@ public class Match {
             this.winnerTeam = winningTeam;
             Player winnerLeader = winningTeam.getLeader();
             if (winnerLeader != null) {
+                Profile profile = Budget.getInstance().getProfileStorage().findProfile(winnerLeader);
+                profile.setMatchState(MatchPlayerState.DEAD);
                 sendMessage(winnerLeader.getName() + (winningTeam.getSize() >= 2 ? "'s team" : "") + " has won the match!");
                 (new MatchEndEvent(this, winnerTeam, getOpponent(winnerTeam))).call();
                 MatchSnapshot snap = new MatchSnapshot(winnerLeader, getOpponent(winnerTeam).getLeader(), winnerLeader.getInventory().getArmorContents(), winnerLeader.getInventory().getContents());
@@ -204,7 +235,7 @@ public class Match {
     }
 
     public boolean isPlayerInMatch(Player player) {
-        return team1.contains(player) || team2.contains(player);
+        return this.team1.contains(player) || this.team2.contains(player) || this.spectators.contains(player);
     }
 
     public void sendMessage(String message) {

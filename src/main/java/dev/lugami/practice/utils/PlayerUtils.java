@@ -1,7 +1,6 @@
 package dev.lugami.practice.utils;
 
 import dev.lugami.practice.Budget;
-import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
 import org.bukkit.Bukkit;
@@ -10,12 +9,8 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @UtilityClass
@@ -57,6 +52,19 @@ public class PlayerUtils {
         player.setNoDamageTicks(0);
         player.setRemainingAir(player.getMaximumAir());
         if (show) showPlayer(player);
+    }
+
+    /**
+     * Helps the player to enter on spectator mode.
+     */
+    public void joinSpectator(Player player) {
+        TaskUtil.runTask(() -> {
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            player.setGameMode(GameMode.CREATIVE);
+            player.setFlySpeed(0.2F);
+            player.updateInventory();
+        });
     }
 
     /**

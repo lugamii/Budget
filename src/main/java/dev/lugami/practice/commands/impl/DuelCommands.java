@@ -41,7 +41,7 @@ public class DuelCommands extends CommandBase {
         if (!profile.isBusy()) {
             new DuelKitMenu(target).open(p1);
         } else {
-            p1.sendMessage(CC.translate("&c" + target.getName() + " is not in lobby."));
+            p1.sendMessage(CC.translate("&c" + target.getName() + " is not in the lobby."));
         }
     }
 

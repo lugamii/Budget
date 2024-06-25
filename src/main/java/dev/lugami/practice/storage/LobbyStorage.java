@@ -2,6 +2,7 @@ package dev.lugami.practice.storage;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.hotbar.HotbarItem;
+import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.*;
@@ -38,6 +39,7 @@ public class LobbyStorage {
         TaskUtil.runTaskLater(() -> {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
             profile.setState(ProfileState.LOBBY);
+            profile.setMatchState(MatchPlayerState.NONE);
             PlayerUtils.resetPlayer(player);
             Budget.getInstance().getHotbarStorage().resetHotbar(player);
             player.teleport(this.lobbyLocation);

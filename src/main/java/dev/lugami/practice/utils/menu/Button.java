@@ -4,6 +4,9 @@ package dev.lugami.practice.utils.menu;
 import dev.lugami.practice.utils.Action;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 @Getter
 public class Button {

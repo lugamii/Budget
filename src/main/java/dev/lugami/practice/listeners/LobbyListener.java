@@ -1,6 +1,7 @@
 package dev.lugami.practice.listeners;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import org.bukkit.GameMode;
@@ -20,10 +21,14 @@ public class LobbyListener implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
         Player player = (Player) event.getEntity();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        if (profile.getState() == ProfileState.LOBBY) {
+        if (profile.isAtSpawn()) {
             event.setCancelled(true);
             if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
                 Budget.getInstance().getLobbyStorage().bringToLobby(player);
+            }
+        } else if (profile.isFighting()) {
+            if (profile.getMatchState() == MatchPlayerState.DEAD) {
+                event.setCancelled(true);
             }
         }
     }

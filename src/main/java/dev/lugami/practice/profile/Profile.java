@@ -5,27 +5,30 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.settings.ProfileSettings;
 import dev.lugami.practice.settings.Setting;
 import dev.lugami.practice.utils.Cooldown;
 import lombok.Data;
+import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Data
 public class Profile {
 
+    @Getter
     private static MongoCollection<Document> collection = Budget.getInstance().getMongoDatabase().getCollection("profiles");
 
     private final Player player;
     private final UUID UUID;
     private ProfileState state;
+    private MatchPlayerState matchState;
     private Cooldown enderpearlCooldown;
     private ProfileSettings profileOptions;
     private List<ProfileStatistics> kitStats;
@@ -42,6 +45,7 @@ public class Profile {
         this.player = player;
         this.UUID = uuid;
         this.state = ProfileState.LOBBY;
+        this.matchState = MatchPlayerState.NONE;
         this.enderpearlCooldown = new Cooldown(0);
         this.profileOptions = new ProfileSettings(this);
         this.kitStats = new ArrayList<>();
@@ -106,6 +110,10 @@ public class Profile {
 
     public boolean isBusy() {
         return state != ProfileState.LOBBY;
+    }
+
+    public boolean isAtSpawn() {
+        return state == ProfileState.LOBBY || state == ProfileState.QUEUEING;
     }
 
     public boolean isFighting() {

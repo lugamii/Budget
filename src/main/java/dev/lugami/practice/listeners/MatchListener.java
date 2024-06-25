@@ -2,6 +2,7 @@ package dev.lugami.practice.listeners;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.Match;
+import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.match.MatchSnapshot;
 import dev.lugami.practice.match.Team;
 import dev.lugami.practice.match.event.MatchEndEvent;
@@ -35,12 +36,14 @@ public class MatchListener implements Listener {
         Player player = event.getEntity();
         Location location = player.getLocation().clone();
         event.setDeathMessage(null);
+        event.getDrops().clear();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (profile.getState() == ProfileState.FIGHTING) {
             player.setHealth(20);
             PlayerUtils.respawnPlayer(player);
             player.setFireTicks(0);
             PlayerUtils.hidePlayer(player);
+            profile.setMatchState(MatchPlayerState.DEAD);
             Match match = Budget.getInstance().getMatchStorage().findMatch(player);
             Team team = match.getTeam(player);
             MatchSnapshot snap = new MatchSnapshot(player, match.getOpponent(team).getLeader(), player.getInventory().getArmorContents(), player.getInventory().getContents());
@@ -49,7 +52,6 @@ public class MatchListener implements Listener {
             player.teleport(location);
             PlayerUtils.resetPlayer(player, false);
             match.end(match.getOpponent(team));
-            event.getDrops().clear();
         }
     }
 
@@ -99,6 +101,22 @@ public class MatchListener implements Listener {
     }
 
     @EventHandler
+    public void onEntityDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
+        Player damager = (Player) event.getDamager();
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(damager);
+        if (profile.getState() == ProfileState.FIGHTING && profile1.getState() == ProfileState.FIGHTING) {
+            if (profile1.getMatchState() == MatchPlayerState.DEAD || profile.getMatchState() == MatchPlayerState.DEAD) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
     public void onMatchEnd(MatchEndEvent event) {
         Match match = event.getMatch();
         String eloMessage = null;
@@ -124,6 +142,8 @@ public class MatchListener implements Listener {
         int[] eloChanges = EloCalculator.calculateElo(player1ELO, player2ELO, match.getWinnerTeam().getLeader() == profile1.getPlayer());
         profile1.getStatistics(match.getKit()).setElo(eloChanges[0]);
         profile2.getStatistics(match.getKit()).setElo(eloChanges[1]);
+        profile1.save();
+        profile2.save();
 
         int p1EloChange = eloChanges[0] - player1ELO;
         int p2EloChange = eloChanges[1] - player2ELO;

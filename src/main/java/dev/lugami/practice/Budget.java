@@ -39,6 +39,7 @@ public class Budget extends JavaPlugin {
     private MatchStorage matchStorage;
     private HotbarStorage hotbarStorage;
     private QueueStorage queueStorage;
+    private LeaderboardsStorage leaderboardsStorage;
     private Assemble assemble;
     private CommandService drink;
     private MongoDatabase mongoDatabase;
@@ -84,6 +85,7 @@ public class Budget extends JavaPlugin {
         this.matchStorage = new MatchStorage();
         this.hotbarStorage = new HotbarStorage();
         this.queueStorage = new QueueStorage();
+        this.leaderboardsStorage = new LeaderboardsStorage();
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
         this.assemble.setAssembleStyle(AssembleStyle.MODERN);

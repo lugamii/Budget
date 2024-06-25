@@ -80,8 +80,8 @@ public class QueueStorage {
      * @param uuid The UUID of the queue.
      * @return The found queue, or null if not found.
      */
-    public Queue findQueue(UUID uuid , QueueType queueType) {
-        return this.queues.stream().filter(queue -> queue.getId() == uuid  && queue.isRanked() == (queueType == QueueType.RANKED)).findFirst().orElse(null);
+    public Queue findQueue(UUID uuid, QueueType queueType) {
+        return this.queues.stream().filter(queue -> queue.getId() == uuid && queue.isRanked() == (queueType == QueueType.RANKED)).findFirst().orElse(null);
     }
 
     /**
@@ -97,7 +97,7 @@ public class QueueStorage {
     /**
      * Gets the number of players currently in queue.
      *
-     * @param kit The kit that should be checked for fights.
+     * @param kit       The kit that should be checked for fights.
      * @param queueType The queue type to check.
      * @return The number of players in fights.
      */
@@ -106,12 +106,31 @@ public class QueueStorage {
             int i = 0;
             for (Profile profile : Budget.getInstance().getProfileStorage().getProfiles()) {
                 if (profile.getState() == ProfileState.QUEUEING) {
-                    Queue queue = this.findQueue(kit);
-                    if (queue.getEloMap().containsKey(profile.getPlayer()) && queueType == QueueType.RANKED) {
+                    Queue queue = this.findQueue(kit, queueType);
+                    if (queue.isRanked() && queueType == QueueType.RANKED && queue.getPlayers().contains(profile.getPlayer())) {
                         i++;
-                    } else if (!queue.getEloMap().containsKey(profile.getPlayer()) && queueType == QueueType.UNRANKED) {
+                    } else if (!queue.isRanked() && queueType == QueueType.UNRANKED && queue.getPlayers().contains(profile.getPlayer())) {
                         i++;
                     }
+                }
+            }
+            return i;
+        } catch (ConcurrentModificationException ex) {
+            return 0;
+        }
+    }
+
+    /**
+     * Gets the number of players currently in queue.
+     *
+     * @return The number of players in fights.
+     */
+    public int getInQueues() {
+        try {
+            int i = 0;
+            for (Profile profile : Budget.getInstance().getProfileStorage().getProfiles()) {
+                if (profile.getState() == ProfileState.QUEUEING) {
+                    i++;
                 }
             }
             return i;

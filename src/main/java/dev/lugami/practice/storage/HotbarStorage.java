@@ -2,11 +2,11 @@ package dev.lugami.practice.storage;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.hotbar.HotbarItem;
+import dev.lugami.practice.menus.LeaderboardsMenu;
 import dev.lugami.practice.menus.QueueMenu;
 import dev.lugami.practice.menus.settings.SettingsMenu;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.queue.Queue;
 import dev.lugami.practice.queue.QueueType;
 import dev.lugami.practice.utils.ActionUtils;
 import dev.lugami.practice.utils.InventoryWrapper;
@@ -30,7 +30,7 @@ public class HotbarStorage {
             new HotbarItem(new ItemBuilder(Material.NAME_TAG).name("&bParty").build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
-            new HotbarItem(new ItemBuilder(Material.EMERALD, true).name("&bLeaderboards").build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.EMERALD, true).name("&bLeaderboards").build(), player -> new LeaderboardsMenu().open(player)),
             new HotbarItem(new ItemBuilder(Material.WATCH, true).name("&bSettings").build(), player -> new SettingsMenu(player).open(player))
     );
 
@@ -42,6 +42,24 @@ public class HotbarStorage {
             new HotbarItem(new ItemBuilder(Material.INK_SACK).name("&cLeave Queue").durability(1).build(), player -> {
                 if (Budget.getInstance().getQueueStorage().findQueue(player) != null) {
                     Budget.getInstance().getQueueStorage().findQueue(player).remove(player);
+                } else {
+                    Budget.getInstance().getLobbyStorage().bringToLobby(player);
+                }
+            }),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED)
+    );
+
+    private final List<HotbarItem> spectatorItems = Arrays.asList(
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.INK_SACK).name("&cLeave Spectator").durability(1).build(), player -> {
+                if (Budget.getInstance().getMatchStorage().findMatch(player) != null) {
+                    Budget.getInstance().getMatchStorage().findMatch(player).removeSpectator(player, player.hasPermission("budget.staff"));
                 } else {
                     Budget.getInstance().getLobbyStorage().bringToLobby(player);
                 }
@@ -64,6 +82,8 @@ public class HotbarStorage {
                 return this.lobbyItems;
             case QUEUEING:
                 return this.queueItems;
+            case SPECTATING:
+                return this.spectatorItems;
             default:
                 return Collections.emptyList();
         }

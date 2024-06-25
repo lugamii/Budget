@@ -8,17 +8,16 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class ItemUtils {
 
-    // Serialize ItemStack array
     public static String serializeInventory(ItemStack[] source) {
         StringBuilder builder = new StringBuilder();
 
         for (ItemStack itemStack : source) {
-            if (itemStack.getType() == Material.AIR) continue;
             builder.append(serializeItemStack(itemStack));
             builder.append(";");
         }
@@ -26,44 +25,47 @@ public class ItemUtils {
         return builder.toString();
     }
 
-    // Deserialize ItemStack array
     public static ItemStack[] deserializeInventory(String source) {
         List<ItemStack> items = new ArrayList<>();
         String[] split = source.split(";");
 
         for (String piece : split) {
-            if (deserializeItemStack(piece).getType() == Material.AIR) continue;
             items.add(deserializeItemStack(piece));
         }
 
-        return items.toArray(new ItemStack[0]);
+        return items.toArray(new ItemStack[items.size()]);
     }
 
-    // Serialize List of PotionEffects
     public static String serializeEffects(List<PotionEffect> source) {
         StringBuilder builder = new StringBuilder();
+        if (source.size() == 0) return null;
 
-        for (PotionEffect effect : source) {
-            builder.append(serializeEffect(effect));
+        for (PotionEffect potionEffect : source) {
+            String potionString = serializeEffect(potionEffect);
+            if (potionString == null || potionString == "null") continue;
+
+            builder.append(potionString);
             builder.append(";");
         }
 
         return builder.toString();
     }
 
-    // Deserialize List of PotionEffects
     public static List<PotionEffect> deserializeEffects(String source) {
-        List<PotionEffect> effects = new ArrayList<>();
+        List<PotionEffect> items = new ArrayList<>();
+
+        if (source.equalsIgnoreCase(""))
+            return null;
+
         String[] split = source.split(";");
 
         for (String piece : split) {
-            effects.add(deserializeEffect(piece));
+            items.add(deserializeEffect(piece));
         }
 
-        return effects;
+        return items;
     }
 
-    // Serialize single ItemStack
     public static String serializeItemStack(ItemStack item) {
         StringBuilder builder = new StringBuilder();
 
@@ -71,93 +73,132 @@ public class ItemUtils {
             return "null";
         }
 
-        builder.append("t@").append(item.getType().name());
+        String isType = String.valueOf(item.getType().getId());
+        builder.append("t@").append(isType);
 
         if (item.getDurability() != 0) {
-            builder.append(":d@").append(item.getDurability());
+            String isDurability = String.valueOf(item.getDurability());
+            builder.append(":d@").append(isDurability);
         }
 
         if (item.getAmount() != 1) {
-            builder.append(":a@").append(item.getAmount());
+            String isAmount = String.valueOf(item.getAmount());
+            builder.append(":a@").append(isAmount);
         }
 
         Map<Enchantment, Integer> enchantments = item.getEnchantments();
-        if (!enchantments.isEmpty()) {
-            builder.append(":e@");
-            for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-                builder.append("e@");
-                builder.append(entry.getKey().getName()).append("@").append(entry.getValue()).append(":");
+
+        if (enchantments.size() > 0) {
+            for (Map.Entry<Enchantment, Integer> enchantment : enchantments.entrySet()) {
+                builder.append(":e@").append(enchantment.getKey().getId()).append("@").append(enchantment.getValue());
             }
-            // Remove the last semicolon
-            builder.deleteCharAt(builder.length() - 1);
         }
 
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            if (meta.hasDisplayName()) {
-                builder.append(":dn@").append(meta.getDisplayName());
+        if (item.hasItemMeta()) {
+            ItemMeta itemMeta = item.getItemMeta();
+
+            if (itemMeta.hasDisplayName()) {
+                builder.append(":dn@").append(itemMeta.getDisplayName());
             }
-            if (meta.hasLore()) {
-                builder.append(":l@").append(meta.getLore());
+
+            if (itemMeta.hasLore()) {
+                builder.append(":l@").append(itemMeta.getLore());
             }
         }
 
         return builder.toString();
     }
 
-    // Deserialize single ItemStack
-    public static ItemStack deserializeItemStack(String source) {
-        ItemStack itemStack = new ItemStack(Material.AIR);
+    public static ItemStack deserializeItemStack(String in) {
+        ItemStack item = null;
+        ItemMeta meta = null;
 
-        if (source.equals("null")) {
-            return itemStack;
+        if (in.equals("null")) {
+            return new ItemStack(Material.AIR);
         }
 
-        String[] parts = source.split(":");
-        for (String part : parts) {
-            String[] split = part.split("@");
-            String key = split[0];
-            String value = split[1];
+        String[] split = in.split(":");
 
-            switch (key) {
-                case "t":
-                    itemStack.setType(Material.getMaterial(value));
-                    break;
-                case "d":
-                    itemStack.setDurability(Short.parseShort(value));
-                    break;
-                case "a":
-                    itemStack.setAmount(Integer.parseInt(value));
-                    break;
-                case "e":
-                    Enchantment enchantment = Enchantment.getByName(value);
-                    if (enchantment != null) {
-                        int level = Integer.parseInt(split[2]);
-                        itemStack.addUnsafeEnchantment(enchantment, level);
+        for (String itemInfo : split) {
+            String[] itemAttribute = itemInfo.split("@");
+            String attributeId = itemAttribute[0];
+
+            switch (attributeId) {
+                case "t": {
+                    try {
+                        item = new ItemStack(Material.getMaterial(Integer.valueOf(itemAttribute[1])));
+                        meta = item.getItemMeta();
+                    } catch (NumberFormatException exception) {
+                        item = new ItemStack(Material.getMaterial(itemAttribute[1]));
+                        meta = item.getItemMeta();
                     }
                     break;
-                case "dn":
-                    ItemMeta meta = itemStack.getItemMeta();
+                }
+                case "d": {
+                    if (item != null) {
+                        item.setDurability(Short.valueOf(itemAttribute[1]));
+                        break;
+                    }
+                    break;
+                }
+                case "a": {
+                    if (item != null) {
+                        item.setAmount(Integer.valueOf(itemAttribute[1]));
+                        break;
+                    }
+                    break;
+                }
+                case "e": {
+                    if (item != null) {
+                        item.addUnsafeEnchantment(
+                                Enchantment.getById(Integer.valueOf(itemAttribute[1])),
+                                Integer.valueOf(itemAttribute[2])
+                        );
+                        break;
+                    }
+                    break;
+                }
+                case "dn": {
                     if (meta != null) {
-                        meta.setDisplayName(value);
-                        itemStack.setItemMeta(meta);
+                        meta.setDisplayName(itemAttribute[1]);
+                        break;
                     }
                     break;
-                case "l":
-                    ItemMeta loreMeta = itemStack.getItemMeta();
-                    if (loreMeta != null) {
-                        List<String> lore = new ArrayList<>();
-                        for (int i = 1; i < split.length; i++) {
-                            lore.add(split[i]);
+                }
+                case "l": {
+                    itemAttribute[1] = itemAttribute[1].replace("[", "");
+                    itemAttribute[1] = itemAttribute[1].replace("]", "");
+                    List<String> lore = Arrays.asList(itemAttribute[1].split(","));
+
+                    for (int x = 0; x < lore.size(); ++x) {
+                        String s = lore.get(x);
+
+                        if (s != null) {
+                            if (s.toCharArray().length != 0) {
+                                if (s.charAt(0) == ' ') {
+                                    s = s.replaceFirst(" ", "");
+                                }
+
+                                lore.set(x, s);
+                            }
                         }
-                        loreMeta.setLore(lore);
-                        itemStack.setItemMeta(loreMeta);
                     }
+
+                    if (meta != null) {
+                        meta.setLore(lore);
+                        break;
+                    }
+
                     break;
+                }
             }
         }
 
-        return itemStack;
+        if (meta != null && (meta.hasDisplayName() || meta.hasLore())) {
+            item.setItemMeta(meta);
+        }
+
+        return item;
     }
 
     // Serialize single PotionEffect
