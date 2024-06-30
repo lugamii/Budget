@@ -10,10 +10,8 @@ import java.util.Map;
 public class ProfileSettings {
 
     private final Map<Setting, Boolean> settingsMap;
-    private final Profile profile;
 
-    public ProfileSettings(Profile p) {
-        this.profile = p;
+    public ProfileSettings() {
         this.settingsMap = new HashMap<>();
         for (Setting setting : Setting.values()) {
             settingsMap.put(setting, setting.isDefaultToggled());

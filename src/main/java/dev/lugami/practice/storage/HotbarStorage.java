@@ -27,7 +27,7 @@ public class HotbarStorage {
             new HotbarItem(new ItemBuilder(Material.DIAMOND_SWORD, true).name("&bRanked").build(), player -> new QueueMenu(QueueType.RANKED).open(player)),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
-            new HotbarItem(new ItemBuilder(Material.NAME_TAG).name("&bParty").build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.NAME_TAG).name("&bParty").build(), player -> player.chat("/party create")),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.EMERALD, true).name("&bLeaderboards").build(), player -> new LeaderboardsMenu().open(player)),
@@ -70,6 +70,25 @@ public class HotbarStorage {
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED)
     );
 
+    private final List<HotbarItem> partyItems = Arrays.asList(
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.GOLD_AXE).name("&bParty Events").build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.INK_SACK).name("&cLeave Party").durability(1).build(), player -> {
+                Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+                if (profile.getParty() != null) {
+                    profile.getParty().leave(player);
+                } else {
+                    Budget.getInstance().getLobbyStorage().bringToLobby(player);
+                }
+            }),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED)
+    );
+
     /**
      * Gets the list of hotbar items based on the player's state.
      *
@@ -84,6 +103,8 @@ public class HotbarStorage {
                 return this.queueItems;
             case SPECTATING:
                 return this.spectatorItems;
+            case PARTY:
+                return this.partyItems;
             default:
                 return Collections.emptyList();
         }

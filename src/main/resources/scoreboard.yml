@@ -13,6 +13,18 @@ LOBBY:
   - ""
   - "&blugami.dev/budget"
   - "&7&m----------------------"
+PARTY:
+  - "&7&m----------------------"
+  - "&fOnline: &b<online>"
+  - "&fFighting: &b<fighting>"
+  - "&fQueueing: &b<queueing>"
+  - ""
+  - "&b&lParty"
+  - " &fLeader: &b<leader>"
+  - " &fMembers: &b<members>"
+  - ""
+  - "&blugami.dev/budget"
+  - "&7&m----------------------"
 QUEUEING:
   - "&7&m----------------------"
   - "&fOnline: &b<online>"

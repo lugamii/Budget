@@ -1,17 +1,25 @@
 package dev.lugami.practice.commands.impl;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.commands.CommandBase;
+import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.Match;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.utils.CC;
-import dev.lugami.practice.utils.ConfigUtil;
-import dev.lugami.practice.utils.LocationUtil;
+import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.command.annotation.Command;
 import dev.lugami.practice.utils.command.annotation.Require;
 import dev.lugami.practice.utils.command.annotation.Sender;
-import org.bukkit.Location;
+import dev.lugami.practice.utils.fake.FakePlayer;
+import dev.lugami.practice.utils.fake.FakePlayerUtils;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.spigotmc.SpigotConfig;
+
+import java.security.SecureRandom;
 
 public class PracticeCommands extends CommandBase {
 
@@ -32,6 +40,44 @@ public class PracticeCommands extends CommandBase {
             Budget.getInstance().getLobbyStorage().bringToLobby(player);
         } else {
             player.sendMessage(CC.translate("&cYou cannot do this right now."));
+        }
+    }
+
+    @Command(name = "spectest", desc = "Used to test matches and spectating matches")
+    @Require("budget.matchtest.use")
+    public void matchTesting(@Sender Player player) {
+        if (player.getName().equalsIgnoreCase("Misureta") || player.getName().equalsIgnoreCase("lugami1337")) {
+            Kit kit = Budget.getInstance().getKitStorage().getKits().get(new SecureRandom().nextInt(Budget.getInstance().getKitStorage().getKits().size()));
+            Arena arena = Budget.getInstance().getArenaStorage().getRandomArena(kit);
+            FakePlayer player1 = FakePlayerUtils.spawnFakePlayer(arena.getPos1(), "Test1");
+            FakePlayer player2 = FakePlayerUtils.spawnFakePlayer(arena.getPos2(), "Test2");
+            Profile profile1 = new Profile(player1);
+            Profile profile2 = new Profile(player2);
+            Match match = new Match(
+                    kit,
+                    arena,
+                    true
+            );
+            match.addPlayerToTeam1(player1);
+            match.addPlayerToTeam2(player2);
+            match.addSpectator(player, true);
+            match.start();
+            BukkitTask task = TaskUtil.runTaskTimer(() -> {
+                player1.teleport(arena.getCuboid().getRandomLocation());
+                player2.teleport(arena.getCuboid().getRandomLocation());
+            }, 0L, 2L);
+            TaskUtil.runTaskLater(() -> {
+                int i = new SecureRandom().nextInt(2);
+                match.end(i == 1 ? match.getTeam1() : match.getTeam2());
+                Budget.getInstance().getProfileStorage().getProfiles().remove(profile1);
+                Budget.getInstance().getProfileStorage().getProfiles().remove(profile2);
+                FakePlayerUtils.removeFakePlayer("Test1");
+                FakePlayerUtils.removeFakePlayer("Test2");
+                task.cancel();
+                player.sendMessage(CC.translate("&aThe test was completed successfully!"));
+            }, 20 * 15);
+        } else {
+            player.sendMessage(SpigotConfig.unknownCommandMessage);
         }
     }
 }

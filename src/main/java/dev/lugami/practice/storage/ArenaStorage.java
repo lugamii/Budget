@@ -5,6 +5,7 @@ import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.utils.ConfigUtil;
 import dev.lugami.practice.utils.LocationUtil;
+import dev.lugami.practice.utils.cuboid.Cuboid;
 import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -71,6 +72,7 @@ public class ArenaStorage {
             arena.setPos2(LocationUtil.stringToLocation(config.getString(path + "pos2")));
             arena.setMin(LocationUtil.stringToLocation(config.getString(path + "min")));
             arena.setMax(LocationUtil.stringToLocation(config.getString(path + "max")));
+            arena.setCuboid(new Cuboid(arena.getMin(), arena.getMax()));
             arena.setWhitelistedKits(config.getStringList(path + "whitelistedKits"));
             arenas.add(arena);
         }

@@ -4,6 +4,8 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.match.Match;
 import dev.lugami.practice.profile.Profile;
+import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.settings.Setting;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.command.annotation.Command;
 import dev.lugami.practice.utils.command.annotation.Sender;
@@ -36,7 +38,22 @@ public class SpectateCommands extends CommandBase {
         } else {
             Match match = Budget.getInstance().getMatchStorage().findMatch(target);
             if (match == null) return;
-            match.addSpectator(player, player.hasPermission("budget.staff"));
+            match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
+        }
+    }
+
+    @Command(name = "leave", desc = "Stops spectating a player.")
+    public void leave(@Sender Player player) {
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (!profile.getState().equals(ProfileState.SPECTATING)) {
+            player.sendMessage(CC.translate("&cYou are not spectating a player."));
+            return;
+        } else {
+            if (Budget.getInstance().getMatchStorage().findMatch(player) == null) {
+                Budget.getInstance().getLobbyStorage().bringToLobby(player);
+            } else {
+                Budget.getInstance().getMatchStorage().findMatch(player).removeSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
+            }
         }
     }
 }

@@ -41,12 +41,22 @@ public class LobbyListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getPlayer().getGameMode() != GameMode.CREATIVE || !event.getPlayer().isOp()) event.setCancelled(true);
+        if (event.getPlayer().getGameMode() != GameMode.CREATIVE || !event.getPlayer().isOp()) {
+            event.setCancelled(true);
+        } else if (event.getPlayer().getGameMode() == GameMode.CREATIVE && event.getPlayer().isOp()) {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
+            event.setCancelled(profile.getState() != ProfileState.LOBBY);
+        }
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getPlayer().getGameMode() != GameMode.CREATIVE || !event.getPlayer().isOp()) event.setCancelled(true);
+        if (event.getPlayer().getGameMode() != GameMode.CREATIVE || !event.getPlayer().isOp()) {
+            event.setCancelled(true);
+        } else if (event.getPlayer().getGameMode() == GameMode.CREATIVE && event.getPlayer().isOp()) {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
+            event.setCancelled(profile.getState() != ProfileState.LOBBY);
+        }
     }
 
     @EventHandler

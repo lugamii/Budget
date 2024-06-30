@@ -29,12 +29,13 @@ public class DrinkHelpService {
                 for (DrinkCommand c : container.getCommands().values()) {
                     if (!sender.hasPermission(c.getPermission())) continue;
                     else {
-                        sender.sendMessage(CC.translate(" &7* &c/" + container.getName() + (!c.getName().isEmpty() ? " &c" + c.getName() : "") + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)"));
                         commands.add(c);
                     }
 
                     if (commands.isEmpty()) {
                         sender.sendMessage(CC.translate("&cYou don't have permissions for any of the commands here."));
+                    } else {
+                        sender.sendMessage(CC.translate(" &7* &b/" + container.getName() + (!c.getName().isEmpty() ? " &c" + c.getName() : "") + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)"));
                     }
                 }
                 return;
@@ -44,15 +45,16 @@ public class DrinkHelpService {
                 Player player = (Player) sender;
                 if (!player.hasPermission(c.getPermission())) continue;
                 else {
-                    TextComponent msg = new TextComponent(net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
-                            " &7* &c/" + container.getName() + (!c.getName().isEmpty() ? " &c" + c.getName() : "") + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)"));
-                    msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.GRAY + "/" + container.getName() + " " + c.getName() + " - " + ChatColor.WHITE + c.getDescription())));
-                    msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + container.getName() + " " + c.getName()));
-                    player.spigot().sendMessage(msg);
-                    commands.add(c);
+                   commands.add(c);
                 }
                 if (commands.isEmpty()) {
                     player.sendMessage(CC.translate("&cYou don't have permissions for any of the commands here."));
+                } else {
+                    TextComponent msg = new TextComponent(net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
+                            " &7* &b/" + container.getName() + (!c.getName().isEmpty() ? " &c" + c.getName() : "") + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)"));
+                    msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.GRAY + "/" + container.getName() + " " + c.getName() + " - " + ChatColor.WHITE + c.getDescription())));
+                    msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + container.getName() + " " + c.getName()));
+                    player.spigot().sendMessage(msg);
                 }
             }
             sender.sendMessage(CC.CHAT_BAR);

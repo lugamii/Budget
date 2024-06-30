@@ -2,20 +2,19 @@ package dev.lugami.practice.settings;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Arrays;
 
 @AllArgsConstructor
 public enum Setting {
 
     SCOREBOARD("Scoreboard", "Toggles your own scoreboard.", "", true, new ItemStack(Material.PAINTING)),
     DUEL_REQUESTS("Duel Requests", "Toggles people sending duels to you.", "", true, new ItemStack(Material.GOLD_SWORD)),
-    ARENA_SELECTOR("Arena Selector", "Toggles selecting arenas in duel requests.", "budget.selector.arena", true, new ItemStack(Material.PAPER));
+    ARENA_SELECTOR("Arena Selector", "Toggles selecting arenas in duel requests.", "budget.selector.arena", true, new ItemStack(Material.PAPER)),
+    SILENT_SPECTATE("Silent Spectate", "Toggles silently spectating a player.", "budget.spectator.silent", false, new ItemStack(Material.FEATHER)),
+    ALLOW_SPECTATORS("Match Spectators", "Toggles people spectating your matches.", "", true, new ItemStack(Material.DIAMOND)),
+    LIGHTNING("Death Lightning", "Toggles a lightning effect when you kill someone.", "", true, new ItemStack(Material.BLAZE_ROD));
 
     @Getter
     private final String name;

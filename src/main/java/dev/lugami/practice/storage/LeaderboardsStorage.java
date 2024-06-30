@@ -21,13 +21,12 @@ public class LeaderboardsStorage {
 
     public LeaderboardsStorage() {
         this.updateLeaderboards();
-        TaskUtil.runTaskTimerAsynchronously(this::updateLeaderboards, 0L, 20L * 60L);
+        TaskUtil.runTaskTimerAsynchronously(this::updateLeaderboards, 0L, 20L * 20L);
     }
 
     public void updateLeaderboards() {
         TaskUtil.runTaskAsynchronously(() -> {
             kitLeaderboards.clear();
-
             Budget.getInstance().getKitStorage().getKits().stream().filter(Kit::isRanked).collect(Collectors.toList()).forEach(kit -> {
                 List<Document> sortedPlayers = getLeaderboards(kit);
                 List<LeaderboardsEntry> entries = new ArrayList<>();
@@ -36,9 +35,7 @@ public class LeaderboardsStorage {
                     Document kitStatistics = (Document) doc.get("profileStatistics");
                     Document kitDocument = (Document) kitStatistics.get(kit.getName());
                     Integer elo = (Integer) kitDocument.getOrDefault("elo", 1000);
-
                     entries.add(new LeaderboardsEntry(Bukkit.getOfflinePlayer(uuid).getName(), elo));
-
                 });
                 kitLeaderboards.put(kit, entries);
             });
@@ -77,13 +74,11 @@ public class LeaderboardsStorage {
 
     }
 
-    public LeaderboardsEntry getByPlayer(Player player) {
+    public LeaderboardsEntry getByPlayer(Kit kit, Player player) {
         AtomicReference<LeaderboardsEntry> ent = new AtomicReference<>();
-        kitLeaderboards.values().forEach(entry -> {
-            for (LeaderboardsEntry leaderboardsEntry : entry) {
-                if (leaderboardsEntry.getName().equals(player.getName())) {
-                    ent.set(leaderboardsEntry);
-                }
+        kitLeaderboards.get(kit).forEach(entry -> {
+            if (entry.getName().equals(player.getName())) {
+                ent.set(entry);
             }
         });
         return ent.get();

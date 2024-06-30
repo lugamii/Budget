@@ -1,10 +1,15 @@
 package dev.lugami.practice.utils;
 
+import com.mojang.authlib.GameProfile;
 import dev.lugami.practice.Budget;
 import lombok.experimental.UtilityClass;
-import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -133,6 +138,7 @@ public class PlayerUtils {
         for (Player other : Bukkit.getOnlinePlayers()) {
             if (!other.equals(player)) {
                 other.hidePlayer(player);
+                Budget.getInstance().getEntityHider().hideEntity(player, other);
             }
         }
     }
@@ -146,6 +152,7 @@ public class PlayerUtils {
         for (Player other : Bukkit.getOnlinePlayers()) {
             if (!other.equals(player)) {
                 other.showPlayer(player);
+                Budget.getInstance().getEntityHider().showEntity(player, other);
             }
         }
     }

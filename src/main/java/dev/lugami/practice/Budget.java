@@ -1,5 +1,6 @@
 package dev.lugami.practice;
 
+import com.comphenix.tinyprotocol.TinyProtocol;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -13,6 +14,7 @@ import dev.lugami.practice.task.MatchSnapshotTask;
 import dev.lugami.practice.task.QueueTask;
 import dev.lugami.practice.utils.ClassUtils;
 import dev.lugami.practice.utils.ConfigUtil;
+import dev.lugami.practice.utils.EntityHider;
 import dev.lugami.practice.utils.TaskUtil;
 import dev.lugami.practice.utils.command.Drink;
 import dev.lugami.practice.utils.command.command.CommandService;
@@ -39,8 +41,10 @@ public class Budget extends JavaPlugin {
     private MatchStorage matchStorage;
     private HotbarStorage hotbarStorage;
     private QueueStorage queueStorage;
+    private PartyStorage partyStorage;
     private LeaderboardsStorage leaderboardsStorage;
     private Assemble assemble;
+    private EntityHider entityHider;
     private CommandService drink;
     private MongoDatabase mongoDatabase;
 
@@ -86,6 +90,8 @@ public class Budget extends JavaPlugin {
         this.hotbarStorage = new HotbarStorage();
         this.queueStorage = new QueueStorage();
         this.leaderboardsStorage = new LeaderboardsStorage();
+        this.partyStorage = new PartyStorage();
+        //this.entityHider = new EntityHider();
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
         this.assemble.setAssembleStyle(AssembleStyle.MODERN);
@@ -99,6 +105,7 @@ public class Budget extends JavaPlugin {
                 drink.register(command, command.getName(), command.getAliases());
             } catch (Exception exception) {
                 getLogger().info("Error while loading the command " + c.getSimpleName());
+                exception.printStackTrace();
             }
         }
         drink.registerCommands();

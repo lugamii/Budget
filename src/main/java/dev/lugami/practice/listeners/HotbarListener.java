@@ -19,26 +19,26 @@ public class HotbarListener implements Listener {
         Player player = event.getPlayer();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (event.getItem() == null) return;
-        if (profile.getState() == ProfileState.LOBBY || profile.getState() == ProfileState.QUEUEING) {
-            Budget.getInstance().getHotbarStorage().getByState(profile.getState()).forEach(hotbarItem -> {
-                if (event.getItem().isSimilar(hotbarItem.getItemStack()) && event.getAction().name().contains("RIGHT_")) {
-                    hotbarItem.getAction().execute(player);
-                }
-            });
-        }
+        if (profile.getState() == ProfileState.FIGHTING) return;
+        Budget.getInstance().getHotbarStorage().getByState(profile.getState()).forEach(hotbarItem -> {
+            if (event.getItem().isSimilar(hotbarItem.getItemStack()) && event.getAction().name().contains("RIGHT_")) {
+                hotbarItem.getAction().execute(player);
+            }
+        });
+
     }
 
     @EventHandler
     public void onPlayerDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        if (profile.getState() == ProfileState.LOBBY || profile.getState() == ProfileState.QUEUEING) {
-            Budget.getInstance().getHotbarStorage().getByState(profile.getState()).forEach(hotbarItem -> {
-                if (event.getItemDrop().getItemStack().isSimilar(hotbarItem.getItemStack())) {
-                    event.setCancelled(true);
-                }
-            });
-        }
+        if (profile.getState() == ProfileState.FIGHTING) return;
+        Budget.getInstance().getHotbarStorage().getByState(profile.getState()).forEach(hotbarItem -> {
+            if (event.getItemDrop().getItemStack().isSimilar(hotbarItem.getItemStack())) {
+                event.setCancelled(true);
+            }
+        });
+
     }
 
     @EventHandler
@@ -51,13 +51,13 @@ public class HotbarListener implements Listener {
             return;
         }
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        if (profile.getState() == ProfileState.LOBBY || profile.getState() == ProfileState.QUEUEING) {
-            Budget.getInstance().getHotbarStorage().getByState(profile.getState()).forEach(hotbarItem -> {
-                if (event.getCurrentItem().isSimilar(hotbarItem.getItemStack())) {
-                    event.setCancelled(true);
-                }
-            });
-        }
+
+        if (profile.getState() == ProfileState.FIGHTING) return;
+        Budget.getInstance().getHotbarStorage().getByState(profile.getState()).forEach(hotbarItem -> {
+            if (event.getCurrentItem().isSimilar(hotbarItem.getItemStack())) {
+                event.setCancelled(true);
+            }
+        });
     }
 
 }

@@ -1,5 +1,6 @@
 package dev.lugami.practice.arena;
 
+import dev.lugami.practice.utils.cuboid.Cuboid;
 import lombok.Data;
 import org.bukkit.Location;
 
@@ -16,9 +17,11 @@ public class Arena {
     private Location min;
     private Location max;
     private List<String> whitelistedKits = new ArrayList<>();
+    private Cuboid cuboid;
 
     public Arena(String name) {
         this.name = name;
+
     }
 
 }
