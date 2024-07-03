@@ -138,7 +138,7 @@ public class PlayerUtils {
         for (Player other : Bukkit.getOnlinePlayers()) {
             if (!other.equals(player)) {
                 other.hidePlayer(player);
-                Budget.getInstance().getEntityHider().hideEntity(player, other);
+               // Budget.getInstance().getEntityHider().hideEntity(player, other);
             }
         }
     }
@@ -152,7 +152,7 @@ public class PlayerUtils {
         for (Player other : Bukkit.getOnlinePlayers()) {
             if (!other.equals(player)) {
                 other.showPlayer(player);
-                Budget.getInstance().getEntityHider().showEntity(player, other);
+               // Budget.getInstance().getEntityHider().showEntity(player, other);
             }
         }
     }

@@ -30,7 +30,7 @@ public class PartyInvite {
     public void send() {
         target.sendMessage(CC.translate("&aYou have been invited to " + party.getLeader().getName() + "'s party."));
         Clickable clickable = new Clickable();
-        clickable.add(CC.translate("&aClick here to accept."), CC.translate("&aJoins " + party.getLeader().getName() + "'s party."), "/party join");
+        clickable.add(CC.translate("&aClick here to accept."), CC.translate("&aJoins " + party.getLeader().getName() + "'s party."), "/party join " + getParty().getLeader().getName());
         clickable.sendToPlayer(target);
     }
 

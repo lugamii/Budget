@@ -11,6 +11,7 @@ import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.storage.*;
 import dev.lugami.practice.task.MatchEnderpearlTask;
 import dev.lugami.practice.task.MatchSnapshotTask;
+import dev.lugami.practice.task.MenuTask;
 import dev.lugami.practice.task.QueueTask;
 import dev.lugami.practice.utils.ClassUtils;
 import dev.lugami.practice.utils.ConfigUtil;
@@ -18,6 +19,7 @@ import dev.lugami.practice.utils.EntityHider;
 import dev.lugami.practice.utils.TaskUtil;
 import dev.lugami.practice.utils.command.Drink;
 import dev.lugami.practice.utils.command.command.CommandService;
+import dev.lugami.practice.utils.menu.Menu;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
@@ -33,7 +35,7 @@ public class Budget extends JavaPlugin {
 
     @Getter
     private static Budget instance;
-    private YamlConfiguration mainConfig, kitConfig, arenaConfig, scoreboardConfig;
+    private YamlConfiguration mainConfig, kitConfig, arenaConfig, scoreboardConfig, messagesConfig;
     private ProfileStorage profileStorage;
     private LobbyStorage lobbyStorage;
     private KitStorage kitStorage;
@@ -55,6 +57,7 @@ public class Budget extends JavaPlugin {
         this.kitConfig = ConfigUtil.createConfig("kits");
         this.arenaConfig = ConfigUtil.createConfig("arenas");
         this.scoreboardConfig = ConfigUtil.createConfig("scoreboard");
+        this.messagesConfig = ConfigUtil.createConfig("messages");
         this.setupListeners();
         this.setupManagers();
         this.setupCommands();
@@ -115,6 +118,7 @@ public class Budget extends JavaPlugin {
         TaskUtil.runTaskTimerAsynchronously(new MatchSnapshotTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new MatchEnderpearlTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
+        TaskUtil.runTaskTimerAsynchronously(new MenuTask(), 0, 20 * 3);
     }
 
     private void setupGameRules() {

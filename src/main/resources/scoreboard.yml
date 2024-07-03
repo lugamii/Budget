@@ -57,6 +57,13 @@ MATCH-ONGOING:
   - ""
   - "&blugami.dev/budget"
   - "&7&m----------------------"
+MATCH-FFA:
+  - "&7&m----------------------"
+  - "&fDuration: &b<duration>"
+  - "&fRemaining: &b<remaining>/<size>"
+  - ""
+  - "&blugami.dev/budget"
+  - "&7&m----------------------"
 MATCH-SPECTATING:
   - "&7&m----------------------"
   - "&fDuration: &b<duration>"

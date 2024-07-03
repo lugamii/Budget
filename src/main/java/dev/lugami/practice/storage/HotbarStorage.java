@@ -4,6 +4,7 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.hotbar.HotbarItem;
 import dev.lugami.practice.menus.LeaderboardsMenu;
 import dev.lugami.practice.menus.QueueMenu;
+import dev.lugami.practice.menus.party.PartyEventsMenu;
 import dev.lugami.practice.menus.settings.SettingsMenu;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
@@ -74,7 +75,7 @@ public class HotbarStorage {
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
-            new HotbarItem(new ItemBuilder(Material.GOLD_AXE).name("&bParty Events").build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.GOLD_AXE).name("&bParty Events").build(), player -> new PartyEventsMenu().open(player)),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.INK_SACK).name("&cLeave Party").durability(1).build(), player -> {
                 Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);

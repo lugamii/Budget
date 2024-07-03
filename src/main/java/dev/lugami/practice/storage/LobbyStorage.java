@@ -42,6 +42,10 @@ public class LobbyStorage {
             profile.setMatchState(MatchPlayerState.NONE);
             if (profile.getParty() != null && profile.getParty().isDisbanded()) {
                 profile.setParty(null);
+            } else if (profile.getParty() != null) {
+                Budget.getInstance().getPartyStorage().bringToParty(player, profile.getParty());
+                player.teleport(this.lobbyLocation);
+                return;
             }
             PlayerUtils.resetPlayer(player);
             Budget.getInstance().getHotbarStorage().resetHotbar(player);

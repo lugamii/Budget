@@ -1,5 +1,7 @@
 package dev.lugami.practice.match;
 
+import dev.lugami.practice.Budget;
+import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.utils.Action;
 import dev.lugami.practice.utils.CC;
 import lombok.Data;
@@ -63,6 +65,18 @@ public class Team {
                 sentPlayers.add(player);
             }
         }
+    }
+
+    public int getAlive() {
+        int i = 0;
+        for (UUID uuid : this.getMembers()) {
+            Player player = Bukkit.getPlayer(uuid);
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+            if (profile.getMatchState() == MatchPlayerState.ALIVE) {
+                i++;
+            }
+        }
+        return i;
     }
 
 }

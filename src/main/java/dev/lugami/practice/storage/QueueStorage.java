@@ -2,7 +2,6 @@ package dev.lugami.practice.storage;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.kit.Kit;
-import dev.lugami.practice.match.Match;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.Queue;
@@ -10,7 +9,6 @@ import dev.lugami.practice.queue.QueueType;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.UUID;

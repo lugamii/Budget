@@ -1,25 +1,23 @@
 package dev.lugami.practice.listeners;
 
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import dev.lugami.practice.Budget;
-import dev.lugami.practice.match.Match;
+import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.match.MatchPlayerState;
-import dev.lugami.practice.match.MatchSnapshot;
 import dev.lugami.practice.match.Team;
 import dev.lugami.practice.match.event.MatchEndEvent;
+import dev.lugami.practice.match.types.PartyMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.QueueType;
 import dev.lugami.practice.utils.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EnderPearl;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,9 +26,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MatchListener implements Listener {
@@ -42,8 +38,21 @@ public class MatchListener implements Listener {
         event.getDrops().clear();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (profile.getState() == ProfileState.FIGHTING) {
-            Match match = Budget.getInstance().getMatchStorage().findMatch(player);
-            match.onDeath(player);
+            DefaultMatch match = Budget.getInstance().getMatchStorage().findMatch(player);
+            if (PlayerUtils.getLastAttacker(player).getName() != null) match.sendMessage("&a" + player.getName() + " &7was killed by &c" + PlayerUtils.getLastAttacker(player).getName() + ".");
+            else match.sendMessage("&a" + player.getName() + " &7died.");
+            if (match.isPartyMatch()) {
+                profile.setMatchState(MatchPlayerState.DEAD);
+                if (match.getTeam(player).getAlive() >= 1) {
+                    match.onDeath(player, false);
+                    match.addSpectator(player, true);
+                }
+                else {
+                    match.onDeath(player, true);
+                }
+            } else {
+                match.onDeath(player);
+            }
         }
     }
 
@@ -72,7 +81,7 @@ public class MatchListener implements Listener {
         Player player = event.getPlayer();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (profile.getState() == ProfileState.FIGHTING) {
-            Match match = Budget.getInstance().getMatchStorage().findMatch(player);
+            DefaultMatch match = Budget.getInstance().getMatchStorage().findMatch(player);
             Team team = match.getTeam(player);
             match.end(match.getOpponent(team));
         }
@@ -96,7 +105,7 @@ public class MatchListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
         if (profile.getState() == ProfileState.FIGHTING) {
-            Match match = Budget.getInstance().getMatchStorage().findMatch(event.getPlayer());
+            DefaultMatch match = Budget.getInstance().getMatchStorage().findMatch(event.getPlayer());
             if (match == null) return;
             else {
                 if (!match.getArena().getCuboid().contains(event.getPlayer().getLocation())) {
@@ -112,6 +121,7 @@ public class MatchListener implements Listener {
 
     @EventHandler
     public void onPlayerInventory(InventoryClickEvent event) {
+        if (event.getClickedInventory() == null || event.getInventory() == null) return;
         if (event.getClickedInventory().getType() == InventoryType.CREATIVE || event.getInventory().getType() == InventoryType.CREATIVE) {
             if (event.getWhoClicked() instanceof Player) {
                 Player player = (Player) event.getWhoClicked();
@@ -128,6 +138,13 @@ public class MatchListener implements Listener {
     }
 
     @EventHandler
+    public void onEntityExplode(EntityExplodeEvent event) {
+        if (event.getEntity() instanceof org.bukkit.entity.TNTPrimed) {
+            event.blockList().clear();
+        }
+    }
+
+    @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) {
             return;
@@ -139,13 +156,24 @@ public class MatchListener implements Listener {
         if (profile.getState() == ProfileState.FIGHTING && profile1.getState() == ProfileState.FIGHTING) {
             if (profile1.getMatchState() == MatchPlayerState.DEAD || profile.getMatchState() == MatchPlayerState.DEAD) {
                 event.setCancelled(true);
+                return;
+            }
+
+            DefaultMatch match = Budget.getInstance().getMatchStorage().findMatch(player);
+            if (match == Budget.getInstance().getMatchStorage().findMatch(damager)) {
+                if (match.isPartyMatch()) {
+                    PartyMatch partyMatch = (PartyMatch) match;
+                    if (partyMatch.getType() == PartyMatch.MatchType.SPLIT) {
+                        event.setCancelled(partyMatch.getTeam(player) == partyMatch.getTeam(damager));
+                    }
+                }
             }
         }
     }
 
     @EventHandler
     public void onMatchEnd(MatchEndEvent event) {
-        Match match = event.getMatch();
+        DefaultMatch match = event.getMatch();
         String eloMessage = null;
 
         if (match.getQueueType() == QueueType.RANKED) {
@@ -159,7 +187,7 @@ public class MatchListener implements Listener {
         sendMatchEndMessages(match, event.getLoser(), winnerMessage, inventories, eloMessage);
     }
 
-    private String handleRankedMatchEnd(Match match) {
+    private String handleRankedMatchEnd(DefaultMatch match) {
         Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(match.getWinnerTeam().getLeader());
         Profile profile2 = Budget.getInstance().getProfileStorage().findProfile(match.getOpponent(match.getWinnerTeam()).getLeader());
 
@@ -178,7 +206,7 @@ public class MatchListener implements Listener {
         return "&aELO Changes: " + match.getWinnerTeam().getLeader().getName() + " +" + p1EloChange + " &7(" + eloChanges[0] + ") &7┃ &c" + match.getOpponent(match.getWinnerTeam()).getLeader().getName() + " " + p2EloChange + " &7(" + eloChanges[1] + ")";
     }
 
-    private void sendMatchEndMessages(Match match, Team team, String winnerMessage, Clickable inventories, String eloMessage) {
+    private void sendMatchEndMessages(DefaultMatch match, Team team, String winnerMessage, Clickable inventories, String eloMessage) {
         team.sendMessage("");
         team.sendMessage(winnerMessage);
         team.doAction(inventories::sendToPlayer);

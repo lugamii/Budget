@@ -30,6 +30,9 @@ public class LeaderboardsMenu extends Menu {
                 lore.add("");
                 int pos = 1;
                 for (LeaderboardsEntry leaderboardsEntry : LeaderboardsStorage.getKitLeaderboards().get(kit)) {
+                    if (leaderboardsEntry.getName() == null || (Integer) leaderboardsEntry.getElo() == null) {
+                        continue;
+                    }
                     lore.add("&b#" + pos + ": &f" + leaderboardsEntry.getName() + "&7 - &f" + leaderboardsEntry.getElo());
                     pos++;
                 }

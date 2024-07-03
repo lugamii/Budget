@@ -1,8 +1,9 @@
 package dev.lugami.practice.commands.impl;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.Language;
 import dev.lugami.practice.commands.CommandBase;
-import dev.lugami.practice.match.Match;
+import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.settings.Setting;
@@ -19,7 +20,7 @@ public class SpectateCommands extends CommandBase {
     @Command(name = "", desc = "Spectates a match, specified by a player", usage = "<target>")
     public void spectate(@Sender Player player, Player target) {
         if (target == null) {
-            player.sendMessage(CC.translate("&cCould not find that player."));
+            player.sendMessage(Language.NULL_TARGET.format());
             return;
         }
         if (target == player) {
@@ -28,7 +29,7 @@ public class SpectateCommands extends CommandBase {
         }
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (profile.isBusy()) {
-            player.sendMessage(CC.translate("&cYou cannot do this right now."));
+            player.sendMessage(Language.CANNOT_DO_ACTION.format());
             return;
         }
         Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(target);
@@ -36,7 +37,7 @@ public class SpectateCommands extends CommandBase {
             player.sendMessage(CC.translate("&c" + target.getName() + " is not in a fight."));
             return;
         } else {
-            Match match = Budget.getInstance().getMatchStorage().findMatch(target);
+            DefaultMatch match = Budget.getInstance().getMatchStorage().findMatch(target);
             if (match == null) return;
             match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
         }

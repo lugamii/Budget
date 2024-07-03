@@ -1,6 +1,7 @@
 package dev.lugami.practice.commands.impl;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.Language;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.party.PartyInvite;
@@ -18,25 +19,14 @@ public class PartyCommands extends CommandBase {
     @Command(name = "create", desc = "Creates a party.")
     public void create(@Sender Player sender) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
+        if (profile.getParty() != null) {
+            sender.sendMessage(CC.translate("&cYou are already in a party."));
+            return;
+        }
         if (profile.isBusy()) {
-            sender.sendMessage(CC.translate("&cYou cannot do this right now."));
+            sender.sendMessage(Language.CANNOT_DO_ACTION.format());
         } else {
             profile.setParty(new Party(sender));
-        }
-    }
-
-    @Command(name = "join", desc = "Joins a party.")
-    public void join(@Sender Player sender) {
-        Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
-        if (PartyInvite.hasInvite(sender)) {
-            PartyInvite invite = PartyInvite.getPartyRequest(sender);
-            if (invite == null || invite.getParty() == null) {
-                Budget.getInstance().getLogger().warning("Party was null on " + invite.toString());
-                return;
-            }
-            invite.getParty().join(sender);
-        } else {
-            sender.sendMessage(CC.translate("&cYou don't have a party invite."));
         }
     }
 
@@ -55,6 +45,10 @@ public class PartyCommands extends CommandBase {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
         if (target == null) {
             sender.sendMessage(CC.translate("&cCould not find that player."));
+            return;
+        }
+        if (profile.getParty() != null) {
+            sender.sendMessage(CC.translate("&cYou are already in a party."));
             return;
         }
         if (PartyInvite.hasInvite(sender)) {
@@ -79,8 +73,30 @@ public class PartyCommands extends CommandBase {
         if (!profile.isInParty()) {
             sender.sendMessage(CC.translate("&cYou are not in a party."));
         } else {
+            if (sender == target) {
+                sender.sendMessage(CC.translate("&cYou cannot invite yourself to a party."));
+                return;
+            }
             PartyInvite partyInvite = new PartyInvite(profile.getParty(), target);
             partyInvite.send();
+            profile.getParty().sendMessage(CC.translate("&a" + sender.getName() + " has invited " + target.getName() + " to the party."));
+        }
+    }
+
+    @Command(name = "kick", desc = "Kicks a player from a party.", usage = "<target>")
+    public void kick(@Sender Player sender, Player target) {
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
+        if (!profile.isInParty()) {
+            sender.sendMessage(CC.translate("&cYou are not in a party."));
+        } else {
+            if (sender == target) {
+                sender.sendMessage(CC.translate("&cYou cannot kick yourself from a party."));
+                return;
+            }
+            Party party = profile.getParty();
+            if (party.getMembers().contains(target.getUniqueId())) {
+                party.kick(target);
+            }
         }
     }
 

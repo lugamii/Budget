@@ -1,8 +1,12 @@
-package dev.lugami.practice.match;
+package dev.lugami.practice.match.types;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.Language;
 import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.MatchPlayerState;
+import dev.lugami.practice.match.MatchSnapshot;
+import dev.lugami.practice.match.Team;
 import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.profile.Profile;
@@ -19,7 +23,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -29,7 +32,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 @Setter
-public class Match {
+public class DefaultMatch {
 
     private final UUID matchId;
     private final Team team1;
@@ -50,16 +53,16 @@ public class Match {
         ENDED
     }
 
-    public Match(Kit kit, Arena arena) {
+    public DefaultMatch(Kit kit, Arena arena) {
         this(kit, arena, QueueType.UNRANKED);
     }
 
-    public Match(Kit kit, Arena arena, boolean npcTesting) {
+    public DefaultMatch(Kit kit, Arena arena, boolean npcTesting) {
         this(kit, arena, QueueType.UNRANKED);
         this.npcTesting = npcTesting;
     }
 
-    public Match(Kit kit, Arena arena, QueueType queueType) {
+    public DefaultMatch(Kit kit, Arena arena, QueueType queueType) {
         this.matchId = UUID.randomUUID();
         this.kit = kit;
         this.arena = arena;
@@ -137,7 +140,7 @@ public class Match {
                 Budget.getInstance().getHotbarStorage().resetHotbar(player);
                 if (!silent) sendMessage("&b" + player.getName() + " &eis spectating the match.");
             } else {
-                player.sendMessage(ChatColor.RED + "You cannot do this right now.");
+                player.sendMessage(Language.CANNOT_DO_ACTION.format());
                 return;
             }
         }
@@ -173,7 +176,7 @@ public class Match {
                     if (countdown == 0) {
                         state = MatchState.IN_PROGRESS;
                         sendMessage(ChatColor.GREEN + "The match has started!");
-                        (new MatchStartEvent(Match.this, team1, team2)).call();
+                        (new MatchStartEvent(DefaultMatch.this, team1, team2)).call();
                         startedAt = System.currentTimeMillis();
                         this.cancel();
                     } else {
@@ -188,6 +191,10 @@ public class Match {
     }
 
     public void onDeath(Player player) {
+        this.onDeath(player, true);
+    }
+
+    public void onDeath(Player player, boolean end) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         Location location = player.getLocation().clone();
         Player killer = PlayerUtils.getLastAttacker(player);
@@ -216,7 +223,7 @@ public class Match {
         player.setVelocity(new Vector());
         player.teleport(location);
         PlayerUtils.resetPlayer(player, false);
-        end(getOpponent(getTeam(player)));
+        if (end) end(getOpponent(getTeam(player)));
     }
 
     /**
@@ -232,7 +239,6 @@ public class Match {
             if (winnerLeader != null) {
                 Profile profile = Budget.getInstance().getProfileStorage().findProfile(winnerLeader);
                 profile.setMatchState(MatchPlayerState.DEAD);
-                this.sendMessage(winnerLeader.getName() + (winningTeam.getSize() >= 2 ? "'s team" : "") + " has won the match!");
                 (new MatchEndEvent(this, this.winnerTeam, this.getOpponent(winnerTeam))).call();
                 MatchSnapshot snap = new MatchSnapshot(winnerLeader, this.getOpponent(winnerTeam).getLeader(), winnerLeader.getInventory().getArmorContents(), winnerLeader.getInventory().getContents());
                 Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
@@ -245,7 +251,7 @@ public class Match {
                     }
                 }
                 Budget.getInstance().getMatchStorage().getMatches().remove(this);
-            }, 20 * 3);
+            }, 20 * 5);
         } else {
             Budget.getInstance().getLogger().warning("Match already ended.");
         }
@@ -265,7 +271,7 @@ public class Match {
         player.getInventory().setArmorContents(this.kit.getArmor());
     }
 
-    private void teleportTeamsToArena() {
+    void teleportTeamsToArena() {
         TaskUtil.runTaskLater(() -> {
             for (UUID playerId : this.team1.getMembers()) {
                 Player player = Bukkit.getPlayer(playerId);
@@ -364,5 +370,9 @@ public class Match {
             default:
                 return "Waiting";
         }
+    }
+
+    public boolean isPartyMatch() {
+        return this instanceof PartyMatch;
     }
 }

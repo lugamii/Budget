@@ -1,6 +1,6 @@
 package dev.lugami.practice.task;
 
-import dev.lugami.practice.match.Match;
+import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.profile.Profile;
@@ -50,7 +50,7 @@ public class QueueTask extends BukkitRunnable {
                     continue;
                 }
 
-                Match match = new Match(queue.getKit(), arena, QueueType.RANKED);
+                DefaultMatch match = new DefaultMatch(queue.getKit(), arena, QueueType.RANKED);
                 match.addPlayerToTeam1(player1);
                 match.addPlayerToTeam2(player2);
                 match.start();
@@ -78,7 +78,7 @@ public class QueueTask extends BukkitRunnable {
                 continue;
             }
 
-            Match match = new Match(queue.getKit(), arena);
+            DefaultMatch match = new DefaultMatch(queue.getKit(), arena);
             match.addPlayerToTeam1(player1);
             match.addPlayerToTeam2(player2);
             match.start();

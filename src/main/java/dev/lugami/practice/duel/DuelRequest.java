@@ -2,11 +2,10 @@ package dev.lugami.practice.duel;
 
 import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.arena.Arena;
-import dev.lugami.practice.match.Match;
+import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.Clickable;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -57,7 +56,7 @@ public class DuelRequest {
             Player target = getTarget();
 
             if (requester != null) {
-                Match match = new Match(getKit(), getArena());
+                DefaultMatch match = new DefaultMatch(getKit(), getArena());
                 match.addPlayerToTeam1(requester);
                 match.addPlayerToTeam2(target);
                 match.start();

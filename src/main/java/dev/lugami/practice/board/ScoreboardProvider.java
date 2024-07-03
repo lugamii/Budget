@@ -1,7 +1,9 @@
 package dev.lugami.practice.board;
 
 import dev.lugami.practice.Budget;
-import dev.lugami.practice.match.Match;
+import dev.lugami.practice.match.MatchPlayerState;
+import dev.lugami.practice.match.types.DefaultMatch;
+import dev.lugami.practice.match.types.PartyMatch;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.settings.Setting;
@@ -11,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ScoreboardProvider implements AssembleAdapter {
     @Override
@@ -51,7 +54,7 @@ public class ScoreboardProvider implements AssembleAdapter {
                         }
                         break;
                     case FIGHTING:
-                        Match match = Budget.getInstance().getMatchStorage().findMatch(player);
+                        DefaultMatch match = Budget.getInstance().getMatchStorage().findMatch(player);
                         if (match == null) {
                             lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WAITING"));
                             break;
@@ -67,11 +70,33 @@ public class ScoreboardProvider implements AssembleAdapter {
                                     }
                                     break;
                                 case IN_PROGRESS:
-                                    for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
-                                        line = line.
-                                                replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
-                                                replace("<duration>", match.getDuration());
-                                        lines.add(line);
+                                    if (match.isPartyMatch()) {
+                                        PartyMatch partyMatch = (PartyMatch) match;
+                                        if (partyMatch.getType() == PartyMatch.MatchType.FFA) {
+                                            for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-FFA")) {
+                                                line = line.
+                                                        replace("<remaining>", "" + (int) partyMatch.getPlayers().stream().filter(player1 ->
+                                                                Budget.getInstance().getProfileStorage().findProfile(player1).getMatchState() == MatchPlayerState.ALIVE
+                                                        ).count())
+                                                        .replace("<size>", "" + partyMatch.getPlayers().size())
+                                                        .replace("<duration>", match.getDuration());
+                                                lines.add(line);
+                                            }
+                                        } else {
+                                            for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
+                                                line = line.
+                                                        replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
+                                                        replace("<duration>", match.getDuration());
+                                                lines.add(line);
+                                            }
+                                        }
+                                    } else {
+                                        for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
+                                            line = line.
+                                                    replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
+                                                    replace("<duration>", match.getDuration());
+                                            lines.add(line);
+                                        }
                                     }
                                     break;
                                 case ENDED:
@@ -85,7 +110,7 @@ public class ScoreboardProvider implements AssembleAdapter {
                         }
                         break;
                     case SPECTATING:
-                        Match match1 = Budget.getInstance().getMatchStorage().findMatch(player);
+                        DefaultMatch match1 = Budget.getInstance().getMatchStorage().findMatch(player);
                         for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-SPECTATING")) {
                             line = line.replace("<duration>", match1.getDuration()).replace("<player1>", match1.getTeam1().getLeader().getName()).replace("<player2>", match1.getTeam2().getLeader().getName());
                             lines.add(line);

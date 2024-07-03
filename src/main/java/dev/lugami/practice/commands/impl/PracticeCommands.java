@@ -1,10 +1,11 @@
 package dev.lugami.practice.commands.impl;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.Language;
 import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.kit.Kit;
-import dev.lugami.practice.match.Match;
+import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.*;
@@ -13,9 +14,7 @@ import dev.lugami.practice.utils.command.annotation.Require;
 import dev.lugami.practice.utils.command.annotation.Sender;
 import dev.lugami.practice.utils.fake.FakePlayer;
 import dev.lugami.practice.utils.fake.FakePlayerUtils;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.SpigotConfig;
 
@@ -39,7 +38,7 @@ public class PracticeCommands extends CommandBase {
         if (profile.getState() == ProfileState.LOBBY) {
             Budget.getInstance().getLobbyStorage().bringToLobby(player);
         } else {
-            player.sendMessage(CC.translate("&cYou cannot do this right now."));
+            player.sendMessage(Language.CANNOT_DO_ACTION.format());
         }
     }
 
@@ -53,7 +52,7 @@ public class PracticeCommands extends CommandBase {
             FakePlayer player2 = FakePlayerUtils.spawnFakePlayer(arena.getPos2(), "Test2");
             Profile profile1 = new Profile(player1);
             Profile profile2 = new Profile(player2);
-            Match match = new Match(
+            DefaultMatch match = new DefaultMatch(
                     kit,
                     arena,
                     true

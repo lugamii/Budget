@@ -1,6 +1,7 @@
 package dev.lugami.practice.utils.menu;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.Language;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.InventoryWrapper;
@@ -78,7 +79,7 @@ public class Menu {
         this.initialize();
         TaskUtil.runTaskLater(() -> {
             if (!player.hasPermission("budget.menu.bypass") && Budget.getInstance().getProfileStorage().findProfile(player).getState() != ProfileState.LOBBY) {
-                player.sendMessage(CC.translate("&cYou cannot do this right now."));
+                player.sendMessage(Language.CANNOT_DO_ACTION.format());
                 return;
             }
             if (player.getOpenInventory() != null) {
@@ -89,6 +90,8 @@ public class Menu {
             openMenus.put(player, this);
         }, 1);
     }
+
+
 
     /**
      * Handles a click event at the specified slot for the given player.

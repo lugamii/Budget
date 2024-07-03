@@ -1,0 +1,5 @@
+MESSAGES:
+  ERRORS:
+    NULL-TARGET: "&cCould not find that player."
+    CANNOT-DO-ACTION: "&cYou cannot do this right now."
+    UNFINISHED: "&cThis feature is not ready yet."

@@ -31,9 +31,9 @@ public class Party extends Team {
     public void disband() {
         Budget.getInstance().getPartyStorage().getParties().remove(this);
         this.doAction(player -> {
+            player.sendMessage(CC.translate("&cThe party has been disbanded."));
             Budget.getInstance().getLobbyStorage().bringToLobby(player);
             this.disbanded = true;
-            player.sendMessage(CC.translate("&aThe party has been disbanded."));
         });
     }
 
@@ -44,21 +44,35 @@ public class Party extends Team {
             this.sendMessage("&a" + p.getName() + " has joined the party.");
         } else {
            if (!PartyInvite.hasInvite(p)) {
-               p.sendMessage("&cYou don't have a invite to this party.");
+               p.sendMessage(CC.translate("&cYou don't have a invite to this party."));
            } else if (this.getMembers().contains(p.getUniqueId())) {
-               p.sendMessage("&cYou are already in a party.");
+               p.sendMessage(CC.translate("&cYou are already in a party."));
            }
         }
     }
 
-    public void leave(Player p) {
+    public void leave(Player p, boolean silent) {
         if (this.getMembers().contains(p.getUniqueId())) {
-            this.removeMember(p);
             Budget.getInstance().getLobbyStorage().bringToLobby(p);
-            this.sendMessage("&c" + p.getName() + " has left the party.");
-            if (this.getSize() <= 1) this.disband();
+            if (!silent) this.sendMessage("&c" + p.getName() + " has left the party.");
+            if (this.getSize() <= 1 || p == this.getLeader()) this.disband();
+            this.removeMember(p);
         } else {
             Budget.getInstance().getLogger().warning("Player tried to leave a party he wasn't in (?)");
         }
+    }
+
+    public void leave(Player p) {
+        this.leave(p, false);
+    }
+
+    public void kick(Player p) {
+        this.leave(p, true);
+        p.sendMessage(CC.translate("&cYou have been kicked from the party."));
+        this.sendMessage("&c" + p.getName() + " was kicked from the party.");
+    }
+
+    public int getSize() {
+        return this.getMembers().size();
     }
 }
