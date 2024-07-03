@@ -198,7 +198,14 @@ public class Match {
                 team2.doAction(player1 -> LightningUtil.spawnLighting(player1, location));
                 spectators.forEach(player1 -> LightningUtil.spawnLighting(player1, location));
             }
+
+            if (killerProfile.getProfileOptions().getSettingsMap().get(Setting.EXPLOSION)) {
+                team1.doAction(player1 -> ExplosionUtil.spawnExplosion(player1, location));
+                team2.doAction(player1 -> ExplosionUtil.spawnExplosion(player1, location));
+                spectators.forEach(player1 -> ExplosionUtil.spawnExplosion(player1, location));
+            }
         }
+
         player.setHealth(20);
         PlayerUtils.respawnPlayer(player);
         player.setFireTicks(0);

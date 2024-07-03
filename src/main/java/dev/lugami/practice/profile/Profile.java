@@ -82,6 +82,8 @@ public class Profile {
                 this.profileOptions.getSettingsMap().put(Setting.ALLOW_SPECTATORS, (boolean) options.getOrDefault("allowSpectators", Setting.ALLOW_SPECTATORS.isDefaultToggled()));
                 this.profileOptions.getSettingsMap().put(Setting.SILENT_SPECTATE, (boolean) options.getOrDefault("silentSpectate", Setting.SILENT_SPECTATE.isDefaultToggled()));
                 this.profileOptions.getSettingsMap().put(Setting.LIGHTNING, (boolean) options.getOrDefault("lightningEffect", Setting.LIGHTNING.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Setting.EXPLOSION, (boolean) options.getOrDefault("explosionEffect", Setting.EXPLOSION.isDefaultToggled()));
+
                 Document kitStatistics = (Document) document.get("profileStatistics");
                 for (String key : kitStatistics.keySet()) {
                     Document kitDoc = (Document) kitStatistics.get(key);
@@ -111,6 +113,8 @@ public class Profile {
         optionsDocument.put("allowSpectators", this.profileOptions.getSettingsMap().get(Setting.ALLOW_SPECTATORS));
         optionsDocument.put("silentSpectate", this.profileOptions.getSettingsMap().get(Setting.SILENT_SPECTATE));
         optionsDocument.put("lightningEffect", this.profileOptions.getSettingsMap().get(Setting.LIGHTNING));
+        optionsDocument.put("explosionEffect", this.profileOptions.getSettingsMap().get(Setting.EXPLOSION));
+
         document.put("options", optionsDocument);
 
         Document profileStatisticsDocument = new Document();

@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 @UtilityClass
 public class LightningUtil {
-    
+
     public void spawnLighting(Player player, Location location) {
         WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
         EntityLightning lightning = new EntityLightning(worldServer, location.getX(), location.getY(), location.getZ(), false);
@@ -21,5 +21,4 @@ public class LightningUtil {
         PacketPlayOutSpawnEntityWeather packet = new PacketPlayOutSpawnEntityWeather(lightning);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
     }
-
 }
