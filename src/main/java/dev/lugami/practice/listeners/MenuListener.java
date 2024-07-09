@@ -10,7 +10,6 @@ import org.bukkit.inventory.Inventory;
 
 public class MenuListener implements Listener {
 
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) {
@@ -31,8 +30,15 @@ public class MenuListener implements Listener {
 
         String title = inventory.getTitle();
         Menu menu = Menu.getOpenMenus().get(player);
-        if (menu.getTitle().equals(title)) {
+        if (menu != null && menu.getTitle().equals(title)) {
             menu.handleClick(event.getSlot(), player);
+            for (Player player1 : Menu.getOpenMenus().keySet()) {
+                Menu openMenu = Menu.getOpenMenus().get(player1);
+                if (openMenu.getTitle().equals(title)) {
+                    openMenu.updateButtonLore(player1);
+                    player1.updateInventory();
+                }
+            }
         }
     }
 
@@ -40,9 +46,7 @@ public class MenuListener implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player)) return;
         Player player = (Player) event.getPlayer();
-        if (Menu.getOpenMenus().get(player) != null) {
-            Menu.getOpenMenus().remove(player);
-        }
+        Menu.getOpenMenus().remove(player);
     }
 
 }

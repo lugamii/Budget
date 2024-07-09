@@ -7,6 +7,7 @@ import dev.lugami.practice.storage.LeaderboardsStorage;
 import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class LeaderboardsMenu extends Menu {
     }
 
     @Override
-    public void initialize() {
+    public void initialize(Player player) {
         this.fillBorder();
         int slot = 10;
         Budget.getInstance().getLeaderboardsStorage().updateLeaderboards();

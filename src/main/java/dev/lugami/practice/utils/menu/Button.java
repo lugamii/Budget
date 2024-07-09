@@ -3,12 +3,13 @@ package dev.lugami.practice.utils.menu;
 
 import dev.lugami.practice.utils.Action;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
-@Getter
+@Getter @Setter
 public class Button {
 
     private final ItemStack itemStack;

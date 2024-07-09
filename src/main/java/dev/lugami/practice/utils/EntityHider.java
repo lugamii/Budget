@@ -43,8 +43,8 @@ public class EntityHider extends TinyProtocol {
 
     @Override
     public Object onPacketOutAsync(Player receiver, Channel channel, Object packet) {
+        if (receiver == null || receiver.getUniqueId() == null) return super.onPacketOutAsync(receiver, channel, packet);
         UUID receiverId = receiver.getUniqueId();
-        if (receiverId == null) return null;
 
         if (!hiddenEntities.containsKey(receiverId)) {
             return super.onPacketOutAsync(receiver, channel, packet);

@@ -18,6 +18,10 @@ public class ArenaCommands extends CommandBase {
     @Command(name = "create", desc = "Creates a new arena.", usage = "<name>")
     @Require("budget.arena.create")
     public void createArena(@Sender Player player, String name) {
+        if (Budget.getInstance().getArenaStorage().getByName(name) != null) {
+            player.sendMessage(CC.translate("&cThis arena already exists!"));
+            return;
+        }
         Arena arena = new Arena(name);
         Budget.getInstance().getArenaStorage().getArenas().add(arena);
         player.sendMessage(CC.translate("&aSuccessfully created the arena " + name + "!"));

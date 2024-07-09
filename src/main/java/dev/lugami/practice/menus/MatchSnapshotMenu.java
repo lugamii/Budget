@@ -7,6 +7,7 @@ import dev.lugami.practice.utils.ItemUtils;
 import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class MatchSnapshotMenu extends Menu {
@@ -22,14 +23,14 @@ public class MatchSnapshotMenu extends Menu {
     }
 
     @Override
-    public void initialize() {
+    public void initialize(Player player) {
         ItemStack[] fixedContents = ItemUtils.fixInventoryOrder(snapshot.getContents());
         for (int i = 0; i < fixedContents.length; ++i) {
             ItemStack itemStack = fixedContents[i];
 
             if (itemStack != null) {
                 if (itemStack.getType() != Material.AIR) {
-                    setButton(i, new Button(itemStack, player -> {}));
+                    setButton(i, new Button(itemStack, player1 -> {}));
                 }
             }
         }
@@ -38,10 +39,10 @@ public class MatchSnapshotMenu extends Menu {
             ItemStack itemStack = snapshot.getArmor()[i];
 
             if (itemStack != null && itemStack.getType() != Material.AIR) {
-                setButton(39 - i, new Button(itemStack, player -> {}));
+                setButton(39 - i, new Button(itemStack, player1 -> {}));
             }
         }
         MatchSnapshot opp = Budget.getInstance().getMatchStorage().findMatchSnapshot(snapshot.getOpponent());
-        setButton(44, new Button(new ItemBuilder(Material.PAPER).name("&bSwitch to " + snapshot.getOpponent().getName() + "'s inventory").build(), player -> new MatchSnapshotMenu(opp).open(player)));
+        setButton(44, new Button(new ItemBuilder(Material.PAPER).name("&bSwitch to " + snapshot.getOpponent().getName() + "'s inventory").build(), player1 -> new MatchSnapshotMenu(opp).open(player1)));
     }
 }

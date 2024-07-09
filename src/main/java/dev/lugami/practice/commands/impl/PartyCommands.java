@@ -44,7 +44,7 @@ public class PartyCommands extends CommandBase {
     public void join(@Sender Player sender, Player target) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
         if (target == null) {
-            sender.sendMessage(CC.translate("&cCould not find that player."));
+            sender.sendMessage(Language.NULL_TARGET.format());
             return;
         }
         if (profile.getParty() != null) {
@@ -73,6 +73,10 @@ public class PartyCommands extends CommandBase {
         if (!profile.isInParty()) {
             sender.sendMessage(CC.translate("&cYou are not in a party."));
         } else {
+            if (target == null) {
+                sender.sendMessage(Language.NULL_TARGET.format());
+                return;
+            }
             if (sender == target) {
                 sender.sendMessage(CC.translate("&cYou cannot invite yourself to a party."));
                 return;
@@ -89,6 +93,10 @@ public class PartyCommands extends CommandBase {
         if (!profile.isInParty()) {
             sender.sendMessage(CC.translate("&cYou are not in a party."));
         } else {
+            if (target == null) {
+                sender.sendMessage(Language.NULL_TARGET.format());
+                return;
+            }
             if (sender == target) {
                 sender.sendMessage(CC.translate("&cYou cannot kick yourself from a party."));
                 return;

@@ -2,6 +2,7 @@ package dev.lugami.practice.storage;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.Match;
 import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.match.MatchSnapshot;
 import dev.lugami.practice.profile.Profile;
@@ -19,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Getter
 public class MatchStorage {
 
-    private final List<DefaultMatch> matches = new CopyOnWriteArrayList<>();
+    private final List<Match> matches = new CopyOnWriteArrayList<>();
     private final List<MatchSnapshot> snapshots = new CopyOnWriteArrayList<>();
 
     /**
@@ -28,7 +29,7 @@ public class MatchStorage {
      * @param uuid The UUID of the match or player in the match.
      * @return The found match, or null if not found.
      */
-    public DefaultMatch findMatch(UUID uuid) {
+    public Match findMatch(UUID uuid) {
         return this.matches.stream().filter(match -> match.getMatchId() == uuid || match.isPlayerInMatch(Bukkit.getPlayer(uuid))).findFirst().orElse(null);
     }
 
@@ -38,7 +39,7 @@ public class MatchStorage {
      * @param player The player in the match.
      * @return The found match, or null if not found.
      */
-    public DefaultMatch findMatch(Player player) {
+    public Match findMatch(Player player) {
         return this.matches.stream().filter(match -> match.isPlayerInMatch(player)).findFirst().orElse(null);
     }
 
@@ -99,7 +100,7 @@ public class MatchStorage {
             int i = 0;
             for (Profile profile : Budget.getInstance().getProfileStorage().getProfiles()) {
                 if (profile.getState() == ProfileState.FIGHTING) {
-                    DefaultMatch match = findMatch(profile.getPlayer());
+                    Match match = findMatch(profile.getPlayer());
                     if (match.getKit() == kit && match.getQueueType() == queueType) {
                         i++;
                     }

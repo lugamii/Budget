@@ -5,12 +5,14 @@ package dev.lugami.practice.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
+@Getter
 public class Clickable {
     private final List<TextComponent> components = new ArrayList<TextComponent>();
     private String hoverText;
@@ -100,15 +102,4 @@ public class Clickable {
     public Clickable() {
     }
 
-    public List<TextComponent> getComponents() {
-        return this.components;
-    }
-
-    public String getHoverText() {
-        return this.hoverText;
-    }
-
-    public String getText() {
-        return this.text;
-    }
 }

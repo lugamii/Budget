@@ -3,30 +3,44 @@ package dev.lugami.practice.utils.menu;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.Language;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.utils.CC;
-import dev.lugami.practice.utils.InventoryWrapper;
-import dev.lugami.practice.utils.ItemBuilder;
-import dev.lugami.practice.utils.TaskUtil;
+import dev.lugami.practice.utils.*;
 import lombok.Getter;
+import net.minecraft.server.v1_8_R3.Container;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutSetSlot;
+import net.minecraft.server.v1_8_R3.PacketPlayOutWindowItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
-@Getter
+
 public class Menu {
 
+    @Getter
     private final String title;
+    @Getter
     private final int size;
-    private final Inventory inventory;
+
+    @Getter
+    private final InventoryWrapper inventory;
+
+    private final Inventory internalInv;
+
+    @Getter
     private final Map<Integer, Button> buttons;
-    private final ItemStack placeholder = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(15).name(" ").build();
-    private final Button placeholderButton = new Button(placeholder);
+    @Getter
+    private static final ItemStack placeholder = new ItemBuilder(Material.STAINED_GLASS_PANE).durability(15).name(" ").build();
+    @Getter
+    private static final Button placeholderButton = new Button(placeholder);
 
     @Getter
     private static final Map<Player, Menu> openMenus = new HashMap<>();
@@ -40,7 +54,8 @@ public class Menu {
     public Menu(String t, int s) {
         this.title = CC.translate(t);
         this.size = s;
-        this.inventory = Bukkit.createInventory(null, size, title);
+        this.internalInv = Bukkit.createInventory(null, size, title);
+        this.inventory = new InventoryWrapper(internalInv);
         this.buttons = new HashMap<>();
     }
 
@@ -51,8 +66,11 @@ public class Menu {
      * @param button the button to be placed
      */
     public void setButton(int slot, Button button) {
-        buttons.put(slot, button);
-        inventory.setItem(slot, button.getItemStack());
+        if (slot > getSize()) slot = internalInv.getSize() - 1;
+        if (buttons.get(slot) != null) buttons.remove(slot);
+        if (slot < getSize() && internalInv.getItem(slot) != null) inventory.setItem(slot, null);
+        if (slot < getSize()) inventory.setItem(slot, button.getItemStack());
+        if (slot < getSize()) buttons.put(slot, button);
     }
 
     /**
@@ -71,23 +89,22 @@ public class Menu {
      * @param player the player to open the menu for
      */
     public void open(Player player) {
-        if (this.getInventory().getSize() != 0) {
-            InventoryWrapper wrapper = new InventoryWrapper(this.getInventory());
-            wrapper.clear();
+        if (this.internalInv.getSize() != 0) {
+            inventory.clearExcept(placeholder);
             buttons.clear();
         }
-        this.initialize();
+        this.initialize(player);
         TaskUtil.runTaskLater(() -> {
             if (!player.hasPermission("budget.menu.bypass") && Budget.getInstance().getProfileStorage().findProfile(player).getState() != ProfileState.LOBBY) {
                 player.sendMessage(Language.CANNOT_DO_ACTION.format());
                 return;
             }
-            if (player.getOpenInventory() != null) {
+            if (this.openMenus.get(player) != null) {
                 ((CraftPlayer) player).getHandle().p();
-                openMenus.remove(player);
+                this.openMenus.remove(player);
             }
-            player.openInventory(inventory);
-            openMenus.put(player, this);
+            player.openInventory(internalInv);
+            this.openMenus.put(player, this);
         }, 1);
     }
 
@@ -100,7 +117,7 @@ public class Menu {
      * @param player the player who clicked the slot
      */
     public void handleClick(int slot, Player player) {
-        if (buttons.containsKey(slot)) {
+        if (this.buttons.containsKey(slot)) {
             Button button = buttons.get(slot);
             button.getAction().execute(player);
         }
@@ -111,31 +128,31 @@ public class Menu {
      * The border includes the top and bottom rows, as well as the left and right columns.
      */
     public void fillBorder() {
-        if (size < 9) return;
+        if (this.size < 9) return;
 
-        int rows = size / 9;
+        int rows = this.size / 9;
 
         // Fill top row
         for (int i = 0; i < 9; i++) {
-            if (getButton(i) == null) {
-                setButton(i, placeholderButton);
+            if (this.getButton(i) == null) {
+                this.setButton(i, placeholderButton);
             }
         }
 
         // Fill bottom row
         for (int i = size - 9; i < size; i++) {
-            if (getButton(i) == null) {
-                setButton(i, placeholderButton);
+            if (this.getButton(i) == null) {
+                this.setButton(i, placeholderButton);
             }
         }
 
         // Fill left and right columns
         for (int i = 1; i < rows - 1; i++) {
-            if (getButton(i * 9) == null) {
-                setButton(i * 9, placeholderButton);
+            if (this.getButton(i * 9) == null) {
+                this.setButton(i * 9, placeholderButton);
             }
-            if (getButton(i * 9 + 8) == null) {
-                setButton(i * 9 + 8, placeholderButton);
+            if (this.getButton(i * 9 + 8) == null) {
+                this.setButton(i * 9 + 8, placeholderButton);
             }
         }
     }
@@ -144,7 +161,36 @@ public class Menu {
      * Initializes the menu.
      * This method is intended to be overridden by subclasses to add custom initialization logic.
      */
-    public void initialize() {
+    public void initialize(Player player) {
 
+    }
+
+    /**
+     * Updates the lore of all buttons in the menu.
+     */
+    public void updateButtonLore(Player player) {
+        for (Map.Entry<Integer, Button> entry : buttons.entrySet()) {
+            Button button = entry.getValue();
+            ItemStack itemStack = button.getItemStack();
+            List<String> newLore = getUpdatedLore(player, entry.getKey(), itemStack);
+            if (newLore != null) {
+                ItemMeta meta = itemStack.getItemMeta();
+                meta.setLore(newLore);
+                itemStack.setItemMeta(meta);
+                setButton(entry.getKey(), new Button(itemStack.clone(), button.getAction()));
+            }
+        }
+    }
+
+
+    /**
+     * Override this method in subclasses to provide the updated lore for a button.
+     *
+     * @param slot the slot of the button
+     * @param itemStack the ItemStack of the button
+     * @return the updated lore, or null if no update is needed
+     */
+    public List<String> getUpdatedLore(Player player, int slot, ItemStack itemStack) {
+        return null;
     }
 }

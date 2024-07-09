@@ -13,8 +13,8 @@ public class LeaderboardsEntry {
         this.elo = elo;
     }
 
-    public LeaderboardsEntry() {
-        // This is empty.
+    public LeaderboardsEntry(String name) {
+        this.name = name;
     }
 
 }

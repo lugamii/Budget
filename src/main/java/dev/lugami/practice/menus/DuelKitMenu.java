@@ -24,20 +24,18 @@ public class DuelKitMenu extends Menu {
     }
 
     @Override
-    public void initialize() {
+    public void initialize(Player player) {
         this.fillBorder();
         int slot = 10;
         for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
             if (kit.isEnabled()) {
-                while (getButton(slot) != null) {
-                    slot++;
-                }
+
                 ItemStack itemStack = kit.getIcon().clone();
                 setButton(slot++, new Button(
                         new ItemBuilder(itemStack != null ? itemStack : new ItemBuilder(Material.DIAMOND_SWORD).build())
                                 .name("&b" + kit.getName())
                                 .build(),
-                        player -> {
+                        player1 -> {
                             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
                             if (profile.getProfileOptions().getSettingsMap().get(Setting.ARENA_SELECTOR) && Setting.ARENA_SELECTOR.hasPermission(player)) {
                                 new DuelArenaMenu(kit, target).open(player);

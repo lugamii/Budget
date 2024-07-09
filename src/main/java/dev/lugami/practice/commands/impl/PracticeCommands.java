@@ -14,11 +14,20 @@ import dev.lugami.practice.utils.command.annotation.Require;
 import dev.lugami.practice.utils.command.annotation.Sender;
 import dev.lugami.practice.utils.fake.FakePlayer;
 import dev.lugami.practice.utils.fake.FakePlayerUtils;
+import dev.lugami.practice.utils.menu.Button;
+import dev.lugami.practice.utils.menu.Menu;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.SpigotConfig;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PracticeCommands extends CommandBase {
 
@@ -29,7 +38,11 @@ public class PracticeCommands extends CommandBase {
     @Command(name = "setspawn", aliases = {"setlobby"}, desc = "Sets the lobby location.")
     @Require("budget.management.use")
     public void setSpawn(@Sender Player player) {
-        player.chat("/management setspawn");
+        Location location = player.getLocation();
+        Budget.getInstance().getLobbyStorage().setLobbyLocation(location);
+        Budget.getInstance().getMainConfig().set("spawnLocation", LocationUtil.locationToString(location));
+        ConfigUtil.saveConfig(Budget.getInstance().getMainConfig(), "config");
+        player.sendMessage(CC.translate("&aThe lobby location was set successfully!"));
     }
 
     @Command(name = "spawn", aliases = {"lobby"}, desc = "Goes to the lobby location.")
@@ -79,4 +92,38 @@ public class PracticeCommands extends CommandBase {
             player.sendMessage(SpigotConfig.unknownCommandMessage);
         }
     }
+
+    @Command(name = "menutest", desc = "Menu API test.")
+    @Require("budget.management.use")
+    public void menu(@Sender Player p) {
+        AtomicInteger i = new AtomicInteger();
+        Menu menu = new Menu("&aTest", 27) {
+            @Override
+            public void initialize(Player player) {
+                this.fillBorder();
+                setButton(10, new Button(new ItemStack(Material.DIAMOND), player1 -> {
+                    player1.closeInventory();
+                    player1.sendMessage("You clicked the diamond!");
+                }));
+                setButton(11, new Button(new ItemStack(Material.GOLD_INGOT), player1 -> {
+                    player1.closeInventory();
+                    player1.sendMessage("You clicked the gold ingot!");
+                }));
+                List<String> lore = new ArrayList<>();
+                lore.add("&fNumber: " + i.get());
+                setButton(12, new Button(new ItemBuilder(Material.EMERALD).name("&aUpdating lore").lore(lore).build(), player1 -> {
+                    player1.sendMessage(CC.translate("&aThe number is currently " + i.get() + "!"));
+                }));
+            }
+        };
+        TaskUtil.runTaskTimerAsynchronously(() -> {
+            if (Menu.getOpenMenus().get(p) != menu) {
+                return;
+            }
+            i.incrementAndGet();
+        }, 0, 20);
+
+        menu.open(p);
+    }
+
 }

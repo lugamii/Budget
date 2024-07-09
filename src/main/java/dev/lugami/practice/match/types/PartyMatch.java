@@ -3,17 +3,20 @@ package dev.lugami.practice.match.types;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.FFATeam;
+import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.party.Party;
-import dev.lugami.practice.queue.QueueType;
+import dev.lugami.practice.profile.Profile;
+import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.TaskUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -21,18 +24,14 @@ public class PartyMatch extends DefaultMatch {
 
     private MatchType type;
     private Party party;
-    private List<Player> players;
-
-    public PartyMatch(Kit kit, Arena arena, Party party) {
-        this(kit, arena, MatchType.SPLIT, party);
-    }
+    private FFATeam ffaTeam;
 
     public PartyMatch(Kit kit, Arena arena, MatchType type, Party party) {
         super(kit, arena);
         this.setType(type);
         this.setParty(party);
         if (type == MatchType.FFA) {
-            players = new ArrayList<>();
+            ffaTeam = new FFATeam(null);
         }
     }
 
@@ -44,7 +43,7 @@ public class PartyMatch extends DefaultMatch {
     @Override
     public void addPlayerToTeam1(Player player) {
         if (this.type == MatchType.FFA) {
-            this.players.add(player);
+            this.addPlayerToFFA(player);
             return;
         }
         super.addPlayerToTeam1(player);
@@ -53,10 +52,22 @@ public class PartyMatch extends DefaultMatch {
     @Override
     public void addPlayerToTeam2(Player player) {
         if (this.type == MatchType.FFA) {
-            this.players.add(player);
+            this.addPlayerToFFA(player);
             return;
         }
         super.addPlayerToTeam2(player);
+    }
+
+    public void addPlayerToFFA(Player player) {
+        if (this.type == MatchType.FFA) {
+            if (this.ffaTeam.contains(player)) return;
+            this.ffaTeam.addMember(player);
+            if (this.ffaTeam.getLeader() == null) this.ffaTeam.setLeader(player);
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+            profile.setState(ProfileState.FIGHTING);
+            profile.setMatchState(MatchPlayerState.ALIVE);
+            this.equipPlayer(player);
+        }
     }
 
     /**
@@ -77,9 +88,7 @@ public class PartyMatch extends DefaultMatch {
                     if (countdown == 0) {
                         setState(MatchState.IN_PROGRESS);
                         sendMessage(ChatColor.GREEN + "The match has started!");
-                        if (PartyMatch.this.getType() == MatchType.SPLIT) {
-                            (new MatchStartEvent(PartyMatch.this, getTeam1(), getTeam2())).call();
-                        }
+                        (new MatchStartEvent(PartyMatch.this, getTeam1(), getTeam2())).call();
                         setStartedAt(System.currentTimeMillis());
                         this.cancel();
                     } else {
@@ -90,6 +99,27 @@ public class PartyMatch extends DefaultMatch {
             }.runTaskTimer(Budget.getInstance(), 0L, 20L);
         } else {
             Budget.getInstance().getLogger().warning("Match already started or ended.");
+        }
+    }
+
+    public void teleportTeamsToArena() {
+        if (this.type == MatchType.SPLIT) {
+            super.teleportTeamsToArena();
+        } else {
+            TaskUtil.runTaskLater(() -> {
+                Location location = new Location(getArena().getPos1().getWorld(), getArena().getPos1().getX(), getArena().getPos1().getY(), getArena().getPos1().getZ(), getArena().getPos1().getYaw(), getArena().getPos1().getPitch());
+                location.add(0.0, 1.0, 0.0);
+                this.ffaTeam.doAction(player -> player.teleport(location));
+            }, 1L);
+        }
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        if (this.type == MatchType.SPLIT) {
+            super.sendMessage(message);
+        } else {
+            this.ffaTeam.sendMessage(message);
         }
     }
 }

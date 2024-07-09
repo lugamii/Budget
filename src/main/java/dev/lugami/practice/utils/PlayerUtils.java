@@ -34,8 +34,8 @@ public class PlayerUtils {
      * Resets a player's state to the default.
      *
      * @param player The player to reset.
-     * @param show If we should show the player after resetting him or
-     *             keep his visibility state.
+     * @param show   If we should show the player after resetting him or
+     *               keep his visibility state.
      */
     public void resetPlayer(Player player, boolean show) {
         player.setHealth(20);
@@ -138,7 +138,7 @@ public class PlayerUtils {
         for (Player other : Bukkit.getOnlinePlayers()) {
             if (!other.equals(player)) {
                 other.hidePlayer(player);
-               // Budget.getInstance().getEntityHider().hideEntity(player, other);
+                Budget.getInstance().getEntityHider().hideEntity(player, other);
             }
         }
     }
@@ -152,7 +152,7 @@ public class PlayerUtils {
         for (Player other : Bukkit.getOnlinePlayers()) {
             if (!other.equals(player)) {
                 other.showPlayer(player);
-               // Budget.getInstance().getEntityHider().showEntity(player, other);
+                Budget.getInstance().getEntityHider().showEntity(player, other);
             }
         }
     }

@@ -24,20 +24,17 @@ public class DuelArenaMenu extends Menu {
     }
 
     @Override
-    public void initialize() {
+    public void initialize(Player player) {
         this.fillBorder();
         int slot = 10;
         for (Arena arena : Budget.getInstance().getArenaStorage().getArenas()) {
             if (arena.isEnabled() && arena.getWhitelistedKits().contains(kit.getName())) {
-                while (getButton(slot) != null) {
-                    slot++;
-                }
                 setButton(slot++, new Button(
                         new ItemBuilder(Material.PAPER)
                                 .name("&b" + arena.getName())
                                 .build(),
-                        player -> {
-                            new DuelRequest(player, target, kit, arena).sendDuelRequest();
+                        player1 -> {
+                            new DuelRequest(player1, target, kit, arena).sendDuelRequest();
                             player.closeInventory();
                         }
                 ));

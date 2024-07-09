@@ -1,6 +1,6 @@
 package dev.lugami.practice;
 
-import com.comphenix.tinyprotocol.TinyProtocol;
+import com.google.common.collect.Table;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -11,7 +11,6 @@ import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.storage.*;
 import dev.lugami.practice.task.MatchEnderpearlTask;
 import dev.lugami.practice.task.MatchSnapshotTask;
-import dev.lugami.practice.task.MenuTask;
 import dev.lugami.practice.task.QueueTask;
 import dev.lugami.practice.utils.ClassUtils;
 import dev.lugami.practice.utils.ConfigUtil;
@@ -19,6 +18,7 @@ import dev.lugami.practice.utils.EntityHider;
 import dev.lugami.practice.utils.TaskUtil;
 import dev.lugami.practice.utils.command.Drink;
 import dev.lugami.practice.utils.command.command.CommandService;
+import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
@@ -26,8 +26,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Map;
 
 @Getter
 @Setter
@@ -94,7 +99,7 @@ public class Budget extends JavaPlugin {
         this.queueStorage = new QueueStorage();
         this.leaderboardsStorage = new LeaderboardsStorage();
         this.partyStorage = new PartyStorage();
-        //this.entityHider = new EntityHider();
+        this.entityHider = new EntityHider();
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
         this.assemble.setAssembleStyle(AssembleStyle.MODERN);
@@ -103,6 +108,7 @@ public class Budget extends JavaPlugin {
     private void setupCommands() {
         drink = Drink.get(this);
         for (Class<?> c : ClassUtils.getClasses(getFile(), "dev.lugami.practice.commands.impl")) {
+            if (c.getName().contains("$")) continue;
             try {
                 CommandBase command = (CommandBase) c.newInstance();
                 drink.register(command, command.getName(), command.getAliases());
@@ -118,7 +124,16 @@ public class Budget extends JavaPlugin {
         TaskUtil.runTaskTimerAsynchronously(new MatchSnapshotTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new MatchEnderpearlTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
-        TaskUtil.runTaskTimerAsynchronously(new MenuTask(), 0, 20 * 3);
+        TaskUtil.runTaskTimer(() -> {
+            for (Player p1 : Bukkit.getOnlinePlayers()) {
+                if (Menu.getOpenMenus().containsKey(p1)) {
+                    Menu menu = Menu.getOpenMenus().get(p1);
+                    menu.updateButtonLore(p1);
+                    menu.initialize(p1);
+                    p1.updateInventory();
+                }
+            }
+        }, 0, 20);
     }
 
     private void setupGameRules() {

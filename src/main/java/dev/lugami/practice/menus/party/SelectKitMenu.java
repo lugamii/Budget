@@ -31,21 +31,19 @@ public class SelectKitMenu extends Menu {
     }
 
     @Override
-    public void initialize() {
+    public void initialize(Player player) {
         this.fillBorder();
         int slot = 10;
         for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
             if (kit.isEnabled()) {
-                while (getButton(slot) != null) {
-                    slot++;
-                }
+
                 ItemStack itemStack = kit.getIcon().clone();
                 setButton(slot++, new Button(
                         new ItemBuilder(itemStack != null ? itemStack : new ItemBuilder(Material.DIAMOND_SWORD).build())
                                 .name("&b" + kit.getName())
                                 .build(),
-                        player -> {
-                            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+                        p1 -> {
+                            Profile profile = Budget.getInstance().getProfileStorage().findProfile(p1);
                             Arena arena = Budget.getInstance().getArenaStorage().getRandomArena(kit);
                             if (arena != null && profile.getParty() != null) {
                                 PartyMatch match = new PartyMatch(kit, arena, type, profile.getParty());
@@ -81,9 +79,9 @@ public class SelectKitMenu extends Menu {
                                 match.start();
                             } else {
                                 if (arena == null) {
-                                    player.sendMessage(CC.translate("&cThere are no arenas."));
+                                    p1.sendMessage(CC.translate("&cThere are no arenas."));
                                 } else if (profile.getParty() == null) {
-                                    player.sendMessage(CC.translate("&cYou are not in a party."));
+                                    p1.sendMessage(CC.translate("&cYou are not in a party."));
                                 }
                             }
                         }

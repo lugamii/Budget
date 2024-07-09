@@ -3,6 +3,7 @@ package dev.lugami.practice.commands.impl;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.Language;
 import dev.lugami.practice.commands.CommandBase;
+import dev.lugami.practice.match.Match;
 import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
@@ -37,7 +38,7 @@ public class SpectateCommands extends CommandBase {
             player.sendMessage(CC.translate("&c" + target.getName() + " is not in a fight."));
             return;
         } else {
-            DefaultMatch match = Budget.getInstance().getMatchStorage().findMatch(target);
+            Match match = Budget.getInstance().getMatchStorage().findMatch(target);
             if (match == null) return;
             match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
         }

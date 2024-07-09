@@ -3,3 +3,16 @@ MESSAGES:
     NULL-TARGET: "&cCould not find that player."
     CANNOT-DO-ACTION: "&cYou cannot do this right now."
     UNFINISHED: "&cThis feature is not ready yet."
+    CANNOT-DUEL-SELF: "&cYou cannot duel yourself!"
+    TARGET-DUELS-DISABLED: "&cThis player is not accepting duel requests."
+    TARGET-BUSY: "&c{0} is not in the lobby."
+    SNAPSHOT-NOT-FOUND: "&cThat inventory could not be found: It's either expired, or already non-existent."
+
+    ALREADY-IN-PARTY: "&cYou are already in a party."
+    NOT-IN-PARTY: "&cYou are not in a party."
+    NO-PARTY-INVITE: "&cYou don't have a party invite."
+    CANNOT-INVITE-SELF: "&cYou cannot invite yourself to a party."
+    CANNOT-KICK-SELF: "&cYou cannot kick yourself from a party."
+    NOT-LEADER: "&cYou cannot do this, as you're not the leader."
+  DUELS:
+    DECLINED: "&c<target> has declined your duel request."

@@ -14,12 +14,13 @@ import java.util.Arrays;
 public class InventoryWrapper {
 
     /**
-     * -- GETTER --
      *  Gets the underlying Bukkit inventory.
-     *
-     * @return The Bukkit inventory.
      */
     private final Inventory inventory;
+
+    public Inventory get() {
+        return inventory;
+    }
 
     /**
      * Constructor to wrap an existing inventory.
@@ -45,6 +46,29 @@ public class InventoryWrapper {
      */
     public void clear() {
         inventory.clear();
+    }
+
+    /**
+     * Clears all items from the inventory except whatever is on 'item'.
+     */
+    public void clearExcept(ItemStack... item) {
+        for (int i = 0; i < inventory.getSize(); i++) {
+            ItemStack currentItem = inventory.getItem(i);
+            boolean shouldClear = true;
+
+            if (currentItem != null) {
+                for (ItemStack is : item) {
+                    if (currentItem.isSimilar(is)) {
+                        shouldClear = false;
+                        break;
+                    }
+                }
+            }
+
+            if (shouldClear) {
+                inventory.setItem(i, null);
+            }
+        }
     }
 
     /**
@@ -87,26 +111,9 @@ public class InventoryWrapper {
      * @return The item in the specified slot, or null if the slot is empty.
      */
     public ItemStack getItem(int slot) {
-        return inventory.getItem(slot);
-    }
-
-    /**
-     * Creates an ItemStack with a specified material, amount, display name, and lore.
-     *
-     * @param material The material of the item.
-     * @param amount   The amount of the item.
-     * @param name     The display name of the item.
-     * @param lore     The lore of the item (optional).
-     * @return The created ItemStack.
-     */
-    public static ItemStack createItem(Material material, int amount, String name, String... lore) {
-        ItemStack item = new ItemStack(material, amount);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-            meta.setLore(Arrays.asList(lore));
-            item.setItemMeta(meta);
+        if (slot > get().getSize()) {
+            return inventory.getItem(get().getSize() - 1);
         }
-        return item;
+        return inventory.getItem(slot);
     }
 }
