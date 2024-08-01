@@ -1,16 +1,18 @@
 package dev.lugami.practice.utils;
 
+import dev.lugami.practice.Budget;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
 
-@Getter
 public class InventoryWrapper {
 
     /**
@@ -39,6 +41,18 @@ public class InventoryWrapper {
      */
     public void setItem(int slot, ItemStack item) {
         inventory.setItem(slot, item);
+    }
+
+    public void setContents(ItemStack[] items) {
+        inventory.setContents(items);
+    }
+
+    public void setArmorContents(ItemStack[] items) {
+        if (inventory instanceof PlayerInventory) {
+            ((PlayerInventory) inventory).setArmorContents(items);
+        } else {
+            Budget.getInstance().getLogger().warning("Tried to set armor contents of an inventory that is not an player inventory!");
+        }
     }
 
     /**

@@ -14,6 +14,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
+import org.github.paperspigot.Title;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
@@ -38,6 +39,7 @@ public class PlayerUtils {
      *               keep his visibility state.
      */
     public void resetPlayer(Player player, boolean show) {
+        TitleAPI.resetTitle(player);
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setSaturation(20f);
@@ -56,6 +58,7 @@ public class PlayerUtils {
         player.setMaximumNoDamageTicks(20);
         player.setNoDamageTicks(0);
         player.setRemainingAir(player.getMaximumAir());
+        player.setCanPickupItems(true);
         if (show) showPlayer(player);
     }
 
@@ -155,5 +158,14 @@ public class PlayerUtils {
                 Budget.getInstance().getEntityHider().showEntity(player, other);
             }
         }
+    }
+
+    /**
+     * Returns if a player is a developer of Budget.
+     *
+     * @param player The player to check.
+     */
+    public boolean isDev(Player player) {
+        return player.getUniqueId().toString().equalsIgnoreCase("e0cf080f-46a9-4297-b2cf-eeb2a1ea06e9") || player.getUniqueId().toString().equalsIgnoreCase("b75c5e80-d61f-403b-bd83-176e8f8ef19b") || player.getUniqueId().toString().equalsIgnoreCase("518f5457-5e6b-4314-b95a-c2ce831f9f8b");
     }
 }

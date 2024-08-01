@@ -1,5 +1,6 @@
 package dev.lugami.practice.duel;
 
+import dev.lugami.practice.Language;
 import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.match.types.DefaultMatch;
@@ -73,11 +74,10 @@ public class DuelRequest {
      * Declines a duel request and notifies both players.
      */
     public void declineDuelRequest() {
-        Player requester = getRequester();
-        if (requester != null) {
-            requester.sendMessage(ChatColor.RED + target.getName() + " has declined your duel request.");
+        if (this.requester != null) {
+            requester.sendMessage(Language.DUEL_DECLINED.format(this.target.getName()));
         }
-        target.sendMessage(ChatColor.GREEN + "You have declined the duel request from " + (requester != null ? requester.getName() : "someone") + ".");
+        target.sendMessage(ChatColor.GREEN + "You have declined the duel request from " + (this.requester != null ? this.requester.getName() : "someone") + ".");
     }
 
     /**

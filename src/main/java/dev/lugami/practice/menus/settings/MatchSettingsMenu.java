@@ -10,21 +10,17 @@ import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.spigotmc.SpigotConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingsMenu extends Menu {
-
-    private final Player player;
+public class MatchSettingsMenu extends Menu {
 
     /**
      * Constructs a new Menu with the specified title and size.
      */
-    public SettingsMenu(Player p) {
-        super("&bSettings", 27);
-        this.player = p;
+    public MatchSettingsMenu() {
+        super("&bMatch Settings", 27);
     }
 
     @Override
@@ -33,7 +29,7 @@ public class SettingsMenu extends Menu {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         int slot = 10;
         for (Setting settings : Setting.values()) {
-            if (settings == Setting.LIGHTNING || settings == Setting.EXPLOSION || settings == Setting.SILENT_SPECTATE || settings == Setting.ALLOW_SPECTATORS) continue;
+            if (settings == Setting.ARENA_SELECTOR || settings == Setting.DUEL_REQUESTS || settings == Setting.SCOREBOARD) continue;
             ItemStack stack = createItem(profile, settings);
             setButton(slot++, new Button(stack, (player1, clickType) -> {
                 if (settings.hasPermission(player1)) {
@@ -44,7 +40,8 @@ public class SettingsMenu extends Menu {
                 }
             }));
         }
-        setButton(slot, new Button(new ItemBuilder(Material.BLAZE_POWDER).name("&bMatch Settings").lore("&7Modify your match settings.", "", "&eClick to view!").build(), (player1, clickType) -> new MatchSettingsMenu().open(player)));
+
+        setButton(16, new Button(new ItemBuilder(Material.REDSTONE).name("&cBack").lore("&7Goes back to the other menu.", "", "&eClick to go back!").build(), (player1, clickType) -> new SettingsMenu(player1).open(player)));
     }
 
     public ItemStack createItem(Profile profile, Setting settings) {

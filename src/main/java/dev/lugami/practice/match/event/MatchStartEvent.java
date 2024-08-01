@@ -1,8 +1,7 @@
 package dev.lugami.practice.match.event;
 
 import dev.lugami.practice.match.Match;
-import dev.lugami.practice.match.types.DefaultMatch;
-import dev.lugami.practice.match.Team;
+import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.utils.event.BaseEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

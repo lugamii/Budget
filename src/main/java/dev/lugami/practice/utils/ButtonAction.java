@@ -3,8 +3,8 @@ package dev.lugami.practice.utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
-public interface Action {
+public interface ButtonAction {
 
-    void execute(Player player);
+    void execute(Player player, ClickType clickType);
 
 }

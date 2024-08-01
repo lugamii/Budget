@@ -34,13 +34,15 @@ public class FakePlayerUtils {
         EntityPlayer npc = new EntityPlayer(server, world, new GameProfile(UUID.randomUUID(), displayName), new PlayerInteractManager(world));
         npc.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
 
+        CraftPlayer craftPlayer = new CraftPlayer((CraftServer) Bukkit.getServer(), npc);
+        FakePlayer fakePlayer = new FakePlayer(craftPlayer);
+
         for (Player all : Bukkit.getOnlinePlayers()) {
             PlayerConnection connection = ((CraftPlayer) all).getHandle().playerConnection;
             connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
             connection.sendPacket(new PacketPlayOutNamedEntitySpawn(npc));
         }
-        CraftPlayer craftPlayer = new CraftPlayer((CraftServer) Bukkit.getServer(), npc);
-        FakePlayer fakePlayer = new FakePlayer(craftPlayer);
+        
         fakePlayers.add(fakePlayer);
         return fakePlayer;
     }

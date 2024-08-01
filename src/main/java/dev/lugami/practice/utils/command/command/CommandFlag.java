@@ -1,10 +1,13 @@
 package dev.lugami.practice.utils.command.command;
 
+import lombok.Getter;
+
 import javax.annotation.Nullable;
 
 public class CommandFlag {
 
     public static final char FLAG_PREFIX = '-';
+    @Getter
     private final char character;
     @Nullable
     private final String value;
@@ -16,10 +19,6 @@ public class CommandFlag {
     public CommandFlag(char character, @Nullable String value) {
         this.character = character;
         this.value = value;
-    }
-
-    public char getCharacter() {
-        return character;
     }
 
     @Nullable

@@ -2,12 +2,9 @@ package dev.lugami.practice.menus.party;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.arena.Arena;
-import dev.lugami.practice.duel.DuelRequest;
 import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.match.types.PartyMatch;
-import dev.lugami.practice.menus.DuelArenaMenu;
 import dev.lugami.practice.profile.Profile;
-import dev.lugami.practice.settings.Setting;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.menu.Button;
@@ -19,13 +16,13 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class SelectKitMenu extends Menu {
+public class PartySelectKitMenu extends Menu {
     private final PartyMatch.MatchType type;
 
     /**
      * Constructs a new Menu with the specified title and size.
      */
-    public SelectKitMenu(PartyMatch.MatchType type) {
+    public PartySelectKitMenu(PartyMatch.MatchType type) {
         super("&bSelect a kit", 36);
         this.type = type;
     }
@@ -42,7 +39,7 @@ public class SelectKitMenu extends Menu {
                         new ItemBuilder(itemStack != null ? itemStack : new ItemBuilder(Material.DIAMOND_SWORD).build())
                                 .name("&b" + kit.getName())
                                 .build(),
-                        p1 -> {
+                        (p1, clickType) -> {
                             Profile profile = Budget.getInstance().getProfileStorage().findProfile(p1);
                             Arena arena = Budget.getInstance().getArenaStorage().getRandomArena(kit);
                             if (arena != null && profile.getParty() != null) {

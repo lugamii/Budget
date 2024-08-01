@@ -10,7 +10,9 @@ import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LeaderboardsMenu extends Menu {
     /**
@@ -19,6 +21,8 @@ public class LeaderboardsMenu extends Menu {
     public LeaderboardsMenu() {
         super("&bLeaderboards", 36);
     }
+
+    private final Map<Kit, List<LeaderboardsEntry>> cachedLeaderboards = new HashMap<>();
 
     @Override
     public void initialize(Player player) {
@@ -29,17 +33,37 @@ public class LeaderboardsMenu extends Menu {
             if (kit.isEnabled() && kit.isRanked()) {
                 List<String> lore = new ArrayList<>();
                 lore.add("");
-                int pos = 1;
-                for (LeaderboardsEntry leaderboardsEntry : LeaderboardsStorage.getKitLeaderboards().get(kit)) {
-                    if (leaderboardsEntry.getName() == null || (Integer) leaderboardsEntry.getElo() == null) {
-                        continue;
+                try {
+                    if (cachedLeaderboards.get(kit) != LeaderboardsStorage.getKitLeaderboards().get(kit) && LeaderboardsStorage.getKitLeaderboards().get(kit) != null) cachedLeaderboards.put(kit, LeaderboardsStorage.getKitLeaderboards().get(kit));
+                    int pos = 1;
+                    for (LeaderboardsEntry leaderboardsEntry : LeaderboardsStorage.getKitLeaderboards().get(kit)) {
+                        if (leaderboardsEntry.getName() == null || (Integer) leaderboardsEntry.getElo() == null) {
+                            continue;
+                        }
+                        lore.add("&b#" + pos + ": &f" + leaderboardsEntry.getName() + "&7 - &f" + leaderboardsEntry.getElo());
+                        pos++;
                     }
-                    lore.add("&b#" + pos + ": &f" + leaderboardsEntry.getName() + "&7 - &f" + leaderboardsEntry.getElo());
-                    pos++;
-                }
-                while (pos <= 10) {
-                    lore.add("&b#" + pos + ": &fNone");
-                    pos++;
+                    while (pos <= 10) {
+                        lore.add("&b#" + pos + ": &fNone");
+                        pos++;
+                    }
+                } catch (Exception e) {
+                    if (cachedLeaderboards.get(kit) != null) {
+                        int pos = 1;
+                        for (LeaderboardsEntry leaderboardsEntry : cachedLeaderboards.get(kit)) {
+                            if (leaderboardsEntry.getName() == null || (Integer) leaderboardsEntry.getElo() == null) {
+                                continue;
+                            }
+                            lore.add("&b#" + pos + ": &f" + leaderboardsEntry.getName() + "&7 - &f" + leaderboardsEntry.getElo());
+                            pos++;
+                        }
+                        while (pos <= 10) {
+                            lore.add("&b#" + pos + ": &fNone");
+                            pos++;
+                        }
+                    } else {
+                        lore.add("&fLoading...");
+                    }
                 }
                 setButton(slot++, new Button(new ItemBuilder(kit.getIcon().clone()).name("&b&l" + kit.getName() + " ┃ Top 10").lore(lore).build()));
             }

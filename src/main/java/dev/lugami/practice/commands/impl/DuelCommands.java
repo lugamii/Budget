@@ -30,7 +30,7 @@ public class DuelCommands extends CommandBase {
             return;
         }
         if (target == p1) {
-            p1.sendMessage(CC.translate("&cYou cannot duel yourself!"));
+            p1.sendMessage(Language.CANNOT_DUEL_SELF.format());
             return;
         }
 
@@ -43,14 +43,14 @@ public class DuelCommands extends CommandBase {
 
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(target);
         if (!profile.getProfileOptions().getSettingsMap().get(Setting.DUEL_REQUESTS)) {
-            p1.sendMessage(CC.translate("&cThis player is not accepting duel requests."));
+            p1.sendMessage(Language.TARGET_DUELS_DISABLED.format());
             return;
         }
 
         if (!profile.isBusy()) {
             new DuelKitMenu(target).open(p1);
         } else {
-            p1.sendMessage(CC.translate("&c" + target.getName() + " is not in the lobby."));
+            p1.sendMessage(CC.translate(Language.TARGET_BUSY.format(target.getName())));
         }
     }
 
@@ -66,12 +66,12 @@ public class DuelCommands extends CommandBase {
         if (DuelRequest.hasPendingDuelRequest(player)) {
             Profile prf2 = Budget.getInstance().getProfileStorage().findProfile(DuelRequest.getDuelRequest(player).getRequester());
             if (prf2.isBusy()) {
-                player.sendMessage(CC.translate("&c" + DuelRequest.getDuelRequest(player).getRequester().getName() + " is not in the lobby."));
+                player.sendMessage(Language.TARGET_BUSY.format(DuelRequest.getDuelRequest(player).getRequester().getName()));
                 return;
             }
             DuelRequest.getDuelRequest(player).acceptDuelRequest();
         } else {
-            player.sendMessage(CC.translate("&cYou don't have a pending duel request."));
+            player.sendMessage(Language.NO_DUEL_REQUEST.format());
         }
     }
 
@@ -85,14 +85,9 @@ public class DuelCommands extends CommandBase {
         }
 
         if (DuelRequest.hasPendingDuelRequest(player)) {
-            Profile prf2 = Budget.getInstance().getProfileStorage().findProfile(DuelRequest.getDuelRequest(player).getRequester());
-            if (prf2.isBusy()) {
-                player.sendMessage(CC.translate("&c" + DuelRequest.getDuelRequest(player).getRequester().getName() + " is not in the lobby."));
-                return;
-            }
             DuelRequest.getDuelRequest(player).declineDuelRequest();
         } else {
-            player.sendMessage(CC.translate("&cYou don't have a pending duel request."));
+            player.sendMessage(Language.NO_DUEL_REQUEST.format());
         }
     }
 

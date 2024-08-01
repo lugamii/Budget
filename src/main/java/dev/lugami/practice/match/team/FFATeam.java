@@ -1,4 +1,4 @@
-package dev.lugami.practice.match;
+package dev.lugami.practice.match.team;
 
 import org.bukkit.entity.Player;
 

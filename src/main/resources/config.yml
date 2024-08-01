@@ -1,5 +1,21 @@
 debug: false
 spawnLocation: world:0.0:0.0:0.0:0.0:0.0
+editorLocation: world:0.0:0.0:0.0:0.0:0.0
+motd:
+  enabled: true
+  clear-chat: true
+  message:
+    - ""
+    - "&b&lBudget Practice"
+    - "&7Welcome to the server!"
+    - ""
+    - "&7Changelogs for 1.0.1 (31/07/24): "
+    - "&7- &fKit Editor almost finished"
+    - "&7- &fNew spectator mode"
+    - ""
+    - "&7Changelogs for 1.0 (15/06/24): "
+    - "&7- &fAdded essentials (Fights, Leaderboards, etc)"
+    - ""
 mongo:
   ip: "127.0.0.1"
   port: 27017

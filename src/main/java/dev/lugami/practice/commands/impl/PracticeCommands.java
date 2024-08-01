@@ -19,6 +19,7 @@ import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -32,7 +33,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PracticeCommands extends CommandBase {
 
     public PracticeCommands() {
-        super("practice", new String[]{"budget"});
+        super("budget", new String[]{"practice"});
+    }
+
+    @Command(name = "", aliases = {"about", "ver", "version"}, desc = "The main command for Budget.")
+    public void default1(@Sender Player player) {
+        player.sendMessage(CC.CHAT_BAR);
+        player.sendMessage(CC.translate("&b&lBudget Practice"));
+        player.sendMessage(CC.translate(""));
+        player.sendMessage(CC.translate("&fVersion: &b" + Budget.getInstance().getDescription().getVersion()));
+        player.sendMessage(CC.translate("&fAuthors: &bLugami, hitblocking"));
+        player.sendMessage(CC.translate("&fGitHub: &bhttps://github.com/lugamii/Budget"));
+        player.sendMessage(CC.CHAT_BAR);
     }
 
     @Command(name = "setspawn", aliases = {"setlobby"}, desc = "Sets the lobby location.")
@@ -43,6 +55,16 @@ public class PracticeCommands extends CommandBase {
         Budget.getInstance().getMainConfig().set("spawnLocation", LocationUtil.locationToString(location));
         ConfigUtil.saveConfig(Budget.getInstance().getMainConfig(), "config");
         player.sendMessage(CC.translate("&aThe lobby location was set successfully!"));
+    }
+
+    @Command(name = "seteditor", aliases = {"seteditorloc"}, desc = "Sets the editor location.")
+    @Require("budget.management.use")
+    public void setEditor(@Sender Player player) {
+        Location location = player.getLocation();
+        Budget.getInstance().getEditorStorage().setEditorLocation(location);
+        Budget.getInstance().getMainConfig().set("editorLocation", LocationUtil.locationToString(location));
+        ConfigUtil.saveConfig(Budget.getInstance().getMainConfig(), "config");
+        player.sendMessage(CC.translate("&aThe editor location was set successfully!"));
     }
 
     @Command(name = "spawn", aliases = {"lobby"}, desc = "Goes to the lobby location.")
@@ -58,13 +80,13 @@ public class PracticeCommands extends CommandBase {
     @Command(name = "spectest", desc = "Used to test matches and spectating matches")
     @Require("budget.matchtest.use")
     public void matchTesting(@Sender Player player) {
-        if (player.getName().equalsIgnoreCase("Misureta") || player.getName().equalsIgnoreCase("lugami1337")) {
+        if (PlayerUtils.isDev(player)) {
             Kit kit = Budget.getInstance().getKitStorage().getKits().get(new SecureRandom().nextInt(Budget.getInstance().getKitStorage().getKits().size()));
             Arena arena = Budget.getInstance().getArenaStorage().getRandomArena(kit);
             FakePlayer player1 = FakePlayerUtils.spawnFakePlayer(arena.getPos1(), "Test1");
             FakePlayer player2 = FakePlayerUtils.spawnFakePlayer(arena.getPos2(), "Test2");
-            Profile profile1 = new Profile(player1);
-            Profile profile2 = new Profile(player2);
+            Profile profile1 = new Profile(player1, true);
+            Profile profile2 = new Profile(player2, true);
             DefaultMatch match = new DefaultMatch(
                     kit,
                     arena,
@@ -93,37 +115,50 @@ public class PracticeCommands extends CommandBase {
         }
     }
 
+    @Command(name = "titletest", desc = "Title API test")
+    public void titleTest(@Sender Player player) {
+        TitleAPI.sendTitle(player, "&bfortnite", "&7balls");
+        player.sendMessage(CC.translate("&aSent a test title!"));
+    }
+
     @Command(name = "menutest", desc = "Menu API test.")
     @Require("budget.management.use")
     public void menu(@Sender Player p) {
-        AtomicInteger i = new AtomicInteger();
-        Menu menu = new Menu("&aTest", 27) {
-            @Override
-            public void initialize(Player player) {
-                this.fillBorder();
-                setButton(10, new Button(new ItemStack(Material.DIAMOND), player1 -> {
-                    player1.closeInventory();
-                    player1.sendMessage("You clicked the diamond!");
-                }));
-                setButton(11, new Button(new ItemStack(Material.GOLD_INGOT), player1 -> {
-                    player1.closeInventory();
-                    player1.sendMessage("You clicked the gold ingot!");
-                }));
-                List<String> lore = new ArrayList<>();
-                lore.add("&fNumber: " + i.get());
-                setButton(12, new Button(new ItemBuilder(Material.EMERALD).name("&aUpdating lore").lore(lore).build(), player1 -> {
-                    player1.sendMessage(CC.translate("&aThe number is currently " + i.get() + "!"));
-                }));
-            }
-        };
-        TaskUtil.runTaskTimerAsynchronously(() -> {
-            if (Menu.getOpenMenus().get(p) != menu) {
-                return;
-            }
-            i.incrementAndGet();
-        }, 0, 20);
+        if (PlayerUtils.isDev(p)) {
+            AtomicInteger i = new AtomicInteger();
+            Menu menu = new Menu("&aTest", 27) {
+                @Override
+                public void initialize(Player player) {
+                    this.fillBorder();
+                    setButton(10, new Button(new ItemStack(Material.DIAMOND), (player1, clickType) -> {
+                        if (clickType == ClickType.LEFT) {
+                            player1.closeInventory();
+                            player1.sendMessage("You left clicked the diamond!");
+                        } else if (clickType == ClickType.RIGHT) {
+                            player1.closeInventory();
+                            player1.sendMessage("You right clicked the diamond!");
+                        }
+                    }));
+                    setButton(11, new Button(new ItemStack(Material.GOLD_INGOT), (player1, clickType) -> {
+                        player1.closeInventory();
+                        player1.sendMessage("You clicked the gold ingot!");
+                    }));
+                    List<String> lore = new ArrayList<>();
+                    lore.add("&fNumber: " + i.get());
+                    setButton(12, new Button(new ItemBuilder(Material.EMERALD).name("&aUpdating lore").lore(lore).build(), (player1, clickType) -> {
+                        player1.sendMessage(CC.translate("&aThe number is currently " + i.get() + "!"));
+                    }));
+                }
+            };
+            TaskUtil.runTaskTimerAsynchronously(() -> {
+                if (Menu.getOpenMenus().get(p) != menu) {
+                    return;
+                }
+                i.incrementAndGet();
+            }, 0, 20);
 
-        menu.open(p);
+            menu.open(p);
+        }
     }
 
 }

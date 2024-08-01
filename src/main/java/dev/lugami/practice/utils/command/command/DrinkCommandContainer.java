@@ -1,6 +1,7 @@
 package dev.lugami.practice.utils.command.command;
 
 import com.google.common.base.Preconditions;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -14,15 +15,22 @@ import java.util.*;
 
 public class DrinkCommandContainer extends Command implements PluginIdentifiableCommand {
 
+    @Getter
     private final DrinkCommandService commandService;
+    @Getter
     private final Object object;
     private final String name;
     private final Set<String> aliases;
+    @Getter
     private final Map<String, DrinkCommand> commands;
     private final DrinkCommand defaultCommand;
+    @Getter
     private final DrinkCommandExecutor executor;
+    @Getter
     private final DrinkTabCompleter tabCompleter;
+    @Getter
     private boolean overrideExistingCommands = true;
+    @Getter
     private boolean defaultCommandIsHelp = false;
 
     public DrinkCommandContainer(DrinkCommandService commandService, Object object, String name, Set<String> aliases, Map<String, DrinkCommand> commands) {
@@ -130,14 +138,6 @@ public class DrinkCommandContainer extends Command implements PluginIdentifiable
         return commandService.getPlugin();
     }
 
-    public DrinkCommandService getCommandService() {
-        return commandService;
-    }
-
-    public Object getObject() {
-        return object;
-    }
-
     @Override
     public String getName() {
         return name;
@@ -147,29 +147,9 @@ public class DrinkCommandContainer extends Command implements PluginIdentifiable
         return aliases;
     }
 
-    public Map<String, DrinkCommand> getCommands() {
-        return commands;
-    }
-
-    public DrinkCommandExecutor getExecutor() {
-        return executor;
-    }
-
-    public DrinkTabCompleter getTabCompleter() {
-        return tabCompleter;
-    }
-
-    public boolean isOverrideExistingCommands() {
-        return overrideExistingCommands;
-    }
-
     public DrinkCommandContainer setOverrideExistingCommands(boolean overrideExistingCommands) {
         this.overrideExistingCommands = overrideExistingCommands;
         return this;
-    }
-
-    public boolean isDefaultCommandIsHelp() {
-        return defaultCommandIsHelp;
     }
 
     public DrinkCommandContainer setDefaultCommandIsHelp(boolean defaultCommandIsHelp) {

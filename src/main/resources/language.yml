@@ -1,3 +1,12 @@
+TITLES:
+  JOIN:
+    ENABLED: true
+    TITLE: "&b&lWelcome to Budget Practice!"
+    SUBTITLE: "&7We hope you enjoy your stay!"
+    FADE-IN: 200
+    STAY: 1000
+    FADE-OUT: 500
+
 MESSAGES:
   ERRORS:
     NULL-TARGET: "&cCould not find that player."
@@ -7,6 +16,8 @@ MESSAGES:
     TARGET-DUELS-DISABLED: "&cThis player is not accepting duel requests."
     TARGET-BUSY: "&c{0} is not in the lobby."
     SNAPSHOT-NOT-FOUND: "&cThat inventory could not be found: It's either expired, or already non-existent."
+    NO-DUEL-REQUEST: "&cYou don't have a pending duel request."
+    CANNOT-SPECTATE-SELF: "&cYou cannot spectate yourself!"
 
     ALREADY-IN-PARTY: "&cYou are already in a party."
     NOT-IN-PARTY: "&cYou are not in a party."

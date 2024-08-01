@@ -7,7 +7,9 @@ import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.match.types.PartyMatch;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.Profile;
+import dev.lugami.practice.profile.editor.EditingMetadata;
 import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.utils.PlayerUtils;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,6 +35,14 @@ public class ScoreboardProvider implements AssembleAdapter {
             }
             try {
                 switch (profile.getState()) {
+                    case SPECTATE_MODE:
+                        for (String line : Budget.getInstance().getScoreboardConfig().getStringList("SPECTATOR_MODE")) {
+                            line = line.replace("<online>", "" + Bukkit.getOnlinePlayers().size())
+                                    .replace("<fighting>", "" + Budget.getInstance().getMatchStorage().getInFights())
+                                    .replace("<queueing>", "" + Budget.getInstance().getQueueStorage().getInQueues());
+                            lines.add(line);
+                        }
+                        break;
                     case LOBBY:
                         for (String line : Budget.getInstance().getScoreboardConfig().getStringList("LOBBY")) {
                             line = line.replace("<online>", "" + Bukkit.getOnlinePlayers().size())
@@ -94,7 +104,9 @@ public class ScoreboardProvider implements AssembleAdapter {
                                         for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
                                             line = line.
                                                     replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
-                                                    replace("<duration>", match.getDuration());
+                                                    replace("<duration>", match.getDuration()).
+                                                    replace("<own_ping>", "" + PlayerUtils.getPing(player)).
+                                                    replace("<opponent_ping>", "" + PlayerUtils.getPing(match.getOpponent(match.getTeam(player)).getLeader()));
                                             lines.add(line);
                                         }
                                     }
@@ -112,7 +124,12 @@ public class ScoreboardProvider implements AssembleAdapter {
                     case SPECTATING:
                         Match match1 = Budget.getInstance().getMatchStorage().findMatch(player);
                         for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-SPECTATING")) {
-                            line = line.replace("<duration>", match1.getDuration()).replace("<player1>", match1.getTeam1().getLeader().getName()).replace("<player2>", match1.getTeam2().getLeader().getName());
+                            line = line.
+                                    replace("<duration>", match1.getDuration()).
+                                    replace("<player1>", match1.getTeam1().getLeader().getName()).
+                                    replace("<player2>", match1.getTeam2().getLeader().getName()).
+                                    replace("<player1_ping>", "" + PlayerUtils.getPing(match1.getTeam1().getLeader())).
+                                    replace("<player2_ping>", "" + PlayerUtils.getPing(match1.getTeam2().getLeader()));
                             lines.add(line);
                         }
                         break;
@@ -124,6 +141,17 @@ public class ScoreboardProvider implements AssembleAdapter {
                                     .replace("<queueing>", "" + Budget.getInstance().getQueueStorage().getInQueues())
                                     .replace("<leader>", party.getLeader().getName())
                                     .replace("<members>", "" + party.getSize());
+                            lines.add(line);
+                        }
+                        break;
+                    case EDITOR:
+                        EditingMetadata meta = profile.getEditingMetadata();
+                        if (meta == null) {
+                            lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("UNKNOWN"));
+                            break;
+                        }
+                        for (String line : Budget.getInstance().getScoreboardConfig().getStringList("EDITOR")) {
+                            line = line.replace("<kit>", meta.getEditing().getName());
                             lines.add(line);
                         }
                         break;

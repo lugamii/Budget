@@ -20,7 +20,7 @@ public class PartyCommands extends CommandBase {
     public void create(@Sender Player sender) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
         if (profile.getParty() != null) {
-            sender.sendMessage(CC.translate("&cYou are already in a party."));
+            sender.sendMessage(Language.ALREADY_IN_PARTY.format());
             return;
         }
         if (profile.isBusy()) {
@@ -34,7 +34,7 @@ public class PartyCommands extends CommandBase {
     public void leave(@Sender Player sender) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
         if (!profile.isInParty()) {
-            sender.sendMessage(CC.translate("&cYou are not in a party."));
+            sender.sendMessage(Language.NOT_IN_PARTY.format());
         } else {
             profile.getParty().leave(sender);
         }
@@ -48,7 +48,7 @@ public class PartyCommands extends CommandBase {
             return;
         }
         if (profile.getParty() != null) {
-            sender.sendMessage(CC.translate("&cYou are already in a party."));
+            sender.sendMessage(Language.ALREADY_IN_PARTY.format());
             return;
         }
         if (PartyInvite.hasInvite(sender)) {
@@ -59,8 +59,6 @@ public class PartyCommands extends CommandBase {
             }
             if (invite.getParty().getLeader() == target) {
                 invite.getParty().join(sender);
-            } else {
-                // ???
             }
         } else {
             sender.sendMessage(CC.translate("&cYou don't have a party invite."));
@@ -71,14 +69,14 @@ public class PartyCommands extends CommandBase {
     public void invite(@Sender Player sender, Player target) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
         if (!profile.isInParty()) {
-            sender.sendMessage(CC.translate("&cYou are not in a party."));
+            sender.sendMessage(Language.NOT_IN_PARTY.format());
         } else {
             if (target == null) {
                 sender.sendMessage(Language.NULL_TARGET.format());
                 return;
             }
             if (sender == target) {
-                sender.sendMessage(CC.translate("&cYou cannot invite yourself to a party."));
+                sender.sendMessage(Language.CANNOT_INVITE_SELF.format());
                 return;
             }
             PartyInvite partyInvite = new PartyInvite(profile.getParty(), target);
@@ -91,14 +89,14 @@ public class PartyCommands extends CommandBase {
     public void kick(@Sender Player sender, Player target) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
         if (!profile.isInParty()) {
-            sender.sendMessage(CC.translate("&cYou are not in a party."));
+            sender.sendMessage(Language.NOT_IN_PARTY.format());
         } else {
             if (target == null) {
                 sender.sendMessage(Language.NULL_TARGET.format());
                 return;
             }
             if (sender == target) {
-                sender.sendMessage(CC.translate("&cYou cannot kick yourself from a party."));
+                sender.sendMessage(Language.CANNOT_KICK_SELF.format());
                 return;
             }
             Party party = profile.getParty();
@@ -112,17 +110,13 @@ public class PartyCommands extends CommandBase {
     public void disband(@Sender Player sender) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(sender);
         if (!profile.isInParty()) {
-            sender.sendMessage(CC.translate("&cYou are not in a party."));
+            sender.sendMessage(Language.NOT_IN_PARTY.format());
         } else {
             Party party = profile.getParty();
-            if (party == null) {
-                sender.sendMessage(CC.translate("&cYou are not in a party."));
-                return;
-            }
             if (party.getLeader() == sender) {
                 party.disband();
             } else {
-                sender.sendMessage(CC.translate("&cYou cannot do this, as you're not the leader."));
+                sender.sendMessage(Language.NOT_LEADER.format());
             }
         }
     }

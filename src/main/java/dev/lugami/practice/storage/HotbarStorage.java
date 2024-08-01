@@ -2,14 +2,19 @@ package dev.lugami.practice.storage;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.hotbar.HotbarItem;
+import dev.lugami.practice.match.Match;
 import dev.lugami.practice.menus.LeaderboardsMenu;
+import dev.lugami.practice.menus.MatchesMenu;
 import dev.lugami.practice.menus.QueueMenu;
+import dev.lugami.practice.menus.editor.EditorSelectKitMenu;
 import dev.lugami.practice.menus.party.PartyEventsMenu;
 import dev.lugami.practice.menus.settings.SettingsMenu;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.QueueType;
+import dev.lugami.practice.settings.Setting;
 import dev.lugami.practice.utils.ActionUtils;
+import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.InventoryWrapper;
 import dev.lugami.practice.utils.ItemBuilder;
 import lombok.Getter;
@@ -26,13 +31,13 @@ public class HotbarStorage {
     private final List<HotbarItem> lobbyItems = Arrays.asList(
             new HotbarItem(new ItemBuilder(Material.IRON_SWORD, true).name("&bUnranked").build(), player -> new QueueMenu().open(player)),
             new HotbarItem(new ItemBuilder(Material.DIAMOND_SWORD, true).name("&bRanked").build(), player -> new QueueMenu(QueueType.RANKED).open(player)),
-            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.REDSTONE_TORCH_ON).name("&bEnable Spectator Mode").build(), player -> Budget.getInstance().getLobbyStorage().bringToLobby(player, true)),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.NAME_TAG).name("&bParty").build(), player -> player.chat("/party create")),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
-            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.EMERALD, true).name("&bLeaderboards").build(), player -> new LeaderboardsMenu().open(player)),
-            new HotbarItem(new ItemBuilder(Material.WATCH, true).name("&bSettings").build(), player -> new SettingsMenu(player).open(player))
+            new HotbarItem(new ItemBuilder(Material.WATCH, true).name("&bSettings").build(), player -> new SettingsMenu(player).open(player)),
+            new HotbarItem(new ItemBuilder(Material.BOOK).name("&bKit Editor").build(), player -> new EditorSelectKitMenu().open(player))
     );
 
     private final List<HotbarItem> queueItems = Arrays.asList(
@@ -47,6 +52,26 @@ public class HotbarStorage {
                     Budget.getInstance().getLobbyStorage().bringToLobby(player);
                 }
             }),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED)
+    );
+
+    private final List<HotbarItem> spectatorModeItems = Arrays.asList(
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
+            new HotbarItem(new ItemBuilder(Material.COMPASS).name("&bCurrent Matches").build(), player -> new MatchesMenu().open(player)),
+            new HotbarItem(new ItemBuilder(Material.REDSTONE_TORCH_ON).name("&bDisable Spectator Mode").build(), player -> Budget.getInstance().getLobbyStorage().bringToLobby(player, false)),
+            new HotbarItem(new ItemBuilder(Material.NETHER_STAR).name("&bRandom Match").build(), player -> {
+                Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+                Match match = Budget.getInstance().getMatchStorage().getRandomMatch();
+                if (match == null) {
+                    player.sendMessage(CC.translate("&cThere are no matches available for you to spectate."));
+                    return;
+                }
+                match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
+            }),
+            new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
@@ -106,6 +131,8 @@ public class HotbarStorage {
                 return this.spectatorItems;
             case PARTY:
                 return this.partyItems;
+            case SPECTATE_MODE:
+                return this.spectatorModeItems;
             default:
                 return Collections.emptyList();
         }

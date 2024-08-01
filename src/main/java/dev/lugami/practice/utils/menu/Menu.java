@@ -15,6 +15,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -68,9 +69,11 @@ public class Menu {
     public void setButton(int slot, Button button) {
         if (slot > getSize()) slot = internalInv.getSize() - 1;
         if (buttons.get(slot) != null) buttons.remove(slot);
-        if (slot < getSize() && internalInv.getItem(slot) != null) inventory.setItem(slot, null);
-        if (slot < getSize()) inventory.setItem(slot, button.getItemStack());
-        if (slot < getSize()) buttons.put(slot, button);
+        if (slot < getSize()) {
+            if (internalInv.getItem(slot) != null) inventory.setItem(slot, null);
+            inventory.setItem(slot, button.getItemStack());
+            buttons.put(slot, button);
+        }
     }
 
     /**
@@ -116,10 +119,10 @@ public class Menu {
      * @param slot the slot that was clicked
      * @param player the player who clicked the slot
      */
-    public void handleClick(int slot, Player player) {
+    public void handleClick(int slot, Player player, ClickType clickType) {
         if (this.buttons.containsKey(slot)) {
             Button button = buttons.get(slot);
-            button.getAction().execute(player);
+            if (button.getAction() != null) button.getAction().execute(player, clickType);
         }
     }
 

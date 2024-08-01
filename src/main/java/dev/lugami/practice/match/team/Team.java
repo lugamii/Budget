@@ -1,10 +1,10 @@
-package dev.lugami.practice.match;
+package dev.lugami.practice.match.team;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.utils.Action;
 import dev.lugami.practice.utils.CC;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;

@@ -47,7 +47,7 @@ public class QueueMenu extends Menu {
             ItemStack itemStack = queue.getKit().getIcon().clone();
             if (queueType == QueueType.RANKED && !queue.isRanked() || queueType == QueueType.UNRANKED && queue.isRanked()) continue;
             else {
-                setButton(slot++, new Button(new ItemBuilder(itemStack).name("&b" + queue.getKit().getName() + (queueType == QueueType.RANKED ? " (Ranked)" : "")).lore(lore).build(), p1 -> {
+                setButton(slot++, new Button(new ItemBuilder(itemStack).name("&b" + queue.getKit().getName() + (queueType == QueueType.RANKED ? " (Ranked)" : "")).lore(lore).build(), (p1, clickType) -> {
                     if (queueType == QueueType.RANKED && !queue.isRanked() || queueType == QueueType.UNRANKED && queue.isRanked()) {
                         Queue queue1 = Budget.getInstance().getQueueStorage().findQueue(queue.getKit(), queueType);
                         queue1.add(p1, queueType);

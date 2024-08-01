@@ -1,5 +1,3 @@
-// Decompiled with: CFR 0.152
-// Class Version: 8
 package dev.lugami.practice.utils;
 
 import java.util.ArrayList;
@@ -17,6 +15,8 @@ public class Clickable {
     private final List<TextComponent> components = new ArrayList<TextComponent>();
     private String hoverText;
     private String text = "";
+
+    public Clickable() {}
 
     public Clickable(String msg) {
         TextComponent message = new TextComponent(TextComponent.fromLegacyText(CC.translate(msg)));
@@ -97,9 +97,6 @@ public class Clickable {
 
     public TextComponent[] asComponents() {
         return this.components.toArray(new TextComponent[0]);
-    }
-
-    public Clickable() {
     }
 
 }

@@ -1,5 +1,5 @@
 name: Budget
 main: dev.lugami.practice.Budget
-version: 1.0
+version: ${project.version}
 description: A simple practice plugin for Spigot 1.8.8
-author: Lugami
+authors: [Lugami, hitblocking]

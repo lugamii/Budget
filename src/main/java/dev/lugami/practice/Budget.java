@@ -1,6 +1,5 @@
 package dev.lugami.practice;
 
-import com.google.common.collect.Table;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -11,28 +10,25 @@ import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.storage.*;
 import dev.lugami.practice.task.MatchEnderpearlTask;
 import dev.lugami.practice.task.MatchSnapshotTask;
+import dev.lugami.practice.task.MenuTask;
 import dev.lugami.practice.task.QueueTask;
-import dev.lugami.practice.utils.ClassUtils;
-import dev.lugami.practice.utils.ConfigUtil;
-import dev.lugami.practice.utils.EntityHider;
-import dev.lugami.practice.utils.TaskUtil;
+import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.command.Drink;
 import dev.lugami.practice.utils.command.command.CommandService;
-import dev.lugami.practice.utils.menu.Button;
-import dev.lugami.practice.utils.menu.Menu;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,7 +36,7 @@ public class Budget extends JavaPlugin {
 
     @Getter
     private static Budget instance;
-    private YamlConfiguration mainConfig, kitConfig, arenaConfig, scoreboardConfig, messagesConfig;
+    private YamlConfiguration mainConfig, kitConfig, arenaConfig, scoreboardConfig, languageConfig;
     private ProfileStorage profileStorage;
     private LobbyStorage lobbyStorage;
     private KitStorage kitStorage;
@@ -50,10 +46,13 @@ public class Budget extends JavaPlugin {
     private QueueStorage queueStorage;
     private PartyStorage partyStorage;
     private LeaderboardsStorage leaderboardsStorage;
+    private EditorStorage editorStorage;
     private Assemble assemble;
     private EntityHider entityHider;
     private CommandService drink;
     private MongoDatabase mongoDatabase;
+
+    private boolean lunarHook = false;
 
     @Override
     public void onEnable() {
@@ -62,13 +61,15 @@ public class Budget extends JavaPlugin {
         this.kitConfig = ConfigUtil.createConfig("kits");
         this.arenaConfig = ConfigUtil.createConfig("arenas");
         this.scoreboardConfig = ConfigUtil.createConfig("scoreboard");
-        this.messagesConfig = ConfigUtil.createConfig("messages");
+        this.languageConfig = ConfigUtil.createConfig("language");
         this.setupListeners();
         this.setupManagers();
         this.setupCommands();
         this.setupTasks();
         this.setupGameRules();
         this.setupMongo();
+        this.setupHooks();
+        this.startupMessage();
     }
 
     @Override
@@ -99,6 +100,7 @@ public class Budget extends JavaPlugin {
         this.queueStorage = new QueueStorage();
         this.leaderboardsStorage = new LeaderboardsStorage();
         this.partyStorage = new PartyStorage();
+        this.editorStorage = new EditorStorage();
         this.entityHider = new EntityHider();
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
@@ -112,6 +114,9 @@ public class Budget extends JavaPlugin {
             try {
                 CommandBase command = (CommandBase) c.newInstance();
                 drink.register(command, command.getName(), command.getAliases());
+                if (drink.get(command.getName()) != null && !command.getName().equalsIgnoreCase("budget")) {
+                    drink.get(command.getName()).setDefaultCommandIsHelp(true);
+                }
             } catch (Exception exception) {
                 getLogger().info("Error while loading the command " + c.getSimpleName());
                 exception.printStackTrace();
@@ -124,16 +129,7 @@ public class Budget extends JavaPlugin {
         TaskUtil.runTaskTimerAsynchronously(new MatchSnapshotTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new MatchEnderpearlTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
-        TaskUtil.runTaskTimer(() -> {
-            for (Player p1 : Bukkit.getOnlinePlayers()) {
-                if (Menu.getOpenMenus().containsKey(p1)) {
-                    Menu menu = Menu.getOpenMenus().get(p1);
-                    menu.updateButtonLore(p1);
-                    menu.initialize(p1);
-                    p1.updateInventory();
-                }
-            }
-        }, 0, 20);
+        TaskUtil.runTaskTimerAsynchronously(new MenuTask(), 0, 2);
     }
 
     private void setupGameRules() {
@@ -141,6 +137,37 @@ public class Budget extends JavaPlugin {
             world.setGameRuleValue("doMobSpawning", "false");
             world.setGameRuleValue("doDaylightCycle", "false");
         });
+    }
+
+    private void setupHooks() {
+        SimplePluginManager pluginManager = (SimplePluginManager) Bukkit.getPluginManager();
+        if (pluginManager.isPluginEnabled("LunarClientAPI")) {
+            lunarHook = true;
+        }
+    }
+
+    private void startupMessage() {
+        CommandSender sender = Bukkit.getConsoleSender();
+        sender.sendMessage(CC.translate(CC.CHAT_BAR));
+        List<String> logo = new ArrayList<>(Arrays.asList(
+                "  ____            _            _   ",
+                " | __ ) _   _  __| | __ _  ___| |_ ",
+                " |  _ \\| | | |/ _` |/ _` |/ _ \\ __|",
+                " | |_) | |_| | (_| | (_| |  __/ |_ ",
+                " |____/ \\__,_|\\__,_|\\__, |\\___|\\__|",
+                "                    |___/          "
+        ));
+        logo.forEach(msg -> sender.sendMessage(CC.translate("&b" + msg)));
+
+        sender.sendMessage(CC.translate(""));
+        sender.sendMessage(CC.translate("Budget was initialized successfully!"));
+        sender.sendMessage(CC.translate("Kits: &b" + this.kitStorage.getKits().size()));
+        sender.sendMessage(CC.translate("Arenas: &b" + this.arenaStorage.getArenas().size()));
+        sender.sendMessage(CC.translate(""));
+        sender.sendMessage(CC.translate("Lunar Support: &b" + this.lunarHook));
+        sender.sendMessage(CC.translate("Version: &b" + this.getDescription().getVersion()));
+        sender.sendMessage(CC.translate("Spigot: &b" + this.getServer().getName()));
+        sender.sendMessage(CC.translate(CC.CHAT_BAR));
     }
 
     private void setupMongo() {

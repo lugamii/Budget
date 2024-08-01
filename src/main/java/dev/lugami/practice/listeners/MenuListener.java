@@ -21,8 +21,6 @@ public class MenuListener implements Listener {
             return;
         }
 
-        event.setCancelled(true);
-
         Inventory inventory = event.getClickedInventory();
         if (inventory == null) {
             return;
@@ -30,8 +28,10 @@ public class MenuListener implements Listener {
 
         String title = inventory.getTitle();
         Menu menu = Menu.getOpenMenus().get(player);
+
         if (menu != null && menu.getTitle().equals(title)) {
-            menu.handleClick(event.getSlot(), player);
+            if (menu.getButton(event.getSlot()) != null) event.setCancelled(menu.getButton(event.getSlot()).shouldCancel());
+            menu.handleClick(event.getSlot(), player, event.getClick());
             for (Player player1 : Menu.getOpenMenus().keySet()) {
                 Menu openMenu = Menu.getOpenMenus().get(player1);
                 if (openMenu.getTitle().equals(title)) {

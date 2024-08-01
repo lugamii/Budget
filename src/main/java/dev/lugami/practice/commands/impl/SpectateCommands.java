@@ -25,7 +25,7 @@ public class SpectateCommands extends CommandBase {
             return;
         }
         if (target == player) {
-            player.sendMessage(CC.translate("&cYou cannot spectate yourself!"));
+            player.sendMessage(Language.CANNOT_SPECTATE_SELF.format());
             return;
         }
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
@@ -40,6 +40,9 @@ public class SpectateCommands extends CommandBase {
         } else {
             Match match = Budget.getInstance().getMatchStorage().findMatch(target);
             if (match == null) return;
+            if (match.getState() == Match.MatchState.ENDED) {
+                player.sendMessage(CC.translate("&cThis match is not available anymore."));
+            }
             match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
         }
     }

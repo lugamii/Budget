@@ -3,7 +3,6 @@ package dev.lugami.practice.storage;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.match.Match;
-import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.match.MatchSnapshot;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
@@ -14,8 +13,10 @@ import org.bukkit.entity.Player;
 
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @Getter
 public class MatchStorage {
@@ -41,6 +42,20 @@ public class MatchStorage {
      */
     public Match findMatch(Player player) {
         return this.matches.stream().filter(match -> match.isPlayerInMatch(player)).findFirst().orElse(null);
+    }
+
+    /**
+     * Finds a random match.
+     */
+    public Match getRandomMatch() {
+        return getRunningMatches().isEmpty() ? null : getRunningMatches().get(new Random().nextInt(getRunningMatches().size()));
+    }
+
+    /**
+     * Returns a list of all running matches (a.k.a. in progress)
+     */
+    public List<Match> getRunningMatches() {
+        return this.matches.stream().filter(match -> match.getState() == Match.MatchState.IN_PROGRESS).collect(Collectors.toList());
     }
 
     /**

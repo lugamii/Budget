@@ -3,22 +3,24 @@ package dev.lugami.practice.match;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.Language;
 import dev.lugami.practice.arena.Arena;
+import dev.lugami.practice.hotbar.HotbarItem;
 import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.match.event.MatchStartEvent;
-import dev.lugami.practice.match.types.DefaultMatch;
+import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.match.types.PartyMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.profile.editor.CustomKitLayout;
 import dev.lugami.practice.queue.QueueType;
 import dev.lugami.practice.settings.Setting;
 import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.fake.FakePlayer;
 import dev.lugami.practice.utils.fake.FakePlayerUtils;
 import lombok.Data;
-import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -98,9 +100,11 @@ public abstract class Match {
             if (this.getTeam1().contains(player) || this.getTeam2().contains(player)) return;
             this.getTeam1().addMember(player);
             if (this.getTeam1().getLeader() == null) this.getTeam1().setLeader(player);
-            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-            profile.setState(ProfileState.FIGHTING);
-            profile.setMatchState(MatchPlayerState.ALIVE);
+            if (!isNpcTesting()) {
+                Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+                profile.setState(ProfileState.FIGHTING);
+                profile.setMatchState(MatchPlayerState.ALIVE);
+            }
             this.equipPlayer(player);
             this.getAllPlayers().add(player);
         } else {
@@ -118,9 +122,11 @@ public abstract class Match {
             if (this.getTeam1().contains(player) || this.getTeam2().contains(player)) return;
             this.getTeam2().addMember(player);
             if (this.getTeam2().getLeader() == null) this.getTeam2().setLeader(player);
-            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-            profile.setState(ProfileState.FIGHTING);
-            profile.setMatchState(MatchPlayerState.ALIVE);
+            if (!isNpcTesting()) {
+                Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+                profile.setState(ProfileState.FIGHTING);
+                profile.setMatchState(MatchPlayerState.ALIVE);
+            }
             this.equipPlayer(player);
             this.getAllPlayers().add(player);
         } else {
@@ -139,8 +145,6 @@ public abstract class Match {
                             if (!profile1.getProfileOptions().getSettingsMap().get(Setting.ALLOW_SPECTATORS)) {
                                 player.sendMessage(CC.translate("&aA player is not allowing spectators in this match."));
                                 break;
-                            } else {
-                                continue;
                             }
                         }
                     }
@@ -249,8 +253,10 @@ public abstract class Match {
             this.setWinnerTeam(winningTeam);
             Player winnerLeader = winningTeam.getLeader();
             if (winnerLeader != null) {
-                Profile profile = Budget.getInstance().getProfileStorage().findProfile(winnerLeader);
-                profile.setMatchState(MatchPlayerState.DEAD);
+                if (!isNpcTesting()) {
+                    Profile profile = Budget.getInstance().getProfileStorage().findProfile(winnerLeader);
+                    profile.setMatchState(MatchPlayerState.DEAD);
+                }
                 (new MatchEndEvent(this, this.getWinnerTeam(), this.getOpponent(getWinnerTeam()))).call();
                 MatchSnapshot snap = new MatchSnapshot(winnerLeader, this.getOpponent(getWinnerTeam()).getLeader(), winnerLeader.getInventory().getArmorContents(), winnerLeader.getInventory().getContents());
                 Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
@@ -277,9 +283,31 @@ public abstract class Match {
      */
     public void equipPlayer(Player player) {
         // Equip the player with the kit's items
-        player.getInventory().clear();
-        player.getInventory().setContents(this.getKit().getInventory());
-        player.getInventory().setArmorContents(this.getKit().getArmor());
+        if (isNpcTesting()) {
+            InventoryWrapper wrapper = new InventoryWrapper(player.getInventory());
+            wrapper.clear();
+            wrapper.setContents(this.getKit().getInventory());
+            wrapper.setArmorContents(this.getKit().getArmor());
+            return;
+        }
+
+        InventoryWrapper wrapper = new InventoryWrapper(player.getInventory());
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        wrapper.clear();
+        if (profile.getKitLayouts().get(this.kit).length == 0) {
+            wrapper.setContents(this.getKit().getInventory());
+            wrapper.setArmorContents(this.getKit().getArmor());
+        } else {
+            if (profile.getKitItems(this.kit).isEmpty()) {
+                wrapper.setContents(this.getKit().getInventory());
+                wrapper.setArmorContents(this.getKit().getArmor());
+                return;
+            }
+            List<HotbarItem> kitItems = profile.getKitItems(this.kit);
+            for (int i = 0; i < kitItems.size(); i++) {
+                wrapper.setItem(i, kitItems.get(i).getItemStack());
+            }
+        }
     }
 
     public void teleportTeamsToArena() {
@@ -289,7 +317,7 @@ public abstract class Match {
                 if (this.getTeam1().getMembers().contains(player.getUniqueId())) {
                     location = new Location(getArena().getPos1().getWorld(), getArena().getPos1().getX(), getArena().getPos1().getY(), getArena().getPos1().getZ(), getArena().getPos1().getYaw(), getArena().getPos1().getPitch());
                 } else if (this.getTeam2().getMembers().contains(player.getUniqueId())) {
-                    location = new Location(getArena().getPos1().getWorld(), getArena().getPos1().getX(), getArena().getPos1().getY(), getArena().getPos1().getZ(), getArena().getPos1().getYaw(), getArena().getPos1().getPitch());
+                    location = new Location(getArena().getPos2().getWorld(), getArena().getPos2().getX(), getArena().getPos2().getY(), getArena().getPos2().getZ(), getArena().getPos2().getYaw(), getArena().getPos2().getPitch());
                 }
                 location.add(0.0, 1.0, 0.0);
                 player.teleport(location);

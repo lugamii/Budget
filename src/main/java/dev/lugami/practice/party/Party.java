@@ -1,12 +1,9 @@
 package dev.lugami.practice.party;
 
 import dev.lugami.practice.Budget;
-import dev.lugami.practice.match.Team;
-import dev.lugami.practice.profile.Profile;
-import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.utils.CC;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;

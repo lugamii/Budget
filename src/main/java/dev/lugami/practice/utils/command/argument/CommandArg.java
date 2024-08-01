@@ -1,13 +1,17 @@
 package dev.lugami.practice.utils.command.argument;
 
+import lombok.Getter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class CommandArg {
 
+    @Getter
     private final CommandSender sender;
     private final String value;
+    @Getter
     private final String label;
+    @Getter
     private final CommandArgs args;
 
     public CommandArg(CommandSender sender, String value, CommandArgs args) {
@@ -17,16 +21,8 @@ public class CommandArg {
         this.args = args;
     }
 
-    public CommandSender getSender() {
-        return sender;
-    }
-
     public String get() {
         return value;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public boolean isSenderPlayer() {
@@ -37,7 +33,4 @@ public class CommandArg {
         return (Player) sender;
     }
 
-    public CommandArgs getArgs() {
-        return args;
-    }
 }

@@ -6,6 +6,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ActionUtils {
 
-    public static final Action UNFINISHED = player -> player.sendMessage(Language.UNFINISHED.format());
+    public static final Action UNFINISHED = (player) -> player.sendMessage(Language.UNFINISHED.format());
 
 }

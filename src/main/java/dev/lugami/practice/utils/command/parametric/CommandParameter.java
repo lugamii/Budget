@@ -20,6 +20,10 @@ public class CommandParameter {
     private final boolean flag;
     private final boolean requireLastArg;
 
+    public boolean isFlag() {
+        return flag;
+    }
+
     public CommandParameter(Class<?> type, Parameter parameter, Annotation[] allAnnotations) {
         this.type = type;
         this.parameter = parameter;
@@ -53,10 +57,6 @@ public class CommandParameter {
 
     private boolean loadFlag() {
         return parameter.isAnnotationPresent(Flag.class);
-    }
-
-    public boolean isFlag() {
-        return flag;
     }
 
     public Flag getFlag() {

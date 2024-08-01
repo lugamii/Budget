@@ -33,7 +33,7 @@ public class DuelArenaMenu extends Menu {
                         new ItemBuilder(Material.PAPER)
                                 .name("&b" + arena.getName())
                                 .build(),
-                        player1 -> {
+                        (player1, c) -> {
                             new DuelRequest(player1, target, kit, arena).sendDuelRequest();
                             player.closeInventory();
                         }

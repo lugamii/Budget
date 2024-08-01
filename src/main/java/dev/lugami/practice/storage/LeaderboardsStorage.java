@@ -26,7 +26,7 @@ public class LeaderboardsStorage {
 
     public void updateLeaderboards() {
         TaskUtil.runTaskAsynchronously(() -> {
-            kitLeaderboards.clear();
+            Map<Kit, List<LeaderboardsEntry>> updated = new HashMap<>();
             Budget.getInstance().getKitStorage().getKits().stream().filter(Kit::isRanked).collect(Collectors.toList()).forEach(kit -> {
                 List<Document> sortedPlayers = getLeaderboards(kit);
                 List<LeaderboardsEntry> entries = new ArrayList<>();
@@ -37,8 +37,9 @@ public class LeaderboardsStorage {
                     Integer elo = (Integer) kitDocument.getOrDefault("elo", 1000);
                     entries.add(new LeaderboardsEntry(Bukkit.getOfflinePlayer(uuid).getName(), elo));
                 });
-                kitLeaderboards.put(kit, entries);
+                updated.put(kit, entries);
             });
+            kitLeaderboards = updated;
             sortLeaderboards();
         });
     }

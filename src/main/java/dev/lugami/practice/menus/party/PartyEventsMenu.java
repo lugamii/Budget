@@ -21,7 +21,7 @@ public class PartyEventsMenu extends Menu {
     @Override
     public void initialize(Player player) {
         this.fillBorder();
-        setButton(12, new Button(new ItemBuilder(Material.DIAMOND_AXE).name("&bSplit").lore("&7Split your party into 2 teams and fight!").build(), player1 -> {
+        setButton(12, new Button(new ItemBuilder(Material.DIAMOND_AXE).name("&bSplit").lore("&7Split your party into 2 teams and fight!").build(), (player1, clickType) -> {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player1);
             if (profile.getParty() == null) {
                 player1.sendMessage(CC.translate("&cYou do not have a party!"));
@@ -30,11 +30,11 @@ public class PartyEventsMenu extends Menu {
                     player1.sendMessage(CC.translate("&cYour party does not have enough players to start an event."));
                     return;
                 }
-                new SelectKitMenu(PartyMatch.MatchType.SPLIT).open(player1);
+                new PartySelectKitMenu(PartyMatch.MatchType.SPLIT).open(player1);
             }
         }));
 
-        setButton(14, new Button(new ItemBuilder(Material.GOLD_SWORD).name("&bFFA").lore("&7Your party will fight in a free-for-all mode!").build(), player1 -> {
+        setButton(14, new Button(new ItemBuilder(Material.GOLD_SWORD).name("&bFFA").lore("&7Your party will fight in a free-for-all mode!").build(), (player1, clickType) -> {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player1);
             if (profile.getParty() == null) {
                 player1.sendMessage(CC.translate("&cYou do not have a party!"));
@@ -43,7 +43,7 @@ public class PartyEventsMenu extends Menu {
                     player1.sendMessage(CC.translate("&cYour party does not have enough players to start an event."));
                     return;
                 }
-                new SelectKitMenu(PartyMatch.MatchType.FFA).open(player1);
+                new PartySelectKitMenu(PartyMatch.MatchType.FFA).open(player1);
             }
         }));
     }
