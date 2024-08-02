@@ -1,23 +1,13 @@
 package dev.lugami.practice.storage;
 
 import dev.lugami.practice.Budget;
-import dev.lugami.practice.hotbar.HotbarItem;
 import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Data
 public class LobbyStorage {
@@ -49,7 +39,7 @@ public class LobbyStorage {
     public void bringToLobby(Player player, boolean spectate) {
         TaskUtil.runTaskLater(() -> {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-            profile.setState(spectate ? ProfileState.SPECTATE_MODE : ProfileState.LOBBY);
+            profile.setState(spectate ? ProfileState.LOBBY_SPECTATE : ProfileState.LOBBY);
             profile.setMatchState(MatchPlayerState.NONE);
             if (!spectate) {
                 if (profile.getEditingMetadata() != null) profile.setEditingMetadata(null);

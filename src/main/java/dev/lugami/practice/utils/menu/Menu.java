@@ -67,10 +67,10 @@ public class Menu {
      * @param button the button to be placed
      */
     public void setButton(int slot, Button button) {
-        if (slot > getSize()) slot = internalInv.getSize() - 1;
+        if (slot > getSize()) slot = inventory.getSize() - 1;
         if (buttons.get(slot) != null) buttons.remove(slot);
         if (slot < getSize()) {
-            if (internalInv.getItem(slot) != null) inventory.setItem(slot, null);
+            if (inventory.getItem(slot) != null) inventory.setItem(slot, null);
             inventory.setItem(slot, button.getItemStack());
             buttons.put(slot, button);
         }

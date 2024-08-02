@@ -3,7 +3,6 @@ package dev.lugami.practice.board;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.Match;
 import dev.lugami.practice.match.MatchPlayerState;
-import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.match.types.PartyMatch;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.Profile;
@@ -35,7 +34,7 @@ public class ScoreboardProvider implements AssembleAdapter {
             }
             try {
                 switch (profile.getState()) {
-                    case SPECTATE_MODE:
+                    case LOBBY_SPECTATE:
                         for (String line : Budget.getInstance().getScoreboardConfig().getStringList("SPECTATOR_MODE")) {
                             line = line.replace("<online>", "" + Bukkit.getOnlinePlayers().size())
                                     .replace("<fighting>", "" + Budget.getInstance().getMatchStorage().getInFights())

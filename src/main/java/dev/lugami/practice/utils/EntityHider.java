@@ -16,6 +16,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * A custom EntityHider that only uses TinyProtocol.
+ * Although not tested, should work fine.
+ */
 public class EntityHider extends TinyProtocol {
 
     private final Map<UUID, Set<UUID>> hiddenEntities = new HashMap<>();
@@ -25,8 +29,8 @@ public class EntityHider extends TinyProtocol {
     }
 
     public void hideEntity(Player player, Player toHide) {
-        hiddenEntities.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(toHide.getUniqueId());
-        sendDestroyPacket(player, toHide);
+        this.hiddenEntities.computeIfAbsent(player.getUniqueId(), k -> new HashSet<>()).add(toHide.getUniqueId());
+        this.sendDestroyPacket(player, toHide);
     }
 
     public void showEntity(Player player, Player toShow) {
@@ -46,14 +50,14 @@ public class EntityHider extends TinyProtocol {
         if (receiver == null || receiver.getUniqueId() == null) return super.onPacketOutAsync(receiver, channel, packet);
         UUID receiverId = receiver.getUniqueId();
 
-        if (!hiddenEntities.containsKey(receiverId)) {
+        if (!this.hiddenEntities.containsKey(receiverId)) {
             return super.onPacketOutAsync(receiver, channel, packet);
         }
 
-        int entityId = getEntityIdFromPacket(packet);
+        int entityId = this.getEntityIdFromPacket(packet);
         if (entityId != -1) {
-            Player toHide = getPlayerByEntityId(entityId);
-            if (toHide != null && hiddenEntities.get(receiverId).contains(toHide.getUniqueId())) {
+            Player toHide = this.getPlayerByEntityId(entityId);
+            if (toHide != null && this.hiddenEntities.get(receiverId).contains(toHide.getUniqueId())) {
                 return null;
             }
         }

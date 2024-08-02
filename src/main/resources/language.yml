@@ -1,11 +1,39 @@
 TITLES:
   JOIN:
     ENABLED: true
-    TITLE: "&b&lWelcome to Budget Practice!"
+    TITLE: "&b&lBudget Practice"
     SUBTITLE: "&7We hope you enjoy your stay!"
     FADE-IN: 200
     STAY: 1000
     FADE-OUT: 500
+  MATCH-STARTING:
+    ENABLED: true
+    TITLE: "&b&lMatch Starting"
+    SUBTITLE: "&7Starting in <countdown>..."
+    FADE-IN: 100
+    STAY: 1000
+    FADE-OUT: 10
+  MATCH-STARTED:
+    ENABLED: true
+    TITLE: "&a&lMatch Started!"
+    SUBTITLE: "&7Good luck, high five!"
+    FADE-IN: 100
+    STAY: 1000
+    FADE-OUT: 10
+  MATCH-WINNER:
+    ENABLED: true
+    TITLE: "&a&lVICTORY!"
+    SUBTITLE: "&7You won the match, GG!"
+    FADE-IN: 100
+    STAY: 1000
+    FADE-OUT: 10
+  MATCH-LOSER:
+    ENABLED: true
+    TITLE: "&c&lDEFEAT!"
+    SUBTITLE: "&7Good luck next time!"
+    FADE-IN: 100
+    STAY: 1000
+    FADE-OUT: 10
 
 MESSAGES:
   ERRORS:

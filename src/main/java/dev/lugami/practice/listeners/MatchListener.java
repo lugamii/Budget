@@ -82,8 +82,13 @@ public class MatchListener implements Listener {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (profile.getState() == ProfileState.FIGHTING) {
             Match match = Budget.getInstance().getMatchStorage().findMatch(player);
-            Team team = match.getTeam(player);
-            match.end(match.getOpponent(team));
+            match.sendMessage("&a" + player.getName() + " &7disconnected.");
+            if (match.isPartyMatch()) {
+                profile.setMatchState(MatchPlayerState.DEAD);
+                match.onDeath(player, match.getAlive() < 1);
+            } else {
+                match.onDeath(player);
+            }
         }
     }
 
@@ -256,9 +261,9 @@ public class MatchListener implements Listener {
 
     private Clickable getClickable(MatchEndEvent event) {
         Clickable inventories = new Clickable("&bInventories: ");
-        inventories.add("&a" + event.getWinner().getLeader().getName(), "&eClick to view " + event.getWinner().getLeader().getName() + "'s inventory!", "/match inventory " + event.getWinner().getLeader().getName());
+        inventories.add("&a" + event.getWinner().getLeader().getName(), "&eClick to view " + event.getWinner().getLeader().getName() + "'s inventory!", "/match inventory " + event.getWinner().getLeader().getUniqueId());
         inventories.add("&7, ");
-        inventories.add("&c" + event.getLoser().getLeader().getName(), "&eClick to view " + event.getLoser().getLeader().getName() + "'s inventory!", "/match inventory " + event.getLoser().getLeader().getName());
+        inventories.add("&c" + event.getLoser().getLeader().getName(), "&eClick to view " + event.getLoser().getLeader().getName() + "'s inventory!", "/match inventory " + event.getLoser().getLeader().getUniqueId());
         return inventories;
     }
 

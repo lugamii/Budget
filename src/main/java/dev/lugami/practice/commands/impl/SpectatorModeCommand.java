@@ -7,7 +7,6 @@ import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.command.annotation.Command;
 import dev.lugami.practice.utils.command.annotation.Sender;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class SpectatorModeCommand extends CommandBase {
@@ -24,6 +23,6 @@ public class SpectatorModeCommand extends CommandBase {
             return;
         }
 
-        Budget.getInstance().getLobbyStorage().bringToLobby(player, profile.getState() != ProfileState.SPECTATE_MODE);
+        Budget.getInstance().getLobbyStorage().bringToLobby(player, profile.getState() != ProfileState.LOBBY_SPECTATE);
     }
 }

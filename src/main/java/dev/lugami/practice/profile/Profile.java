@@ -195,7 +195,7 @@ public class Profile {
 
         InventoryWrapper wrapper = new InventoryWrapper(player.getInventory());
         HotbarItem defaultKitItem = new HotbarItem(
-                new ItemBuilder(Material.ENCHANTED_BOOK)
+                new ItemBuilder(Material.BOOK)
                         .name("&bDefault Kit")
                         .build(),
                 player1 -> {
@@ -215,8 +215,11 @@ public class Profile {
 
         for (int i = 0; i < layouts.size(); i++) {
             CustomKitLayout layout = layouts.get(i);
+            if (layout == null || layout.getInventory() == null || layout.getArmor() == null || (layout.getInventory() == kit.getInventory() && layout.getArmor() == kit.getArmor())) {
+                continue;
+            }
             HotbarItem hotbarItem = new HotbarItem(
-                    new ItemBuilder(Material.ENCHANTED_BOOK)
+                    new ItemBuilder(Material.BOOK)
                             .name("&bKit " + (i + 1))
                             .build(),
                     player1 -> {
@@ -229,19 +232,15 @@ public class Profile {
             hotbarItems.add(hotbarItem);
         }
 
-        for (int i = hotbarItems.size(); i < 8; i++) {
-            hotbarItems.add(new HotbarItem(new ItemBuilder(Material.AIR).build()));
-        }
-
         return hotbarItems;
     }
 
     public boolean isBusy() {
-        return this.state != ProfileState.LOBBY && this.state != ProfileState.SPECTATE_MODE;
+        return this.state != ProfileState.LOBBY && this.state != ProfileState.LOBBY_SPECTATE;
     }
 
     public boolean isAtSpawn() {
-        return this.state == ProfileState.LOBBY || this.state == ProfileState.QUEUEING || this.state == ProfileState.SPECTATE_MODE;
+        return this.state == ProfileState.LOBBY || this.state == ProfileState.QUEUEING || this.state == ProfileState.LOBBY_SPECTATE;
     }
 
     public boolean isFighting() {

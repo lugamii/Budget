@@ -21,6 +21,7 @@ import lombok.Data;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -191,11 +192,21 @@ public abstract class Match {
                 public void run() {
                     if (countdown == 0) {
                         setState(MatchState.IN_PROGRESS);
+                        YamlConfiguration config = Budget.getInstance().getLanguageConfig();
+                        doAction(player -> {
+                            if (config.getBoolean("TITLES.MATCH-STARTED.ENABLED"))
+                                TitleAPI.sendTitle(player, config.getString("TITLES.MATCH-STARTED.TITLE"), config.getString("TITLES.MATCH-STARTED.SUBTITLE"), config.getInt("TITLES.MATCH-STARTED.FADE-IN"), config.getInt("TITLES.MATCH-STARTED.STAY"), config.getInt("TITLES.MATCH-STARTED.FADE-OUT"));
+                        });
                         sendMessage(ChatColor.GREEN + "The match has started!");
                         (new MatchStartEvent(Match.this, getTeam1(), getTeam2())).call();
                         setStartedAt(System.currentTimeMillis());
                         this.cancel();
                     } else {
+                        YamlConfiguration config = Budget.getInstance().getLanguageConfig();
+                        doAction(player -> {
+                            if (config.getBoolean("TITLES.MATCH-STARTING.ENABLED"))
+                                TitleAPI.sendTitle(player, config.getString("TITLES.MATCH-STARTING.TITLE").replace("<countdown>", "" + countdown), config.getString("TITLES.MATCH-STARTING.SUBTITLE").replace("<countdown>", "" + countdown), config.getInt("TITLES.MATCH-STARTING.FADE-IN"), config.getInt("TITLES.MATCH-STARTING.STAY"), config.getInt("TITLES.MATCH-STARTING.FADE-OUT"));
+                        });
                         sendMessage(ChatColor.YELLOW + "Match starting in " + countdown + " seconds...");
                         countdown--;
                     }
@@ -248,9 +259,19 @@ public abstract class Match {
      * @param winningTeam the winning team of the match
      */
     public void end(Team winningTeam) {
-        if (this.getState() == MatchState.IN_PROGRESS) {
+        if (this.getState() == MatchState.IN_PROGRESS || this.getState() == MatchState.COUNTDOWN || this.getState() == MatchState.WAITING) {
             this.setState(MatchState.ENDED);
             this.setWinnerTeam(winningTeam);
+            this.getWinnerTeam().doAction(player -> {
+                YamlConfiguration config = Budget.getInstance().getLanguageConfig();
+                if (config.getBoolean("TITLES.MATCH-WINNER.ENABLED"))
+                    TitleAPI.sendTitle(player, config.getString("TITLES.MATCH-WINNER.TITLE"), config.getString("TITLES.MATCH-WINNER.SUBTITLE"), config.getInt("TITLES.MATCH-WINNER.FADE-IN"), config.getInt("TITLES.MATCH-WINNER.STAY"), config.getInt("TITLES.MATCH-WINNER.FADE-OUT"));
+            });
+            this.getOpponent(getWinnerTeam()).doAction(player -> {
+                YamlConfiguration config = Budget.getInstance().getLanguageConfig();
+                if (config.getBoolean("TITLES.MATCH-LOSER.ENABLED"))
+                    TitleAPI.sendTitle(player, config.getString("TITLES.MATCH-LOSER.TITLE"), config.getString("TITLES.MATCH-LOSER.SUBTITLE"), config.getInt("TITLES.MATCH-LOSER.FADE-IN"), config.getInt("TITLES.MATCH-LOSER.STAY"), config.getInt("TITLES.MATCH-LOSER.FADE-OUT"));
+            });
             Player winnerLeader = winningTeam.getLeader();
             if (winnerLeader != null) {
                 if (!isNpcTesting()) {
@@ -294,11 +315,11 @@ public abstract class Match {
         InventoryWrapper wrapper = new InventoryWrapper(player.getInventory());
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         wrapper.clear();
-        if (profile.getKitLayouts().get(this.kit).length == 0) {
+        if (profile.getKitLayouts().get(this.kit) != null && profile.getKitLayouts().get(this.kit).length == 0) {
             wrapper.setContents(this.getKit().getInventory());
             wrapper.setArmorContents(this.getKit().getArmor());
-        } else {
-            if (profile.getKitItems(this.kit).isEmpty()) {
+        } else if (profile.getKitLayouts().get(this.kit) != null) {
+            if (profile.getKitItems(this.kit).isEmpty() || profile.getKitItems(this.kit).size() == 1) {
                 wrapper.setContents(this.getKit().getInventory());
                 wrapper.setArmorContents(this.getKit().getArmor());
                 return;
@@ -366,6 +387,14 @@ public abstract class Match {
         }
     }
 
+    public void doAction(Action action) {
+        getTeam1().doAction(action);
+        getTeam2().doAction(action);
+        for (Player player : this.getSpectators()) {
+            action.execute(player);
+        }
+    }
+
     public Team getTeam(Player player) {
         if (isPartyMatch()) {
             if (((PartyMatch) this).getType() == PartyMatch.MatchType.FFA) {
@@ -401,15 +430,19 @@ public abstract class Match {
     }
 
     public String getDuration() {
-        switch (getState()) {
-            case COUNTDOWN:
-                return "Starting";
-            case IN_PROGRESS:
-                return TimeUtils.formatTime(System.currentTimeMillis() - getStartedAt());
-            case ENDED:
-                return "Ended";
-            default:
-                return "Waiting";
+        try {
+            switch (getState()) {
+                case COUNTDOWN:
+                    return "Starting";
+                case IN_PROGRESS:
+                    return TimeUtils.formatTime(System.currentTimeMillis() - getStartedAt());
+                case ENDED:
+                    return "Ended";
+                default:
+                    return "Waiting";
+            }
+        } catch (Exception ex) {
+            return "Waiting";
         }
     }
 

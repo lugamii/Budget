@@ -131,7 +131,7 @@ public class HotbarStorage {
                 return this.spectatorItems;
             case PARTY:
                 return this.partyItems;
-            case SPECTATE_MODE:
+            case LOBBY_SPECTATE:
                 return this.spectatorModeItems;
             default:
                 return Collections.emptyList();

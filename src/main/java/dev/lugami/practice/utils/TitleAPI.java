@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
-import java.util.Optional;
 
 @UtilityClass
 public class TitleAPI {
@@ -19,6 +18,7 @@ public class TitleAPI {
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         title = CC.translate(title);
         subtitle = CC.translate(subtitle);
+        resetTitle(player);
         player.sendTitle(new org.github.paperspigot.Title(title, subtitle, fadeIn, stay, fadeOut));
 
         if (Budget.getInstance().isLunarHook()) {

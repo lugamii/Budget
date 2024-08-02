@@ -149,14 +149,16 @@ public class Budget extends JavaPlugin {
     private void startupMessage() {
         CommandSender sender = Bukkit.getConsoleSender();
         sender.sendMessage(CC.translate(CC.CHAT_BAR));
-        List<String> logo = new ArrayList<>(Arrays.asList(
+        List<String> logo = Arrays.asList(
                 "  ____            _            _   ",
-                " | __ ) _   _  __| | __ _  ___| |_ ",
-                " |  _ \\| | | |/ _` |/ _` |/ _ \\ __|",
+                " |  _ \\          | |          | |  ",
+                " | |_) |_   _  __| | __ _  ___| |_ ",
+                " |  _ <| | | |/ _` |/ _` |/ _ \\ __|",
                 " | |_) | |_| | (_| | (_| |  __/ |_ ",
                 " |____/ \\__,_|\\__,_|\\__, |\\___|\\__|",
+                "                     __/ |         ",
                 "                    |___/          "
-        ));
+        );
         logo.forEach(msg -> sender.sendMessage(CC.translate("&b" + msg)));
 
         sender.sendMessage(CC.translate(""));

@@ -110,6 +110,15 @@ public class InventoryWrapper {
     }
 
     /**
+     * Gets the size for the underlying Bukkit inventory.
+     *
+     * @return The size of the inventory.
+     */
+    public int getSize() {
+        return inventory.getSize();
+    }
+
+    /**
      * Adds an item to the inventory, placing it in the first available slot.
      *
      * @param item The item to add to the inventory.

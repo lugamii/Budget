@@ -10,10 +10,12 @@ import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.TaskUtil;
+import dev.lugami.practice.utils.TitleAPI;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -86,11 +88,20 @@ public class PartyMatch extends DefaultMatch {
                 public void run() {
                     if (countdown == 0) {
                         setState(MatchState.IN_PROGRESS);
+                        YamlConfiguration config = Budget.getInstance().getLanguageConfig();
+                        doAction(player -> {
+                            if (config.getBoolean("TITLES.MATCH-STARTED.ENABLED"))
+                                TitleAPI.sendTitle(player, config.getString("TITLES.MATCH-STARTED.TITLE"), config.getString("TITLES.MATCH-STARTED.SUBTITLE"), config.getInt("TITLES.MATCH-STARTED.FADE-IN"), config.getInt("TITLES.MATCH-STARTED.STAY"), config.getInt("TITLES.MATCH-STARTED.FADE-OUT"));
+                        });
                         sendMessage(ChatColor.GREEN + "The match has started!");
                         (new MatchStartEvent(PartyMatch.this, getTeam1(), getTeam2())).call();
                         setStartedAt(System.currentTimeMillis());
                         this.cancel();
                     } else {
+                        YamlConfiguration config = Budget.getInstance().getLanguageConfig();
+                        doAction(player -> {
+                            if (config.getBoolean("TITLES.MATCH-STARTING.ENABLED")) TitleAPI.sendTitle(player, config.getString("TITLES.MATCH-STARTING.TITLE").replace("<countdown>", "" + countdown), config.getString("TITLES.MATCH-STARTING.SUBTITLE").replace("<countdown>", "" + countdown), config.getInt("TITLES.MATCH-STARTING.FADE-IN"), config.getInt("TITLES.MATCH-STARTING.STAY"), config.getInt("TITLES.MATCH-STARTING.FADE-OUT"));
+                        });
                         sendMessage(ChatColor.YELLOW + "Match starting in " + countdown + " seconds...");
                         countdown--;
                     }
