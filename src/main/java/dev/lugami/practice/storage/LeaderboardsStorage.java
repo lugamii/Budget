@@ -33,9 +33,13 @@ public class LeaderboardsStorage {
                 sortedPlayers.forEach(doc -> {
                     UUID uuid = UUID.fromString(doc.getString("uuid"));
                     Document kitStatistics = (Document) doc.get("profileStatistics");
-                    Document kitDocument = (Document) kitStatistics.get(kit.getName());
-                    Integer elo = (Integer) kitDocument.getOrDefault("elo", 1000);
-                    entries.add(new LeaderboardsEntry(Bukkit.getOfflinePlayer(uuid).getName(), elo));
+                    try {
+                        Document kitDocument = (Document) kitStatistics.get(kit.getName());
+                        Integer elo = (Integer) kitDocument.getOrDefault("elo", 1000);
+                        entries.add(new LeaderboardsEntry(Bukkit.getOfflinePlayer(uuid).getName(), elo));
+                    } catch (Exception e) {
+                        entries.add(new LeaderboardsEntry(Bukkit.getOfflinePlayer(uuid).getName(), 1000));
+                    }
                 });
                 updated.put(kit, entries);
             });
