@@ -23,3 +23,7 @@ But now, as of 15/06/24, I decided to try making it on Java, and seeing if this 
 ## Requirements
 
 - So far, you only need Spigot 1.8.8, but in the future, Budget might need more plugins as dependencies.
+
+### UPDATE: 03/08/2024
+
+- Not a **REQUIRED** dependency, but Apollo and BukkitAPI (Lunar Client APIs) are currently supported.
