@@ -431,6 +431,16 @@ public abstract class Match {
         return i + 1;
     }
 
+    public String getHitDiff(Player player1, Player player2) {
+        if (this.getTeam(player1).getMember(player1).getHits() - this.getTeam(player2).getMember(player2).getHits() > 0) {
+            return "&a+" + (this.getTeam(player1).getMember(player1).getHits() - this.getTeam(player2).getMember(player2).getHits());
+        } else if (this.getTeam(player1).getMember(player1).getHits() - this.getTeam(player2).getMember(player2).getHits() < 0) {
+            return "&c-" + Math.abs(this.getTeam(player1).getMember(player1).getHits() - this.getTeam(player2).getMember(player2).getHits());
+        } else if (this.getTeam(player1).getMember(player1).getHits() - this.getTeam(player2).getMember(player2).getHits() == 0) {
+            return "No Diff";
+        } else return "No Diff";
+    }
+
     public String getDuration() {
         try {
             switch (getState()) {

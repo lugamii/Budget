@@ -61,6 +61,54 @@ public class KitCommands extends CommandBase {
         player.sendMessage(CC.translate(kit.isEnabled() ? "&aKit was enabled!" : "&cKit was disabled!"));
     }
 
+    @Command(name = "hunger", desc = "Toggles a kit's hunger mode.", usage = "<kit>")
+    @Require("budget.kit.toggle")
+    public void toggleHunger(@Sender Player player, String name) {
+        Kit kit = Budget.getInstance().getKitStorage().getByName(name);
+        if (kit == null) {
+            player.sendMessage(CC.translate("&cThat kit doesn't exist."));
+            return;
+        }
+        kit.setHunger(!kit.isHunger());
+        player.sendMessage(CC.translate(kit.isHunger() ? "&aHunger was enabled!" : "&cHunger was disabled!"));
+    }
+
+    @Command(name = "boxing", desc = "Toggles a kit's boxing mode.", usage = "<kit>")
+    @Require("budget.kit.toggle")
+    public void toggleBoxing(@Sender Player player, String name) {
+        Kit kit = Budget.getInstance().getKitStorage().getByName(name);
+        if (kit == null) {
+            player.sendMessage(CC.translate("&cThat kit doesn't exist."));
+            return;
+        }
+        kit.setBoxing(!kit.isBoxing());
+        player.sendMessage(CC.translate(kit.isBoxing() ? "&aBoxing was enabled!" : "&cBoxing was disabled!"));
+    }
+
+    @Command(name = "party", desc = "Toggles a kit's party mode.", usage = "<kit>")
+    @Require("budget.kit.toggle")
+    public void toggleParty(@Sender Player player, String name) {
+        Kit kit = Budget.getInstance().getKitStorage().getByName(name);
+        if (kit == null) {
+            player.sendMessage(CC.translate("&cThat kit doesn't exist."));
+            return;
+        }
+        kit.setParty(!kit.isParty());
+        player.sendMessage(CC.translate(kit.isParty() ? "&aParty mode was enabled!" : "&cParty mode was disabled!"));
+    }
+
+    @Command(name = "ranked", desc = "Toggles a kit's ranked mode.", usage = "<kit>")
+    @Require("budget.kit.toggle")
+    public void toggleRanked(@Sender Player player, String name) {
+        Kit kit = Budget.getInstance().getKitStorage().getByName(name);
+        if (kit == null) {
+            player.sendMessage(CC.translate("&cThat kit doesn't exist."));
+            return;
+        }
+        kit.setRanked(!kit.isRanked());
+        player.sendMessage(CC.translate(kit.isRanked() ? "&aRanked mode was enabled!" : "&cRanked mode was disabled!"));
+    }
+
     @Command(name = "setinventory", aliases = {"setinv"}, desc = "Sets a kit's inventory.", usage = "<kit>")
     @Require("budget.kit.setinventory")
     public void setKitInv(@Sender Player player, String name) {

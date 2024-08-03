@@ -43,6 +43,10 @@ public class KitStorage {
             Kit kit = new Kit(key);
             kit.setEnabled(config.getBoolean(path + "enabled"));
             kit.setRanked(config.getBoolean(path + "ranked"));
+            kit.setHunger(config.getBoolean(path + "hunger"));
+            kit.setParty(config.getBoolean(path + "party"));
+            kit.setBoxing(config.getBoolean(path + "boxing"));
+            kit.setEditable(config.getBoolean(path + "editable"));
             kit.setIcon(ItemUtils.deserializeItemStack(config.getString(path + "icon")));
             kit.setInventory(ItemUtils.deserializeInventory(config.getString(path + "inventory")));
             kit.setArmor(ItemUtils.deserializeInventory(config.getString(path + "armor")));
@@ -59,6 +63,10 @@ public class KitStorage {
             String path = kit.getName() + ".";
             config.set(path + "enabled", kit.isEnabled());
             config.set(path + "ranked", kit.isRanked());
+            config.set(path + "hunger", kit.isHunger());
+            config.set(path + "boxing", kit.isBoxing());
+            config.set(path + "party", kit.isParty());
+            config.set(path + "editable", kit.isEditable());
             config.set(path + "icon", ItemUtils.serializeItemStack(kit.getIcon()));
             config.set(path + "inventory", ItemUtils.serializeInventory(kit.getInventory()));
             config.set(path + "armor", ItemUtils.serializeInventory(kit.getArmor()));

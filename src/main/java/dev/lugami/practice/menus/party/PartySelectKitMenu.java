@@ -33,7 +33,7 @@ public class PartySelectKitMenu extends Menu {
         this.fillBorder();
         int slot = 10;
         for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
-            if (kit.isEnabled()) {
+            if (kit.isEnabled() && kit.isParty()) {
 
                 ItemStack itemStack = kit.getIcon().clone();
                 setButton(slot++, new Button(

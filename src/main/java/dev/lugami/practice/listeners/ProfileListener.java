@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -58,6 +59,16 @@ public class ProfileListener implements Listener {
         }, 10L);
     }
 
+    @EventHandler
+    public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
+        Player player = (Player) event.getEntity();
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (profile.getState() == ProfileState.LOBBY || profile.getState() == ProfileState.FIGHTING && (!Budget.getInstance().getMatchStorage().findMatch(player).getKit().isHunger() || Budget.getInstance().getMatchStorage().findMatch(player).getKit().isBoxing())) {
+            event.setFoodLevel(20);
+            event.setCancelled(true);
+        }
+    }
+
     /**
      * Monitors damage events where one entity damages another entity, specifically focusing on Player entities.
      * Updates the last attacker for the victim Player if the damager is also a Player or a Player-controlled Projectile.
@@ -89,7 +100,5 @@ public class ProfileListener implements Listener {
             }
         }
     }
-
-
 
 }

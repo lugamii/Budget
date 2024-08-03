@@ -188,7 +188,22 @@ public class MatchListener implements Listener {
                     } else {
                         ((CraftPlayer) player).getHandle().bU();
                     }
+
                     match.getTeam(damager).getMember(damager).hit();
+
+                    if (match.getKit().isBoxing()) {
+                        event.setDamage(0.0);
+                    }
+
+                    if (match.getTeam(damager).getMember(damager).getHits() == 100 && match.getKit().isBoxing()) {
+                        if (match.isPartyMatch()) {
+                            profile.setMatchState(MatchPlayerState.DEAD);
+                            match.onDeath(player, match.getAlive() < 1);
+                        } else {
+                            match.onDeath(player);
+                        }
+                    }
+
                     boolean crit = damager.getFallDistance() > 0.0F
                             && !damager.isOnGround()
                             && !damager.isInsideVehicle()

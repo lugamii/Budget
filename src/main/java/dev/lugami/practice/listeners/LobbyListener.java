@@ -1,10 +1,16 @@
 package dev.lugami.practice.listeners;
 
+import com.lunarclient.apollo.Apollo;
+import com.lunarclient.apollo.module.notification.NotificationModule;
+import com.lunarclient.apollo.module.title.TitleModule;
+import com.lunarclient.apollo.module.waypoint.WaypointModule;
+import com.lunarclient.apollo.player.ApolloPlayer;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.NotificationAPI;
 import dev.lugami.practice.utils.TaskUtil;
 import dev.lugami.practice.utils.TitleAPI;
 import org.bukkit.GameMode;
@@ -25,6 +31,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
 
 public class LobbyListener implements Listener {
 
@@ -59,6 +67,16 @@ public class LobbyListener implements Listener {
                 }
             }
             YamlConfiguration config = Budget.getInstance().getLanguageConfig();
+            if (Budget.getInstance().isLunarHook() && Budget.getInstance().getLunarHookMode().equalsIgnoreCase("Modern")) {
+                Optional<ApolloPlayer> apolloPlayerOpt = Apollo.getPlayerManager().getPlayer(player.getUniqueId());
+
+                // Removes the default "Spawn" waypoint (which in my opinion is ugly asf)
+                WaypointModule waypointModule = Apollo.getModuleManager().getModule(WaypointModule.class);
+                apolloPlayerOpt.ifPresent(apolloPlayer -> waypointModule.removeWaypoint(apolloPlayer, "Spawn"));
+
+                if (config.getBoolean("LUNAR-NOTIFICATIONS.JOIN.ENABLED")) NotificationAPI.showNotification(player, config.getInt("LUNAR-NOTIFICATIONS.JOIN.DURATION"), config.getString("LUNAR-NOTIFICATIONS.JOIN.TITLE"), config.getStringList("LUNAR-NOTIFICATIONS.JOIN.LINES").toArray(new String[0]));
+            }
+
             if (config.getBoolean("TITLES.JOIN.ENABLED"))
                 TitleAPI.sendTitle(player, config.getString("TITLES.JOIN.TITLE"), config.getString("TITLES.JOIN.SUBTITLE"), config.getInt("TITLES.JOIN.FADE-IN"), config.getInt("TITLES.JOIN.STAY"), config.getInt("TITLES.JOIN.FADE-OUT"));
         }, 1L);
@@ -96,16 +114,6 @@ public class LobbyListener implements Listener {
         } else if (event.getPlayer().getGameMode() == GameMode.CREATIVE && event.getPlayer().isOp()) {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
             event.setCancelled(profile.getState() != ProfileState.LOBBY);
-        }
-    }
-
-    @EventHandler
-    public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
-        Player player = (Player) event.getEntity();
-        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        if (profile.getState() == ProfileState.LOBBY) {
-            event.setFoodLevel(20);
-            event.setCancelled(true);
         }
     }
 

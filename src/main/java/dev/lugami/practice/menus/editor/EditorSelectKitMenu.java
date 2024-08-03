@@ -27,8 +27,7 @@ public class EditorSelectKitMenu extends Menu {
         this.fillBorder();
         int slot = 10;
         for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
-            if (kit.isEnabled()) {
-
+            if (kit.isEnabled() && kit.isEditable()) {
                 ItemStack itemStack = kit.getIcon().clone();
                 setButton(slot++, new Button(
                         new ItemBuilder(itemStack != null ? itemStack : new ItemBuilder(Material.DIAMOND_SWORD).build())

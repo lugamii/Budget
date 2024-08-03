@@ -100,13 +100,27 @@ public class ScoreboardProvider implements AssembleAdapter {
                                             }
                                         }
                                     } else {
-                                        for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
-                                            line = line.
-                                                    replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
-                                                    replace("<duration>", match.getDuration()).
-                                                    replace("<own_ping>", "" + PlayerUtils.getPing(player)).
-                                                    replace("<opponent_ping>", "" + PlayerUtils.getPing(match.getOpponent(match.getTeam(player)).getLeader()));
-                                            lines.add(line);
+                                        if (!match.getKit().isBoxing()) {
+                                            for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
+                                                line = line.
+                                                        replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
+                                                        replace("<duration>", match.getDuration()).
+                                                        replace("<own_ping>", "" + PlayerUtils.getPing(player)).
+                                                        replace("<opponent_ping>", "" + PlayerUtils.getPing(match.getOpponent(match.getTeam(player)).getLeader()));
+                                                lines.add(line);
+                                            }
+                                        } else {
+                                            for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING-BOXING")) {
+                                                line = line.
+                                                        replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
+                                                        replace("<duration>", match.getDuration()).
+                                                        replace("<own_ping>", "" + PlayerUtils.getPing(player)).
+                                                        replace("<opponent_ping>", "" + PlayerUtils.getPing(match.getOpponent(match.getTeam(player)).getLeader())).
+                                                        replace("<own_hits>", "" + match.getTeam(player).getMember(player).getHits()).
+                                                        replace("<opponent_hits>", "" + match.getOpponent(match.getTeam(player)).getMember(match.getOpponent(match.getTeam(player)).getLeader()).getHits()).
+                                                        replace("<diff>", match.getHitDiff(player, match.getOpponent(match.getTeam(player)).getLeader()));
+                                                lines.add(line);
+                                            }
                                         }
                                     }
                                     break;

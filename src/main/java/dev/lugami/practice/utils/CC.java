@@ -33,7 +33,7 @@ public class CC {
      * The method replaces all instances of '&' with '§', which is used by Minecraft for color codes.
      *
      * @param strings the list to translate
-     * @return the translated string with color codes
+     * @return the translated string list with color codes
      */
     public List<String> translate(List<String> strings) {
         List<String> list = new ArrayList<>();
@@ -41,6 +41,21 @@ public class CC {
             list.add(CC.translate(string));
         }
         return list;
+    }
+
+    /**
+     * Translates color codes in a given string array.
+     * The method replaces all instances of '&' with '§', which is used by Minecraft for color codes.
+     *
+     * @param strings the array to translate
+     * @return the translated string array with color codes
+     */
+    public String[] translate(String[] strings) {
+        String[] translated = new String[strings.length];
+        for (int i = 0; i < strings.length; i++) {
+            translated[i] = CC.translate(strings[i]);
+        }
+        return translated;
     }
 
 }

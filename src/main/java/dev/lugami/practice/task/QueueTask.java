@@ -6,6 +6,7 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.queue.Queue;
 import dev.lugami.practice.queue.QueueType;
+import dev.lugami.practice.utils.CC;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,7 +39,14 @@ public class QueueTask extends BukkitRunnable {
             Player player1 = queue.getPlayers().get(i);
             for (int j = i + 1; j < queue.getPlayers().size(); j++) {
                 Player player2 = queue.getPlayers().get(j);
-                Arena arena = Budget.getInstance().getArenaStorage().getRandomArena(queue.getKit());
+                Arena arena;
+                try {
+                    arena = Budget.getInstance().getArenaStorage().getRandomArena(queue.getKit());
+                } catch (Exception ex) {
+                    player1.sendMessage(CC.translate("&cNo arenas were found."));
+                    player2.sendMessage(CC.translate("&cNo arenas were found."));
+                    return;
+                }
                 if (arena == null) {
                     continue;
                 }
@@ -65,7 +73,14 @@ public class QueueTask extends BukkitRunnable {
                 continue;
             }
 
-            Arena arena = Budget.getInstance().getArenaStorage().getRandomArena(queue.getKit());
+            Arena arena;
+            try {
+                arena = Budget.getInstance().getArenaStorage().getRandomArena(queue.getKit());
+            } catch (Exception ex) {
+                player1.sendMessage(CC.translate("&cNo arenas were found."));
+                player2.sendMessage(CC.translate("&cNo arenas were found."));
+                return;
+            }
             if (arena == null) {
                 continue;
             }

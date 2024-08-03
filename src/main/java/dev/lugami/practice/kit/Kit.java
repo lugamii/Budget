@@ -12,6 +12,11 @@ public class Kit {
 
     private boolean enabled = true;
     private boolean ranked = false;
+    private boolean hunger = true;
+    private boolean boxing = false;
+    private boolean party = false;
+    private boolean editable = true;
+
     private String name;
     private ItemStack icon;
     private ItemStack[] inventory = new ItemStack[36];
