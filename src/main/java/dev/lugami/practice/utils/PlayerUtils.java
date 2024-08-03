@@ -39,7 +39,6 @@ public class PlayerUtils {
      *               keep his visibility state.
      */
     public void resetPlayer(Player player, boolean show) {
-        TitleAPI.resetTitle(player);
         player.setHealth(20);
         player.setFoodLevel(20);
         player.setSaturation(20f);

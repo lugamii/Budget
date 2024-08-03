@@ -3,6 +3,7 @@ package dev.lugami.practice.menus.party;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.team.TeamPlayer;
 import dev.lugami.practice.match.types.PartyMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.utils.CC;
@@ -44,14 +45,14 @@ public class PartySelectKitMenu extends Menu {
                             Arena arena = Budget.getInstance().getArenaStorage().getRandomArena(kit);
                             if (arena != null && profile.getParty() != null) {
                                 PartyMatch match = new PartyMatch(kit, arena, type, profile.getParty());
-                                List<UUID> partyMembers = new ArrayList<>(profile.getParty().getMembers());
+                                List<TeamPlayer> partyMembers = new ArrayList<>(profile.getParty().getMembers());
                                 Collections.shuffle(partyMembers);
 
                                 List<Player> team1 = new ArrayList<>();
                                 List<Player> team2 = new ArrayList<>();
 
                                 for (int i = 0; i < partyMembers.size(); i++) {
-                                    Player player1 = Bukkit.getPlayer(partyMembers.get(i));
+                                    Player player1 = partyMembers.get(i).getPlayer();
                                     if (i % 2 == 0) {
                                         team1.add(player1);
                                     } else {

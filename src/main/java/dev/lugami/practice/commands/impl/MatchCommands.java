@@ -21,7 +21,7 @@ public class MatchCommands extends CommandBase {
 
     @Command(name = "inventory", desc = "Opens the match inventory for a player after the match ends.", usage = "<uuid>")
     public void inventory(@Sender Player player, UUID uuid) {
-        MatchSnapshot inv = Budget.getInstance().getMatchStorage().getSnapshots().stream().filter(snap -> snap.getTarget() == Bukkit.getOfflinePlayer(uuid).getPlayer() || snap.getOpponent() == Bukkit.getOfflinePlayer(uuid).getPlayer()).findFirst().orElse(null);
+        MatchSnapshot inv = Budget.getInstance().getMatchStorage().getSnapshots().stream().filter(snap -> snap.getTarget() == Bukkit.getOfflinePlayer(uuid).getPlayer()).findFirst().orElse(null);
         if (inv == null || inv.isExpired()) {
             player.sendMessage(Language.SNAPSHOT_NOT_FOUND.format());
         } else {

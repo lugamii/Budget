@@ -38,6 +38,7 @@ public class LobbyStorage {
      */
     public void bringToLobby(Player player, boolean spectate) {
         TaskUtil.runTaskLater(() -> {
+            PlayerUtils.resetPlayer(player);
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
             profile.setState(spectate ? ProfileState.LOBBY_SPECTATE : ProfileState.LOBBY);
             profile.setMatchState(MatchPlayerState.NONE);
@@ -51,7 +52,6 @@ public class LobbyStorage {
                     return;
                 }
             }
-            PlayerUtils.resetPlayer(player);
             Budget.getInstance().getHotbarStorage().resetHotbar(player);
             player.teleport(this.lobbyLocation);
         }, 1L);

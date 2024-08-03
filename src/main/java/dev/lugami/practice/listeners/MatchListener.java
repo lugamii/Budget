@@ -3,6 +3,7 @@ package dev.lugami.practice.listeners;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.Match;
 import dev.lugami.practice.match.MatchPlayerState;
+import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.match.types.PartyMatch;
@@ -11,22 +12,25 @@ import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.QueueType;
 import dev.lugami.practice.utils.*;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftTNTPrimed;
 import org.bukkit.entity.EnderPearl;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MatchListener implements Listener {
@@ -39,15 +43,15 @@ public class MatchListener implements Listener {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (profile.getState() == ProfileState.FIGHTING) {
             Match match = Budget.getInstance().getMatchStorage().findMatch(player);
-            if (PlayerUtils.getLastAttacker(player).getName() != null) match.sendMessage("&a" + player.getName() + " &7was killed by &c" + PlayerUtils.getLastAttacker(player).getName() + ".");
+            if (PlayerUtils.getLastAttacker(player).getName() != null)
+                match.sendMessage("&a" + player.getName() + " &7was killed by &c" + PlayerUtils.getLastAttacker(player).getName() + ".");
             else match.sendMessage("&a" + player.getName() + " &7died.");
             if (match.isPartyMatch()) {
                 profile.setMatchState(MatchPlayerState.DEAD);
                 if (match.getAlive() >= 1) {
                     match.onDeath(player, false);
                     match.addSpectator(player, true);
-                }
-                else {
+                } else {
                     match.onDeath(player, true);
                 }
             } else {
@@ -177,6 +181,52 @@ public class MatchListener implements Listener {
                     if (partyMatch.getType() == PartyMatch.MatchType.SPLIT) {
                         event.setCancelled(partyMatch.getTeam(player) == partyMatch.getTeam(damager));
                     }
+                }
+                if (!event.isCancelled()) {
+                    if (player.isBlocking() && match.getTeam(player).getMember(player).getBlocked() <= 20) {
+                        match.getTeam(player).getMember(player).block();
+                    } else {
+                        ((CraftPlayer) player).getHandle().bU();
+                    }
+                    match.getTeam(damager).getMember(damager).hit();
+                    boolean crit = damager.getFallDistance() > 0.0F
+                            && !damager.isOnGround()
+                            && !damager.isInsideVehicle()
+                            && !damager.hasPotionEffect(PotionEffectType.BLINDNESS)
+                            && damager.getLocation().getBlock().getType() != Material.LADDER
+                            && damager.getLocation().getBlock().getType() != Material.VINE;
+                    if (crit) {
+                        match.getTeam(damager).getMember(damager).crit();
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        if (event.getEntity().getShooter() instanceof Player) {
+            Player shooter = (Player) event.getEntity().getShooter();
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(shooter);
+            if (profile.getState() == ProfileState.FIGHTING) {
+                Match match = Budget.getInstance().getMatchStorage().findMatch(shooter);
+                if (match == null) return;
+                if (match.getState() != Match.MatchState.IN_PROGRESS) event.setCancelled(true);
+                if (event.getEntity() instanceof ThrownPotion) match.getTeam(shooter).getMember(shooter).pot();
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPotionSplashEvent(PotionSplashEvent event) {
+        if (event.getPotion().getShooter() instanceof Player) {
+            Player shooter = (Player) event.getPotion().getShooter();
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(shooter);
+            if (profile.getState() == ProfileState.FIGHTING) {
+                Match match = Budget.getInstance().getMatchStorage().findMatch(shooter);
+                if (match == null) return;
+                if (match.getState() == Match.MatchState.IN_PROGRESS) {
+                    if (event.getIntensity(shooter) <= 0.5D) match.getTeam(shooter).getMember(shooter).miss();
                 }
             }
         }

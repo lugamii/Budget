@@ -8,6 +8,7 @@ import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.match.team.Team;
+import dev.lugami.practice.match.team.TeamPlayer;
 import dev.lugami.practice.match.types.PartyMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -222,6 +224,8 @@ public abstract class Match {
     }
 
     public void onDeath(Player player, boolean end) {
+        MatchSnapshot snap = new MatchSnapshot(player, getOpponent(getTeam(player)).getLeader(), player.getInventory().getArmorContents(), player.getInventory().getContents());
+        Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         Location location = player.getLocation().clone();
         Player killer = PlayerUtils.getLastAttacker(player);
@@ -245,8 +249,6 @@ public abstract class Match {
         player.setFireTicks(0);
         PlayerUtils.hidePlayer(player);
         profile.setMatchState(MatchPlayerState.DEAD);
-        MatchSnapshot snap = new MatchSnapshot(player, getOpponent(getTeam(player)).getLeader(), player.getInventory().getArmorContents(), player.getInventory().getContents());
-        Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
         player.setVelocity(new Vector());
         player.teleport(location);
         PlayerUtils.resetPlayer(player, false);
@@ -278,9 +280,9 @@ public abstract class Match {
                     Profile profile = Budget.getInstance().getProfileStorage().findProfile(winnerLeader);
                     profile.setMatchState(MatchPlayerState.DEAD);
                 }
-                (new MatchEndEvent(this, this.getWinnerTeam(), this.getOpponent(getWinnerTeam()))).call();
                 MatchSnapshot snap = new MatchSnapshot(winnerLeader, this.getOpponent(getWinnerTeam()).getLeader(), winnerLeader.getInventory().getArmorContents(), winnerLeader.getInventory().getContents());
                 Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
+                (new MatchEndEvent(this, this.getWinnerTeam(), this.getOpponent(getWinnerTeam()))).call();
             }
             TaskUtil.runTaskLater(() -> {
                 if (!isNpcTesting()) this.teleportTeamsToSpawn();
@@ -360,16 +362,16 @@ public abstract class Match {
         TaskUtil.runTaskLater(() -> {
             if (!FakePlayerUtils.getFakePlayers().contains((FakePlayer) getTeam1().getLeader()) || FakePlayerUtils.getFakePlayers().contains((FakePlayer) getTeam2().getLeader()))
                 return;
-            for (UUID playerId : this.getTeam1().getMembers()) {
-                FakePlayer player = FakePlayerUtils.getByUUID(playerId);
+            for (TeamPlayer playerId : this.getTeam1().getMembers()) {
+                FakePlayer player = FakePlayerUtils.getByUUID(playerId.getPlayer().getUniqueId());
                 if (player != null) {
                     Location location = new Location(getArena().getPos1().getWorld(), getArena().getPos1().getX(), getArena().getPos1().getY(), getArena().getPos1().getZ(), getArena().getPos1().getYaw(), getArena().getPos1().getPitch());
                     location.add(0.0, 1.0, 0.0);
                     player.teleport(location);
                 }
             }
-            for (UUID playerId : this.getTeam2().getMembers()) {
-                FakePlayer player = FakePlayerUtils.getByUUID(playerId);
+            for (TeamPlayer playerId : this.getTeam2().getMembers()) {
+                FakePlayer player = FakePlayerUtils.getByUUID(playerId.getPlayer().getUniqueId());
                 if (player != null) {
                     Location location = new Location(getArena().getPos2().getWorld(), getArena().getPos2().getX(), getArena().getPos2().getY(), getArena().getPos2().getZ(), getArena().getPos2().getYaw(), getArena().getPos2().getPitch());
                     location.add(0.0, 1.0, 0.0);

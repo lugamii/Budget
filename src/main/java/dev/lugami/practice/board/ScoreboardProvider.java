@@ -85,7 +85,7 @@ public class ScoreboardProvider implements AssembleAdapter {
                                             for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-FFA")) {
                                                 line = line.
                                                         replace("<remaining>", "" + (int) partyMatch.getFfaTeam().getMembers().stream().filter(player1 ->
-                                                                Budget.getInstance().getProfileStorage().findProfile(player1).getMatchState() == MatchPlayerState.ALIVE
+                                                                Budget.getInstance().getProfileStorage().findProfile(player1.getPlayer()).getMatchState() == MatchPlayerState.ALIVE
                                                         ).count())
                                                         .replace("<size>", "" + partyMatch.getFfaTeam().getSize())
                                                         .replace("<duration>", match.getDuration());

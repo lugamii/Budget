@@ -52,7 +52,12 @@ public class Budget extends JavaPlugin {
     private CommandService drink;
     private MongoDatabase mongoDatabase;
 
+
+    /**
+     * Lunar Client related stuff...
+     */
     private boolean lunarHook = false;
+    private String lunarHookMode = "None";
 
     @Override
     public void onEnable() {
@@ -142,7 +147,11 @@ public class Budget extends JavaPlugin {
     private void setupHooks() {
         SimplePluginManager pluginManager = (SimplePluginManager) Bukkit.getPluginManager();
         if (pluginManager.isPluginEnabled("LunarClientAPI")) {
-            lunarHook = true;
+            this.lunarHook = true;
+            this.lunarHookMode = "Legacy";
+        } else if (pluginManager.isPluginEnabled("Apollo-Bukkit")) {
+            this.lunarHook = true;
+            this.lunarHookMode = "Modern";
         }
     }
 
@@ -166,7 +175,7 @@ public class Budget extends JavaPlugin {
         sender.sendMessage(CC.translate("Kits: &b" + this.kitStorage.getKits().size()));
         sender.sendMessage(CC.translate("Arenas: &b" + this.arenaStorage.getArenas().size()));
         sender.sendMessage(CC.translate(""));
-        sender.sendMessage(CC.translate("Lunar Support: &b" + this.lunarHook));
+        sender.sendMessage(CC.translate("Lunar Support: &b" + (this.lunarHook ? "Yes (" + this.lunarHookMode + ")" : "No")));
         sender.sendMessage(CC.translate("Version: &b" + this.getDescription().getVersion()));
         sender.sendMessage(CC.translate("Spigot: &b" + this.getServer().getName()));
         sender.sendMessage(CC.translate(CC.CHAT_BAR));

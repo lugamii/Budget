@@ -17,21 +17,25 @@ import java.util.UUID;
 @Getter @Setter
 public class Team {
 
-    private final List<UUID> members;
+    private final List<TeamPlayer> members;
     private Player leader;
 
     public Team(Player leader) {
         this.leader = leader;
         this.members = new ArrayList<>();
-        if (leader != null) this.members.add(leader.getUniqueId());
+        if (leader != null) this.members.add(new TeamPlayer(leader));
     }
 
     public void addMember(Player player) {
-        members.add(player.getUniqueId());
+        members.add(new TeamPlayer(player));
     }
 
     public boolean removeMember(Player player) {
-        return members.remove(player.getUniqueId());
+        return members.removeIf(p -> p.getPlayer() == player);
+    }
+
+    public TeamPlayer getMember(Player player) {
+        return members.stream().filter(p -> p.getPlayer() == player).findFirst().orElse(new TeamPlayer(player));
     }
 
     public void setLeader(Player player) {
@@ -40,7 +44,7 @@ public class Team {
     }
 
     public boolean contains(Player player) {
-        return members.contains(player.getUniqueId());
+        return members.stream().anyMatch(p -> p.getPlayer() == player);
     }
 
     public int getSize() {
@@ -57,21 +61,18 @@ public class Team {
 
     public void doAction(Action action) {
         List<Player> sentPlayers = new ArrayList<>();
-        for (UUID uuid : getMembers()) {
-            if (Bukkit.getPlayer(uuid) == null) return;
-            Player player = Bukkit.getPlayer(uuid);
-            if (!sentPlayers.contains(player)) {
-                action.execute(player);
-                sentPlayers.add(player);
+        for (TeamPlayer player : getMembers()) {
+            if (!sentPlayers.contains(player.getPlayer())) {
+                action.execute(player.getPlayer());
+                sentPlayers.add(player.getPlayer());
             }
         }
     }
 
     public int getAlive() {
         int i = 0;
-        for (UUID uuid : this.getMembers()) {
-            Player player = Bukkit.getPlayer(uuid);
-            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        for (TeamPlayer player : this.getMembers()) {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player.getPlayer());
             if (profile.getMatchState() == MatchPlayerState.ALIVE) {
                 i++;
             }

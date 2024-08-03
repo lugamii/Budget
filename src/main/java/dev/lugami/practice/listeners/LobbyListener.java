@@ -49,7 +49,7 @@ public class LobbyListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Budget.getInstance().getLobbyStorage().bringToLobby(player);
-        TaskUtil.runTaskLaterAsynchronously(() -> {
+        TaskUtil.runTaskLater(() -> {
             if (Budget.getInstance().getMainConfig().getBoolean("motd.clear-chat")) {
                 for (int i = 0; i < 1000; i++) player.sendMessage("");
             }
@@ -59,7 +59,8 @@ public class LobbyListener implements Listener {
                 }
             }
             YamlConfiguration config = Budget.getInstance().getLanguageConfig();
-            if (config.getBoolean("TITLES.JOIN.ENABLED")) TitleAPI.sendTitle(player, config.getString("TITLES.JOIN.TITLE"), config.getString("TITLES.JOIN.SUBTITLE"), config.getInt("TITLES.JOIN.FADE-IN"), config.getInt("TITLES.JOIN.STAY"), config.getInt("TITLES.JOIN.FADE-OUT"));
+            if (config.getBoolean("TITLES.JOIN.ENABLED"))
+                TitleAPI.sendTitle(player, config.getString("TITLES.JOIN.TITLE"), config.getString("TITLES.JOIN.SUBTITLE"), config.getInt("TITLES.JOIN.FADE-IN"), config.getInt("TITLES.JOIN.STAY"), config.getInt("TITLES.JOIN.FADE-OUT"));
         }, 1L);
     }
 
@@ -76,10 +77,13 @@ public class LobbyListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.hasBlock()) {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
+            if (profile.isFighting()) {
+                return;
+            }
             if (event.getPlayer().getGameMode() != GameMode.CREATIVE || !event.getPlayer().isOp()) {
                 event.setCancelled(true);
             } else if (event.getPlayer().getGameMode() == GameMode.CREATIVE && event.getPlayer().isOp()) {
-                Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
                 event.setCancelled(profile.getState() != ProfileState.LOBBY);
             }
         }
