@@ -140,7 +140,7 @@ public abstract class Match {
     public void addSpectator(Player player, boolean silent) {
         if (this.getState() != MatchState.ENDED) {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-            if (profile.isAtSpawn()) {
+            if (profile.isAtSpawn() || profile.getMatchState() == MatchPlayerState.DEAD) {
                 if (!isNpcTesting()) {
                     for (Player player1 : this.getAllPlayers()) {
                         Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(player1);
@@ -252,7 +252,13 @@ public abstract class Match {
         player.setVelocity(new Vector());
         player.teleport(location);
         PlayerUtils.resetPlayer(player, false);
-        if (end) end(getOpponent(getTeam(player)));
+        if (end) {
+            if (!isPartyMatch() || (isPartyMatch() && ((PartyMatch) this).getType() == PartyMatch.MatchType.SPLIT)) {
+                end(getOpponent(getTeam(player)));
+            } else if (isPartyMatch() && ((PartyMatch) this).getType() == PartyMatch.MatchType.FFA) {
+                ((PartyMatch) this).end(killer);
+            }
+        }
     }
 
     /**
@@ -337,9 +343,9 @@ public abstract class Match {
         TaskUtil.runTaskLater(() -> {
             for (Player player : this.getAllPlayers()) {
                 Location location = player.getLocation().clone();
-                if (this.getTeam1().getMembers().contains(player.getUniqueId())) {
+                if (this.getTeam1().contains(player)) {
                     location = new Location(getArena().getPos1().getWorld(), getArena().getPos1().getX(), getArena().getPos1().getY(), getArena().getPos1().getZ(), getArena().getPos1().getYaw(), getArena().getPos1().getPitch());
-                } else if (this.getTeam2().getMembers().contains(player.getUniqueId())) {
+                } else if (this.getTeam2().contains(player)) {
                     location = new Location(getArena().getPos2().getWorld(), getArena().getPos2().getX(), getArena().getPos2().getY(), getArena().getPos2().getZ(), getArena().getPos2().getYaw(), getArena().getPos2().getPitch());
                 }
                 location.add(0.0, 1.0, 0.0);
@@ -348,7 +354,7 @@ public abstract class Match {
         }, 1L);
     }
 
-    private void teleportTeamsToSpawn() {
+    protected void teleportTeamsToSpawn() {
         TaskUtil.runTaskLater(() -> {
             this.getAllPlayers().forEach(Budget.getInstance().getLobbyStorage()::bringToLobby);
 
@@ -358,7 +364,7 @@ public abstract class Match {
         }, 1L);
     }
 
-    private void teleportNPCSToArena() {
+    protected void teleportNPCSToArena() {
         TaskUtil.runTaskLater(() -> {
             if (!FakePlayerUtils.getFakePlayers().contains((FakePlayer) getTeam1().getLeader()) || FakePlayerUtils.getFakePlayers().contains((FakePlayer) getTeam2().getLeader()))
                 return;
@@ -420,7 +426,7 @@ public abstract class Match {
     }
 
     public int getAlive() {
-        int i = 0;
+        int i = 1;
         if (!this.isPartyMatch() || (this.isPartyMatch() && ((PartyMatch) this).getType() == PartyMatch.MatchType.SPLIT)) {
             i += this.getTeam1().getAlive();
             i += this.getTeam2().getAlive();
@@ -428,7 +434,7 @@ public abstract class Match {
             PartyMatch match = (PartyMatch) this;
             i += match.getFfaTeam().getAlive();
         }
-        return i + 1;
+        return i;
     }
 
     public String getHitDiff(Player player1, Player player2) {

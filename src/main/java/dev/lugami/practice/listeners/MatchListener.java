@@ -4,6 +4,7 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.Match;
 import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.match.event.MatchStartEvent;
+import dev.lugami.practice.match.event.PartyMatchEndEvent;
 import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.match.types.PartyMatch;
@@ -32,6 +33,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class MatchListener implements Listener {
 
@@ -43,19 +45,17 @@ public class MatchListener implements Listener {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         if (profile.getState() == ProfileState.FIGHTING) {
             Match match = Budget.getInstance().getMatchStorage().findMatch(player);
-            if (PlayerUtils.getLastAttacker(player).getName() != null)
+            if (PlayerUtils.getLastAttacker(player) != null && PlayerUtils.getLastAttacker(player).getName() != null)
                 match.sendMessage("&a" + player.getName() + " &7was killed by &c" + PlayerUtils.getLastAttacker(player).getName() + ".");
             else match.sendMessage("&a" + player.getName() + " &7died.");
             if (match.isPartyMatch()) {
                 profile.setMatchState(MatchPlayerState.DEAD);
-                if (match.getAlive() >= 1) {
-                    match.onDeath(player, false);
-                    match.addSpectator(player, true);
-                } else {
-                    match.onDeath(player, true);
-                }
+                TaskUtil.runTaskLater(() -> {
+                    match.onDeath(player, match.getAlive() == 1);
+                    if (match.getAlive() > 1) match.addSpectator(player, true);
+                }, 1);
             } else {
-                match.onDeath(player);
+                match.onDeath(player, true);
             }
         }
     }
@@ -89,7 +89,7 @@ public class MatchListener implements Listener {
             match.sendMessage("&a" + player.getName() + " &7disconnected.");
             if (match.isPartyMatch()) {
                 profile.setMatchState(MatchPlayerState.DEAD);
-                match.onDeath(player, match.getAlive() < 1);
+                match.onDeath(player, match.getAlive() > 1);
             } else {
                 match.onDeath(player);
             }
@@ -265,6 +265,18 @@ public class MatchListener implements Listener {
         this.sendMatchEndMessages(match, event.getLoser(), winnerMessage, inventories, eloMessage);
     }
 
+    @EventHandler
+    public void onPartyMatchEnd(PartyMatchEndEvent event) {
+        Match match = event.getMatch();
+        String eloMessage = null;
+        this.handlePartyMatchEnd((PartyMatch) event.getMatch());
+        Clickable inventories = this.getClickable(event);
+        String winnerMessage = CC.translate("&eWinner: " + event.getWinner().getName());
+        List<Player> players = event.getLosers();
+        players.add(event.getWinner());
+        this.sendMatchEndMessages(match, players, winnerMessage, inventories, eloMessage);
+    }
+
     private String handleRankedMatchEnd(Match match) {
         if (match.isNpcTesting()) {
             return null;
@@ -293,6 +305,18 @@ public class MatchListener implements Listener {
         }
         Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(match.getWinnerTeam().getLeader());
         Profile profile2 = Budget.getInstance().getProfileStorage().findProfile(match.getOpponent(match.getWinnerTeam()).getLeader());
+        profile1.getStatistics(match.getKit()).setWon(profile1.getStatistics(match.getKit()).getWon() + 1);
+        profile2.getStatistics(match.getKit()).setLost(profile2.getStatistics(match.getKit()).getLost() + 1);
+        profile1.save();
+        profile2.save();
+    }
+
+    private void handlePartyMatchEnd(PartyMatch match) {
+        if (match.isNpcTesting()) {
+            return;
+        }
+        Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(match.getWinner());
+        Profile profile2 = Budget.getInstance().getProfileStorage().findProfile(match.getLastHit(match.getWinner()));
         profile1.getStatistics(match.getKit()).setWon(profile1.getStatistics(match.getKit()).getWon() + 1);
         profile2.getStatistics(match.getKit()).setLost(profile2.getStatistics(match.getKit()).getLost() + 1);
         profile1.save();
@@ -329,6 +353,50 @@ public class MatchListener implements Listener {
         inventories.add("&a" + event.getWinner().getLeader().getName(), "&eClick to view " + event.getWinner().getLeader().getName() + "'s inventory!", "/match inventory " + event.getWinner().getLeader().getUniqueId());
         inventories.add("&7, ");
         inventories.add("&c" + event.getLoser().getLeader().getName(), "&eClick to view " + event.getLoser().getLeader().getName() + "'s inventory!", "/match inventory " + event.getLoser().getLeader().getUniqueId());
+        return inventories;
+    }
+
+    private void sendMatchEndMessages(Match match, List<Player> players, String winnerMessage, Clickable inventories, String eloMessage) {
+        players.forEach(player -> {
+            player.sendMessage("");
+            player.sendMessage(winnerMessage);
+            inventories.sendToPlayer(player);
+
+            if (eloMessage != null) {
+                player.sendMessage(eloMessage);
+            }
+            if (!match.getSpectators().isEmpty()) {
+                StringBuilder builder = new StringBuilder();
+                Iterator<Player> iterator = match.getSpectators().iterator();
+
+                while (iterator.hasNext()) {
+                    Player player1 = iterator.next();
+                    builder.append(player1.getName());
+                    if (iterator.hasNext()) {
+                        builder.append(", ");
+                    }
+                }
+                player.sendMessage(CC.translate("&6Spectators &7(&b" + match.getSpectators().size() + "): " + builder));
+            }
+            player.sendMessage("");
+        });
+
+    }
+
+
+    private Clickable getClickable(PartyMatchEndEvent event) {
+        Clickable inventories = new Clickable("&bInventories: ");
+        inventories.add("&a" + event.getWinner().getName(), "&eClick to view " + event.getWinner().getName() + "'s inventory!", "/match inventory " + event.getWinner().getUniqueId());
+        inventories.add("&7, ");
+        Iterator<Player> iterator = event.getLosers().iterator();
+
+        while (iterator.hasNext()) {
+            Player player = iterator.next();
+            inventories.add("&c" + player.getName(), "&eClick to view " + player.getName() + "'s inventory!", "/match inventory " + player.getUniqueId());
+            if (iterator.hasNext()) {
+                inventories.add(", ");
+            }
+        }
         return inventories;
     }
 

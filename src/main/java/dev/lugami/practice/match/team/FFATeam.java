@@ -8,9 +8,4 @@ public class FFATeam extends Team {
         super(leader);
     }
 
-    @Override
-    public int getSize() {
-        return getMembers().size();
-    }
-
 }

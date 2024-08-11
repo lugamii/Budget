@@ -2,6 +2,7 @@ package dev.lugami.practice.party;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.team.Team;
+import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.utils.CC;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -29,27 +30,30 @@ public class Party extends Team {
         Budget.getInstance().getPartyStorage().getParties().remove(this);
         this.doAction(player -> {
             player.sendMessage(CC.translate("&cThe party has been disbanded."));
-            Budget.getInstance().getLobbyStorage().bringToLobby(player);
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player.getUniqueId());
+            if (!profile.isFighting()) Budget.getInstance().getLobbyStorage().bringToLobby(player);
             this.disbanded = true;
         });
     }
 
     public void join(Player p) {
-        if (PartyInvite.hasInvite(p) && !this.getMembers().contains(p.getUniqueId())) {
+        if (PartyInvite.hasInvite(p) && !this.contains(p)) {
             this.addMember(p);
             Budget.getInstance().getPartyStorage().bringToParty(p, this);
             this.sendMessage("&a" + p.getName() + " has joined the party.");
         } else {
            if (!PartyInvite.hasInvite(p)) {
                p.sendMessage(CC.translate("&cYou don't have a invite to this party."));
-           } else if (this.getMembers().contains(p.getUniqueId())) {
+           } else if (this.contains(p)) {
                p.sendMessage(CC.translate("&cYou are already in a party."));
            }
         }
     }
 
     public void leave(Player p, boolean silent) {
-        if (this.getMembers().contains(p.getUniqueId())) {
+        if (this.contains(p)) {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(p);
+            profile.setParty(null);
             Budget.getInstance().getLobbyStorage().bringToLobby(p);
             if (!silent) this.sendMessage("&c" + p.getName() + " has left the party.");
             if (this.getSize() <= 1 || p == this.getLeader()) this.disband();

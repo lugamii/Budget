@@ -47,6 +47,11 @@ public class ProfileListener implements Listener {
                 Budget.getInstance().getQueueStorage().findQueue(player).remove(player);
             }
         }
+        if (profile.getParty() != null) {
+            if (profile.getParty().getLeader() == player) {
+                profile.getParty().disband();
+            }
+        }
         Budget.getInstance().getProfileStorage().getProfiles().remove(profile);
         profile.save();
         TaskUtil.runTaskLater(() -> {

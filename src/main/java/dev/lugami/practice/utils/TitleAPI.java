@@ -18,7 +18,7 @@ import java.util.Optional;
 public class TitleAPI {
 
     public void sendTitle(Player player, String title, String subtitle) {
-        sendTitle(player, CC.translate(title), CC.translate(subtitle), 20, 100, 50);
+        sendTitle(player, CC.translate(title), CC.translate(subtitle), 200, 1000, 500);
     }
 
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {

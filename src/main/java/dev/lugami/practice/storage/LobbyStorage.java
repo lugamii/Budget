@@ -44,9 +44,9 @@ public class LobbyStorage {
             profile.setMatchState(MatchPlayerState.NONE);
             if (!spectate) {
                 if (profile.getEditingMetadata() != null) profile.setEditingMetadata(null);
-                if (profile.getParty() != null && profile.getParty().isDisbanded()) {
+                if (profile.getParty() != null && profile.getParty().isDisbanded() || profile.getParty() != null && !profile.getParty().contains(player)) {
                     profile.setParty(null);
-                } else if (profile.getParty() != null) {
+                } else if (profile.getParty() != null && profile.getParty().contains(player)) {
                     Budget.getInstance().getPartyStorage().bringToParty(player, profile.getParty());
                     player.teleport(this.lobbyLocation);
                     return;

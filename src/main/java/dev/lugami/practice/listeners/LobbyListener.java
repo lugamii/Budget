@@ -59,7 +59,7 @@ public class LobbyListener implements Listener {
         Budget.getInstance().getLobbyStorage().bringToLobby(player);
         TaskUtil.runTaskLater(() -> {
             if (Budget.getInstance().getMainConfig().getBoolean("motd.clear-chat")) {
-                for (int i = 0; i < 1000; i++) player.sendMessage("");
+                for (int i = 0; i < 100; i++) player.sendMessage("");
             }
             if (Budget.getInstance().getMainConfig().getBoolean("motd.enabled")) {
                 for (String s : Budget.getInstance().getMainConfig().getStringList("motd.message")) {

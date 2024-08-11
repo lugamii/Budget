@@ -47,7 +47,7 @@ public class PartyCommands extends CommandBase {
             sender.sendMessage(Language.NULL_TARGET.format());
             return;
         }
-        if (profile.getParty() != null) {
+        if (profile.isInParty()) {
             sender.sendMessage(Language.ALREADY_IN_PARTY.format());
             return;
         }
@@ -79,6 +79,11 @@ public class PartyCommands extends CommandBase {
                 sender.sendMessage(Language.CANNOT_INVITE_SELF.format());
                 return;
             }
+            Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(target);
+            if (profile1.isInParty()) {
+                sender.sendMessage(CC.translate("&c" + target.getName() + " is already in a party!"));
+                return;
+            }
             PartyInvite partyInvite = new PartyInvite(profile.getParty(), target);
             partyInvite.send();
             profile.getParty().sendMessage(CC.translate("&a" + sender.getName() + " has invited " + target.getName() + " to the party."));
@@ -100,7 +105,7 @@ public class PartyCommands extends CommandBase {
                 return;
             }
             Party party = profile.getParty();
-            if (party.getMembers().contains(target.getUniqueId())) {
+            if (party.contains(target)) {
                 party.kick(target);
             }
         }

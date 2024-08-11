@@ -100,7 +100,18 @@ public class HotbarStorage {
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
-            new HotbarItem(new ItemBuilder(Material.GOLD_AXE).name("&bParty Events").build(), player -> new PartyEventsMenu().open(player)),
+            new HotbarItem(new ItemBuilder(Material.GOLD_AXE).name("&bParty Events").build(), player -> {
+                Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+                if (profile.getParty() != null) {
+                    if (profile.getParty().getLeader() == player) {
+                        new PartyEventsMenu().open(player);
+                    } else {
+                        player.sendMessage(CC.translate("&cYou are not the leader!"));
+                    }
+                } else {
+                    Budget.getInstance().getLobbyStorage().bringToLobby(player);
+                }
+            }),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.INK_SACK).name("&cLeave Party").durability(1).build(), player -> {
                 Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);

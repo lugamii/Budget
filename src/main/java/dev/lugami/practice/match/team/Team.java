@@ -7,12 +7,10 @@ import dev.lugami.practice.utils.Action;
 import dev.lugami.practice.utils.CC;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Getter @Setter
 public class Team {
@@ -30,8 +28,8 @@ public class Team {
         members.add(new TeamPlayer(player));
     }
 
-    public boolean removeMember(Player player) {
-        return members.removeIf(p -> p.getPlayer() == player);
+    public void removeMember(Player player) {
+        members.removeIf(p -> p.getPlayer() == player);
     }
 
     public TeamPlayer getMember(Player player) {
@@ -70,14 +68,39 @@ public class Team {
     }
 
     public int getAlive() {
-        int i = 0;
+        List<Player> sentPlayers = new ArrayList<Player>() {
+
+            @Override
+            public boolean add(Player player) {
+                this.filter();
+                return super.add(player);
+            }
+
+            @Override
+            public int size() {
+                this.filter();
+                return super.size();
+            }
+
+            private void filter() {
+                for (Player player : this) {
+                    Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+                    if (profile.getMatchState() == MatchPlayerState.DEAD) {
+                        remove(player);
+                    }
+                }
+            }
+
+        };
+
         for (TeamPlayer player : this.getMembers()) {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player.getPlayer());
             if (profile.getMatchState() == MatchPlayerState.ALIVE) {
-                i++;
+                sentPlayers.add(player.getPlayer());
             }
         }
-        return i;
+
+        return sentPlayers.size() - 1;
     }
 
 }

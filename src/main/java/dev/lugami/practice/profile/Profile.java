@@ -244,7 +244,7 @@ public class Profile {
     }
 
     public boolean isFighting() {
-        return this.state == ProfileState.FIGHTING;
+        return this.state == ProfileState.FIGHTING || Budget.getInstance().getMatchStorage().findMatch(player) != null;
     }
 
     public boolean isInParty() {

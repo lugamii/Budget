@@ -8,10 +8,7 @@ import com.mongodb.client.MongoDatabase;
 import dev.lugami.practice.board.ScoreboardProvider;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.storage.*;
-import dev.lugami.practice.task.MatchEnderpearlTask;
-import dev.lugami.practice.task.MatchSnapshotTask;
-import dev.lugami.practice.task.MenuTask;
-import dev.lugami.practice.task.QueueTask;
+import dev.lugami.practice.task.*;
 import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.command.Drink;
 import dev.lugami.practice.utils.command.command.CommandService;
@@ -29,6 +26,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Getter
 @Setter
@@ -133,6 +132,7 @@ public class Budget extends JavaPlugin {
     private void setupTasks() {
         TaskUtil.runTaskTimerAsynchronously(new MatchSnapshotTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new MatchEnderpearlTask(), 0, 2);
+        TaskUtil.runTaskTimerAsynchronously(new MatchGeneralTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new MenuTask(), 0, 2);
     }
@@ -181,7 +181,20 @@ public class Budget extends JavaPlugin {
         sender.sendMessage(CC.translate(CC.CHAT_BAR));
     }
 
+
+    /**
+     * Credits to Refine Development.
+     */
+    public void disableLogging() {
+        Logger mongoLogger = Logger.getLogger("com.mongodb");
+        mongoLogger.setLevel(Level.SEVERE);
+
+        Logger legacyLogger = Logger.getLogger("org.mongodb");
+        legacyLogger.setLevel(Level.SEVERE);
+    }
+
     private void setupMongo() {
+        this.disableLogging();
         if (mainConfig.getBoolean("mongo.auth.enabled")) {
             MongoCredential credential = MongoCredential.createCredential(
                     mainConfig.getString("mongo.auth.username"), "admin",

@@ -84,9 +84,7 @@ public class ScoreboardProvider implements AssembleAdapter {
                                         if (partyMatch.getType() == PartyMatch.MatchType.FFA) {
                                             for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-FFA")) {
                                                 line = line.
-                                                        replace("<remaining>", "" + (int) partyMatch.getFfaTeam().getMembers().stream().filter(player1 ->
-                                                                Budget.getInstance().getProfileStorage().findProfile(player1.getPlayer()).getMatchState() == MatchPlayerState.ALIVE
-                                                        ).count())
+                                                        replace("<remaining>", "" + partyMatch.getFfaTeam().getAlive())
                                                         .replace("<size>", "" + partyMatch.getFfaTeam().getSize())
                                                         .replace("<duration>", match.getDuration());
                                                 lines.add(line);
@@ -95,7 +93,9 @@ public class ScoreboardProvider implements AssembleAdapter {
                                             for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
                                                 line = line.
                                                         replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
-                                                        replace("<duration>", match.getDuration());
+                                                        replace("<duration>", match.getDuration()).
+                                                        replace("<own_ping>", "" + PlayerUtils.getPing(player)).
+                                                        replace("<opponent_ping>", "" + PlayerUtils.getPing(match.getOpponent(match.getTeam(player)).getLeader()));
                                                 lines.add(line);
                                             }
                                         }
@@ -125,7 +125,7 @@ public class ScoreboardProvider implements AssembleAdapter {
                                     }
                                     break;
                                 case ENDED:
-                                    if (match.getWinnerTeam() == match.getTeam(player)) {
+                                    if (match.getWinnerTeam() == match.getTeam(player) || (match.isPartyMatch() && ((PartyMatch) match).getWinner() == player)) {
                                         lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WON"));
                                     } else {
                                         lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-LOST"));

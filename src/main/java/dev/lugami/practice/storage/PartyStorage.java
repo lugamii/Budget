@@ -21,11 +21,11 @@ public class PartyStorage {
     private final List<Party> parties = new CopyOnWriteArrayList<>();
 
     public Party findByUUID(UUID id) {
-        return this.parties.stream().filter(party -> party.getUUID() == id || party.getMembers().contains(id)).findFirst().orElse(null);
+        return this.parties.stream().filter(party -> party.getUUID() == id || party.getMembers().stream().anyMatch(p -> p.getPlayer().getUniqueId() == id)).findFirst().orElse(null);
     }
 
     public Party findByPlayer(Player player) {
-        return this.parties.stream().filter(party -> party.getMembers().contains(player.getUniqueId())).findFirst().orElse(null);
+        return this.parties.stream().filter(party -> party.contains(player)).findFirst().orElse(null);
     }
 
     /**
