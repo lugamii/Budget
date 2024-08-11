@@ -10,7 +10,6 @@ import dev.lugami.practice.utils.TaskUtil;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -21,7 +20,7 @@ public class PartyStorage {
     private final List<Party> parties = new CopyOnWriteArrayList<>();
 
     public Party findByUUID(UUID id) {
-        return this.parties.stream().filter(party -> party.getUUID() == id || party.getMembers().stream().anyMatch(p -> p.getPlayer().getUniqueId() == id)).findFirst().orElse(null);
+        return this.parties.stream().filter(party -> party.getUniqueID() == id || party.getMembers().stream().anyMatch(p -> p.getPlayer().getUniqueId() == id)).findFirst().orElse(null);
     }
 
     public Party findByPlayer(Player player) {

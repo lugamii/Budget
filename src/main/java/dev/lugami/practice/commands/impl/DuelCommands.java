@@ -2,20 +2,14 @@ package dev.lugami.practice.commands.impl;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.Language;
-import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.duel.DuelRequest;
-import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.menus.DuelKitMenu;
 import dev.lugami.practice.profile.Profile;
-import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.CC;
-import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.command.annotation.Command;
 import dev.lugami.practice.utils.command.annotation.Sender;
-import dev.lugami.practice.utils.menu.Button;
-import dev.lugami.practice.utils.menu.Menu;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class DuelCommands extends CommandBase {
@@ -42,7 +36,7 @@ public class DuelCommands extends CommandBase {
         }
 
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(target);
-        if (!profile.getProfileOptions().getSettingsMap().get(Setting.DUEL_REQUESTS)) {
+        if (!profile.getProfileOptions().getSettingsMap().get(Settings.DUEL_REQUESTS)) {
             p1.sendMessage(Language.TARGET_DUELS_DISABLED.format());
             return;
         }

@@ -62,7 +62,7 @@ public class MatchSnapshotMenu extends Menu {
         lore.clear();
         lore.add("");
         lore.add("&b" + snapshot.getTarget().getName() + " &fhad &b" + snapshot.getRemainingPots() + " &fpot" + (snapshot.getRemainingPots() <= 1 ? "" : "s") + " left.");
-        setButton(50, new Button(new ItemBuilder(Material.POTION).name("&bPotions").lore(lore).build()));
+        setButton(50, new Button(new ItemBuilder(Material.POTION).durability(16421).amount(snapshot.getRemainingPots() == 0 ? 1 : snapshot.getRemainingPots()).name("&bPotions").lore(lore).build()));
         lore.clear();
         lore.add("");
         lore.add("&bTotal Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getHits());

@@ -2,7 +2,7 @@ package dev.lugami.practice.menus.settings;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.profile.Profile;
-import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.menu.Button;
@@ -10,21 +10,17 @@ import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.spigotmc.SpigotConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SettingsMenu extends Menu {
 
-    private final Player player;
-
     /**
      * Constructs a new Menu with the specified title and size.
      */
-    public SettingsMenu(Player p) {
-        super("&bSettings", 27);
-        this.player = p;
+    public SettingsMenu() {
+        super("&bSettings", 9 * 4);
     }
 
     @Override
@@ -32,8 +28,7 @@ public class SettingsMenu extends Menu {
         this.fillBorder();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         int slot = 10;
-        for (Setting settings : Setting.values()) {
-            if (settings == Setting.LIGHTNING || settings == Setting.EXPLOSION || settings == Setting.SILENT_SPECTATE || settings == Setting.ALLOW_SPECTATORS) continue;
+        for (Settings settings : Settings.values()) {
             ItemStack stack = createItem(profile, settings);
             setButton(slot++, new Button(stack, (player1, clickType) -> {
                 if (settings.hasPermission(player1)) {
@@ -44,10 +39,9 @@ public class SettingsMenu extends Menu {
                 }
             }));
         }
-        setButton(slot, new Button(new ItemBuilder(Material.BLAZE_POWDER).name("&bMatch Settings").lore("&7Modify your match settings.", "", "&eClick to view!").build(), (player1, clickType) -> new MatchSettingsMenu().open(player)));
     }
 
-    public ItemStack createItem(Profile profile, Setting settings) {
+    public ItemStack createItem(Profile profile, Settings settings) {
         List<String> lore = new ArrayList<>();
         lore.add("&7" + settings.getDescription());
         lore.add("");

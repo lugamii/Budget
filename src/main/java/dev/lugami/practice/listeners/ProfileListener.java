@@ -48,9 +48,7 @@ public class ProfileListener implements Listener {
             }
         }
         if (profile.getParty() != null) {
-            if (profile.getParty().getLeader() == player) {
-                profile.getParty().disband();
-            }
+            profile.getParty().leave(player);
         }
         Budget.getInstance().getProfileStorage().getProfiles().remove(profile);
         profile.save();

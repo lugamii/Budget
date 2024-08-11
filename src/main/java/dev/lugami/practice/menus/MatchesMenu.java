@@ -1,20 +1,15 @@
 package dev.lugami.practice.menus;
 
 import dev.lugami.practice.Budget;
-import dev.lugami.practice.kit.Kit;
-import dev.lugami.practice.leaderboards.LeaderboardsEntry;
 import dev.lugami.practice.match.Match;
-import dev.lugami.practice.match.types.PartyMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.queue.QueueType;
-import dev.lugami.practice.settings.Setting;
-import dev.lugami.practice.storage.LeaderboardsStorage;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,16 +41,19 @@ public class MatchesMenu extends Menu {
             lore.add("&eClick to spectate!");
             setButton(slot++, new Button(new ItemBuilder(match.getKit().getIcon().clone()).name("&a" + match.getTeam1().getLeader().getName() + " &7vs. &c" + match.getTeam2().getLeader().getName()).lore(lore).build(), (player1, clickType) -> {
                 Profile profile = Budget.getInstance().getProfileStorage().findProfile(player1);
-                match.addSpectator(player1, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
+                match.addSpectator(player1, profile.getProfileOptions().getSettingsMap().get(Settings.SILENT_SPECTATE));
             }));
         }
     }
 
     private String getMatchType(Match match) {
-        if (!match.isPartyMatch()) {
-            return match.getQueueType() == QueueType.UNRANKED ? "Unranked" : "Ranked";
-        } else {
-            return ((PartyMatch) match).getType() == PartyMatch.MatchType.SPLIT ? "Party (Split)" : "Party (FFA)";
+        if (match.isSplitMatch()) {
+            return "Split";
         }
+
+        if (match.isFFAMatch()) {
+            return "FFA";
+        }
+        return match.getQueueType() == QueueType.UNRANKED ? "Unranked" : "Ranked";
     }
 }

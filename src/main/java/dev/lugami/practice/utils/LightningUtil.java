@@ -13,9 +13,12 @@ import org.bukkit.entity.Player;
 public class LightningUtil {
 
     public void spawnLighting(Player player, Location location) {
-        WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
-        net.minecraft.server.v1_8_R3.EntityLightning lightning = new net.minecraft.server.v1_8_R3.EntityLightning(world, location.getX(), location.getY(), location.getZ(), false);
-        Packet<?> packet = new PacketPlayOutSpawnEntityWeather(lightning);
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
+        TaskUtil.runTaskLater(() -> {
+            WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
+            net.minecraft.server.v1_8_R3.EntityLightning lightning = new net.minecraft.server.v1_8_R3.EntityLightning(world, location.getX(), location.getY(), location.getZ(), false);
+            Packet<?> packet = new PacketPlayOutSpawnEntityWeather(lightning);
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
+        }, 1L);
+
     }
 }

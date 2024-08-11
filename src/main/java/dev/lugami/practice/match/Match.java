@@ -9,25 +9,23 @@ import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.match.team.TeamPlayer;
-import dev.lugami.practice.match.types.PartyMatch;
+import dev.lugami.practice.match.types.FFAMatch;
+import dev.lugami.practice.match.types.SplitMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.profile.editor.CustomKitLayout;
 import dev.lugami.practice.queue.QueueType;
-import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.fake.FakePlayer;
 import dev.lugami.practice.utils.fake.FakePlayerUtils;
 import lombok.Data;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -38,7 +36,7 @@ public abstract class Match {
     private final UUID matchId = UUID.randomUUID();
     private final Team team1;
     private final Team team2;
-
+    private MatchType type = MatchType.DEFAULT;
     private final Kit kit;
     private final Arena arena;
     private final QueueType queueType;
@@ -48,6 +46,12 @@ public abstract class Match {
     private boolean npcTesting = false;
     private List<Player> spectators;
     private List<Player> allPlayers;
+
+    public enum MatchType {
+        DEFAULT,
+        SPLIT,
+        FFA
+    }
 
     public Match(Kit kit, Arena arena) {
         this(kit, arena, QueueType.UNRANKED);
@@ -77,20 +81,25 @@ public abstract class Match {
     }
 
     public boolean isPartyMatch() {
-        return this instanceof PartyMatch;
+        return this.isFFAMatch() || this.isSplitMatch();
+    }
+
+    public boolean isFFAMatch() {
+        return this instanceof FFAMatch;
+    }
+
+    public boolean isSplitMatch() {
+        return this instanceof SplitMatch;
     }
 
     public boolean isPlayerInMatch(Player player) {
-        if (!isPartyMatch()) {
+        if (!isPartyMatch() || this instanceof SplitMatch) {
             return this.team1.contains(player) || this.team2.contains(player) || this.spectators.contains(player);
-        } else {
-            PartyMatch partyMatch = (PartyMatch) this;
-            if (partyMatch.getType() == PartyMatch.MatchType.FFA) {
-                return partyMatch.getFfaTeam().contains(player);
-            } else {
-                return this.team1.contains(player) || this.team2.contains(player) || this.spectators.contains(player);
-            }
+        } else if (this instanceof FFAMatch) {
+            FFAMatch match = (FFAMatch) this;
+            return this.team1.contains(player) || this.team2.contains(player) || match.getFFATeam().contains(player) || this.spectators.contains(player);
         }
+        return false;
     }
 
     /**
@@ -145,7 +154,7 @@ public abstract class Match {
                     for (Player player1 : this.getAllPlayers()) {
                         Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(player1);
                         if (profile1.getMatchState() != null && profile.isFighting()) {
-                            if (!profile1.getProfileOptions().getSettingsMap().get(Setting.ALLOW_SPECTATORS)) {
+                            if (!profile1.getProfileOptions().getSettingsMap().get(Settings.ALLOW_SPECTATORS)) {
                                 player.sendMessage(CC.translate("&aA player is not allowing spectators in this match."));
                                 break;
                             }
@@ -224,6 +233,9 @@ public abstract class Match {
     }
 
     public void onDeath(Player player, boolean end) {
+        player.setHealth(20);
+        PlayerUtils.respawnPlayer(player);
+        player.setFireTicks(0);
         MatchSnapshot snap = new MatchSnapshot(player, getOpponent(getTeam(player)).getLeader(), player.getInventory().getArmorContents(), player.getInventory().getContents());
         Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
@@ -231,33 +243,36 @@ public abstract class Match {
         Player killer = PlayerUtils.getLastAttacker(player);
         if (killer != null) {
             Profile killerProfile = Budget.getInstance().getProfileStorage().findProfile(killer);
-            if (killerProfile.getProfileOptions().getSettingsMap().get(Setting.LIGHTNING)) {
+            if (killerProfile.getProfileOptions().getSettingsMap().get(Settings.LIGHTNING)) {
                 getTeam1().doAction(player1 -> LightningUtil.spawnLighting(player1, location));
                 getTeam2().doAction(player1 -> LightningUtil.spawnLighting(player1, location));
                 getSpectators().forEach(player1 -> LightningUtil.spawnLighting(player1, location));
             }
 
-            if (killerProfile.getProfileOptions().getSettingsMap().get(Setting.EXPLOSION)) {
+            if (killerProfile.getProfileOptions().getSettingsMap().get(Settings.EXPLOSION)) {
                 getTeam1().doAction(player1 -> ExplosionUtil.spawnExplosion(player1, location));
                 getTeam2().doAction(player1 -> ExplosionUtil.spawnExplosion(player1, location));
                 getSpectators().forEach(player1 -> ExplosionUtil.spawnExplosion(player1, location));
             }
         }
 
-        player.setHealth(20);
-        PlayerUtils.respawnPlayer(player);
-        player.setFireTicks(0);
         PlayerUtils.hidePlayer(player);
         profile.setMatchState(MatchPlayerState.DEAD);
         player.setVelocity(new Vector());
         player.teleport(location);
         PlayerUtils.resetPlayer(player, false);
         if (end) {
-            if (!isPartyMatch() || (isPartyMatch() && ((PartyMatch) this).getType() == PartyMatch.MatchType.SPLIT)) {
-                end(getOpponent(getTeam(player)));
-            } else if (isPartyMatch() && ((PartyMatch) this).getType() == PartyMatch.MatchType.FFA) {
-                ((PartyMatch) this).end(killer);
-            }
+            end(getOpponent(getTeam(player)));
+        }
+    }
+
+    public boolean canEnd() {
+        if (this.isSplitMatch()) {
+            return this.getTeam1().getAlive() == 0 || this.getTeam2().getAlive() == 0;
+        } else if (this.isFFAMatch()) {
+            return ((FFAMatch) this).getFFATeam().getAlive() == 1;
+        } else {
+            return true;
         }
     }
 
@@ -404,10 +419,8 @@ public abstract class Match {
     }
 
     public Team getTeam(Player player) {
-        if (isPartyMatch()) {
-            if (((PartyMatch) this).getType() == PartyMatch.MatchType.FFA) {
-                return ((PartyMatch) this).getFfaTeam();
-            }
+        if (isFFAMatch()) {
+            return ((FFAMatch) this).getFFATeam();
         }
         if (getTeam1().contains(player)) return getTeam1();
         else if (getTeam2().contains(player)) return getTeam2();
@@ -415,10 +428,8 @@ public abstract class Match {
     }
 
     public Team getOpponent(Team team) {
-        if (isPartyMatch()) {
-            if (((PartyMatch) this).getType() == PartyMatch.MatchType.FFA) {
-                return team;
-            }
+        if (isFFAMatch()) {
+            return ((FFAMatch) this).getFFATeam();
         }
         if (getTeam1() == team) return getTeam2();
         else if (getTeam2() == team) return getTeam1();
@@ -427,12 +438,12 @@ public abstract class Match {
 
     public int getAlive() {
         int i = 1;
-        if (!this.isPartyMatch() || (this.isPartyMatch() && ((PartyMatch) this).getType() == PartyMatch.MatchType.SPLIT)) {
+        if (!this.isPartyMatch() || this.isPartyMatch() && this.isSplitMatch()) {
             i += this.getTeam1().getAlive();
             i += this.getTeam2().getAlive();
-        } else {
-            PartyMatch match = (PartyMatch) this;
-            i += match.getFfaTeam().getAlive();
+        } else if (this.isFFAMatch()) {
+            FFAMatch match = (FFAMatch) this;
+            i += match.getFFATeam().getAlive();
         }
         return i;
     }

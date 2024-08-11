@@ -10,8 +10,7 @@ import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.editor.CustomKitLayout;
 import dev.lugami.practice.profile.editor.EditingMetadata;
-import dev.lugami.practice.settings.ProfileSettings;
-import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.fake.FakePlayer;
 import lombok.Data;
@@ -84,13 +83,14 @@ public class Profile {
         } else {
             try {
                 Document options = (Document) document.get("options");
-                this.profileOptions.getSettingsMap().put(Setting.SCOREBOARD, (boolean) options.getOrDefault("showScoreboard", Setting.SCOREBOARD.isDefaultToggled()));
-                this.profileOptions.getSettingsMap().put(Setting.DUEL_REQUESTS, (boolean) options.getOrDefault("duelRequests", Setting.DUEL_REQUESTS.isDefaultToggled()));
-                this.profileOptions.getSettingsMap().put(Setting.ARENA_SELECTOR, (boolean) options.getOrDefault("arenaSelector", Setting.ARENA_SELECTOR.isDefaultToggled()));
-                this.profileOptions.getSettingsMap().put(Setting.ALLOW_SPECTATORS, (boolean) options.getOrDefault("allowSpectators", Setting.ALLOW_SPECTATORS.isDefaultToggled()));
-                this.profileOptions.getSettingsMap().put(Setting.SILENT_SPECTATE, (boolean) options.getOrDefault("silentSpectate", Setting.SILENT_SPECTATE.isDefaultToggled()));
-                this.profileOptions.getSettingsMap().put(Setting.LIGHTNING, (boolean) options.getOrDefault("lightningEffect", Setting.LIGHTNING.isDefaultToggled()));
-                this.profileOptions.getSettingsMap().put(Setting.EXPLOSION, (boolean) options.getOrDefault("explosionEffect", Setting.EXPLOSION.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.SCOREBOARD, (boolean) options.getOrDefault("showScoreboard", Settings.SCOREBOARD.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.DUEL_REQUESTS, (boolean) options.getOrDefault("duelRequests", Settings.DUEL_REQUESTS.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.PARTY_REQUESTS, (boolean) options.getOrDefault("partyRequests", Settings.PARTY_REQUESTS.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.ARENA_SELECTOR, (boolean) options.getOrDefault("arenaSelector", Settings.ARENA_SELECTOR.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.ALLOW_SPECTATORS, (boolean) options.getOrDefault("allowSpectators", Settings.ALLOW_SPECTATORS.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.SILENT_SPECTATE, (boolean) options.getOrDefault("silentSpectate", Settings.SILENT_SPECTATE.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.LIGHTNING, (boolean) options.getOrDefault("lightningEffect", Settings.LIGHTNING.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.EXPLOSION, (boolean) options.getOrDefault("explosionEffect", Settings.EXPLOSION.isDefaultToggled()));
 
                 Document kitStatistics = (Document) document.get("profileStatistics");
                 for (String key : kitStatistics.keySet()) {
@@ -138,13 +138,14 @@ public class Profile {
         document.put("uuid", this.UUID.toString());
 
         Document optionsDocument = new Document();
-        optionsDocument.put("showScoreboard", this.profileOptions.getSettingsMap().get(Setting.SCOREBOARD));
-        optionsDocument.put("duelRequests", this.profileOptions.getSettingsMap().get(Setting.DUEL_REQUESTS));
-        optionsDocument.put("arenaSelector", this.profileOptions.getSettingsMap().get(Setting.ARENA_SELECTOR));
-        optionsDocument.put("allowSpectators", this.profileOptions.getSettingsMap().get(Setting.ALLOW_SPECTATORS));
-        optionsDocument.put("silentSpectate", this.profileOptions.getSettingsMap().get(Setting.SILENT_SPECTATE));
-        optionsDocument.put("lightningEffect", this.profileOptions.getSettingsMap().get(Setting.LIGHTNING));
-        optionsDocument.put("explosionEffect", this.profileOptions.getSettingsMap().get(Setting.EXPLOSION));
+        optionsDocument.put("showScoreboard", this.profileOptions.getSettingsMap().get(Settings.SCOREBOARD));
+        optionsDocument.put("duelRequests", this.profileOptions.getSettingsMap().get(Settings.DUEL_REQUESTS));
+        optionsDocument.put("partyRequests", this.profileOptions.getSettingsMap().get(Settings.PARTY_REQUESTS));
+        optionsDocument.put("arenaSelector", this.profileOptions.getSettingsMap().get(Settings.ARENA_SELECTOR));
+        optionsDocument.put("allowSpectators", this.profileOptions.getSettingsMap().get(Settings.ALLOW_SPECTATORS));
+        optionsDocument.put("silentSpectate", this.profileOptions.getSettingsMap().get(Settings.SILENT_SPECTATE));
+        optionsDocument.put("lightningEffect", this.profileOptions.getSettingsMap().get(Settings.LIGHTNING));
+        optionsDocument.put("explosionEffect", this.profileOptions.getSettingsMap().get(Settings.EXPLOSION));
 
         document.put("options", optionsDocument);
 
@@ -249,6 +250,10 @@ public class Profile {
 
     public boolean isInParty() {
         return this.state == ProfileState.PARTY || this.party != null;
+    }
+
+    public boolean canJoinParties() {
+        return !isInParty() && this.profileOptions.getSettingsMap().get(Settings.PARTY_REQUESTS);
     }
 
     public ProfileStatistics getStatistics(Kit kit) {

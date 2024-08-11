@@ -3,19 +3,17 @@ package dev.lugami.practice.match.types;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.arena.Arena;
 import dev.lugami.practice.kit.Kit;
+import dev.lugami.practice.match.Match;
+import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.match.MatchSnapshot;
 import dev.lugami.practice.match.event.MatchEndEvent;
-import dev.lugami.practice.match.event.PartyMatchEndEvent;
-import dev.lugami.practice.match.team.FFATeam;
-import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.match.event.MatchStartEvent;
+import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.utils.Action;
-import dev.lugami.practice.utils.PlayerUtils;
-import dev.lugami.practice.utils.TaskUtil;
-import dev.lugami.practice.utils.TitleAPI;
+import dev.lugami.practice.settings.Settings;
+import dev.lugami.practice.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -24,72 +22,54 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Had to recode party matches, so now Split/FFA are separate types.
+ */
 @Getter
 @Setter
-public class PartyMatch extends DefaultMatch {
+public class FFAMatch extends Match {
 
-    private MatchType type;
-    private Party party;
-    private FFATeam ffaTeam;
+    private Team FFATeam;
     private Player winner;
+    private Party party;
 
-    public PartyMatch(Kit kit, Arena arena, MatchType type, Party party) {
+    public FFAMatch(Kit kit, Arena arena, MatchType type, Party party) {
         super(kit, arena);
         this.setType(type);
         this.setParty(party);
-        if (type == MatchType.FFA) {
-            ffaTeam = new FFATeam(null);
-        }
-    }
-
-    public enum MatchType {
-        SPLIT,
-        FFA
+        this.FFATeam = new Team(this.party.getLeader());
     }
 
     @Override
     public void addPlayerToTeam1(Player player) {
-        if (this.type == MatchType.FFA) {
-            this.addPlayerToFFA(player);
-            return;
-        }
-        super.addPlayerToTeam1(player);
+        this.addPlayerToFFA(player);
     }
 
     @Override
     public void addPlayerToTeam2(Player player) {
-        if (this.type == MatchType.FFA) {
-            this.addPlayerToFFA(player);
-            return;
-        }
-        super.addPlayerToTeam2(player);
+        this.addPlayerToFFA(player);
     }
 
     public void addPlayerToFFA(Player player) {
-        if (this.type == MatchType.FFA) {
-            if (this.ffaTeam.contains(player)) return;
-            this.ffaTeam.addMember(player);
-            if (this.ffaTeam.getLeader() == null) this.ffaTeam.setLeader(player);
-            Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-            profile.setState(ProfileState.FIGHTING);
-            profile.setMatchState(MatchPlayerState.ALIVE);
-            this.equipPlayer(player);
-            this.getAllPlayers().add(player);
-        }
+        if (this.FFATeam.contains(player)) return;
+        this.FFATeam.addMember(player);
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        profile.setState(ProfileState.FIGHTING);
+        profile.setMatchState(MatchPlayerState.ALIVE);
+        this.equipPlayer(player);
+        this.getAllPlayers().add(player);
     }
 
-    /**
-     * Starts the match with a 5-second countdown, changing the state to COUNTDOWN and then to IN_PROGRESS.
-     */
     @Override
     public void start() {
         Budget.getInstance().getMatchStorage().getMatches().add(this);
-        this.sendMessage(ChatColor.GOLD + "A " + (this.type == MatchType.FFA ? "FFA " : "Split ") + "match between " + this.party.getLeader().getName() + "'s party is starting!");
+        this.sendMessage(ChatColor.GOLD + "A FFA match between " + this.party.getLeader().getName() + "'s party is starting!");
         if (this.getState() == MatchState.WAITING) {
             this.setState(MatchState.COUNTDOWN);
             teleportTeamsToArena();
@@ -106,7 +86,7 @@ public class PartyMatch extends DefaultMatch {
                                 TitleAPI.sendTitle(player, config.getString("TITLES.MATCH-STARTED.TITLE"), config.getString("TITLES.MATCH-STARTED.SUBTITLE"), config.getInt("TITLES.MATCH-STARTED.FADE-IN"), config.getInt("TITLES.MATCH-STARTED.STAY"), config.getInt("TITLES.MATCH-STARTED.FADE-OUT"));
                         });
                         sendMessage(ChatColor.GREEN + "The match has started!");
-                        (new MatchStartEvent(PartyMatch.this, getTeam1(), getTeam2())).call();
+                        (new MatchStartEvent(FFAMatch.this, getTeam1(), getTeam2())).call();
                         setStartedAt(System.currentTimeMillis());
                         this.cancel();
                     } else {
@@ -125,8 +105,43 @@ public class PartyMatch extends DefaultMatch {
         }
     }
 
+    @Override
+    public void onDeath(Player player, boolean end) {
+        MatchSnapshot snap = new MatchSnapshot(player, getOpponent(getTeam(player)).getLeader(), player.getInventory().getArmorContents(), player.getInventory().getContents());
+        Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        Location location = player.getLocation().clone();
+        Player killer = PlayerUtils.getLastAttacker(player);
+        if (killer != null) {
+            Profile killerProfile = Budget.getInstance().getProfileStorage().findProfile(killer);
+            if (killerProfile.getProfileOptions().getSettingsMap().get(Settings.LIGHTNING)) {
+                getTeam1().doAction(player1 -> LightningUtil.spawnLighting(player1, location));
+                getTeam2().doAction(player1 -> LightningUtil.spawnLighting(player1, location));
+                getSpectators().forEach(player1 -> LightningUtil.spawnLighting(player1, location));
+            }
+
+            if (killerProfile.getProfileOptions().getSettingsMap().get(Settings.EXPLOSION)) {
+                getTeam1().doAction(player1 -> ExplosionUtil.spawnExplosion(player1, location));
+                getTeam2().doAction(player1 -> ExplosionUtil.spawnExplosion(player1, location));
+                getSpectators().forEach(player1 -> ExplosionUtil.spawnExplosion(player1, location));
+            }
+        }
+
+        player.setHealth(20);
+        PlayerUtils.respawnPlayer(player);
+        player.setFireTicks(0);
+        PlayerUtils.hidePlayer(player);
+        profile.setMatchState(MatchPlayerState.DEAD);
+        player.setVelocity(new Vector());
+        player.teleport(location);
+        PlayerUtils.resetPlayer(player, false);
+        if (end) {
+            this.end(killer);
+        }
+    }
+
     public void end(Player player) {
-        if (this.type == MatchType.FFA) {
+        if (this.getType() == MatchType.FFA) {
             if (this.getState() == MatchState.IN_PROGRESS || this.getState() == MatchState.COUNTDOWN || this.getState() == MatchState.WAITING) {
                 this.setState(MatchState.ENDED);
                 this.setWinner(player);
@@ -150,7 +165,7 @@ public class PartyMatch extends DefaultMatch {
                     }
                     MatchSnapshot snap = new MatchSnapshot(winner, this.getLastHit(winner), winner.getInventory().getArmorContents(), winner.getInventory().getContents());
                     Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
-                    (new PartyMatchEndEvent(this, winner, getOpponents(winner))).call();
+                    (new MatchEndEvent(this, getFFATeam(), getFFATeam(), winner, getOpponents(winner))).call();
                 }
 
                 TaskUtil.runTaskLater(() -> {
@@ -188,35 +203,44 @@ public class PartyMatch extends DefaultMatch {
         return lastHitPlayer.get();
     }
 
-    public void doAction(Action action) {
-        if (type == MatchType.FFA) {
-            getFfaTeam().doAction(action);
-            for (Player player : this.getSpectators()) {
-                action.execute(player);
-            }
-        } else {
-            super.doAction(action);
-        }
-    }
-
-    public void teleportTeamsToArena() {
-        if (this.type == MatchType.SPLIT) {
-            super.teleportTeamsToArena();
-        } else {
-            TaskUtil.runTaskLater(() -> {
-                Location location = new Location(getArena().getPos1().getWorld(), getArena().getPos1().getX(), getArena().getPos1().getY(), getArena().getPos1().getZ(), getArena().getPos1().getYaw(), getArena().getPos1().getPitch());
-                location.add(0.0, 1.0, 0.0);
-                this.ffaTeam.doAction(player -> player.teleport(location));
-            }, 1L);
-        }
+    @Override
+    public void end(Team winningTeam) {
+        super.end(winningTeam);
     }
 
     @Override
-    public void sendMessage(String message) {
-        if (this.type == MatchType.SPLIT) {
-            super.sendMessage(message);
-        } else {
-            this.ffaTeam.sendMessage(message);
-        }
+    public void teleportTeamsToArena() {
+        TaskUtil.runTaskLater(() -> {
+            for (Player player : this.getAllPlayers()) {
+                Location location  = new Location(getArena().getPos1().getWorld(), getArena().getPos1().getX(), getArena().getPos1().getY(), getArena().getPos1().getZ(), getArena().getPos1().getYaw(), getArena().getPos1().getPitch());
+                location.add(0.0, 1.0, 0.0);
+                player.teleport(location);
+            }
+        }, 1L);
+    }
+
+    @Override
+    protected void teleportTeamsToSpawn() {
+        super.teleportTeamsToSpawn();
+    }
+
+    @Override
+    protected void teleportNPCSToArena() {
+        super.teleportNPCSToArena();
+    }
+
+    @Override
+    public void doAction(Action action) {
+        this.getFFATeam().doAction(action);
+    }
+
+    @Override
+    public Team getTeam(Player player) {
+        return this.getFFATeam();
+    }
+
+    @Override
+    public Team getOpponent(Team team) {
+        return this.getFFATeam();
     }
 }

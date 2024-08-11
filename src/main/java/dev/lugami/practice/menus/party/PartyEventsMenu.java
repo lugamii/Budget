@@ -1,7 +1,7 @@
 package dev.lugami.practice.menus.party;
 
 import dev.lugami.practice.Budget;
-import dev.lugami.practice.match.types.PartyMatch;
+import dev.lugami.practice.match.Match;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.ItemBuilder;
@@ -30,7 +30,7 @@ public class PartyEventsMenu extends Menu {
                     player1.sendMessage(CC.translate("&cYour party does not have enough players to start an event."));
                     return;
                 }
-                new PartySelectKitMenu(PartyMatch.MatchType.SPLIT).open(player1);
+                new PartySelectKitMenu(Match.MatchType.SPLIT).open(player1);
             }
         }));
 
@@ -43,7 +43,7 @@ public class PartyEventsMenu extends Menu {
                     player1.sendMessage(CC.translate("&cYour party does not have enough players to start an event."));
                     return;
                 }
-                new PartySelectKitMenu(PartyMatch.MatchType.FFA).open(player1);
+                new PartySelectKitMenu(Match.MatchType.FFA).open(player1);
             }
         }));
     }

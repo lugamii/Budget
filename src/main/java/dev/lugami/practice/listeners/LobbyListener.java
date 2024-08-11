@@ -41,7 +41,7 @@ public class LobbyListener implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
         Player player = (Player) event.getEntity();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        if (profile.isAtSpawn() || profile.getState() == ProfileState.EDITOR) {
+        if (profile.isAtSpawn() || profile.getState() == ProfileState.PARTY || profile.getState() == ProfileState.EDITOR) {
             event.setCancelled(true);
             if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
                 Budget.getInstance().getLobbyStorage().bringToLobby(player);

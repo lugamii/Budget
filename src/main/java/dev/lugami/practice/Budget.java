@@ -22,6 +22,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.spigotmc.AsyncCatcher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,6 +107,7 @@ public class Budget extends JavaPlugin {
         this.partyStorage = new PartyStorage();
         this.editorStorage = new EditorStorage();
         this.entityHider = new EntityHider();
+        AsyncCatcher.enabled = false;
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
         this.assemble.setAssembleStyle(AssembleStyle.MODERN);
@@ -132,7 +134,6 @@ public class Budget extends JavaPlugin {
     private void setupTasks() {
         TaskUtil.runTaskTimerAsynchronously(new MatchSnapshotTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new MatchEnderpearlTask(), 0, 2);
-        TaskUtil.runTaskTimerAsynchronously(new MatchGeneralTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
         TaskUtil.runTaskTimerAsynchronously(new MenuTask(), 0, 2);
     }
@@ -164,7 +165,7 @@ public class Budget extends JavaPlugin {
                 " | |_) |_   _  __| | __ _  ___| |_ ",
                 " |  _ <| | | |/ _` |/ _` |/ _ \\ __|",
                 " | |_) | |_| | (_| | (_| |  __/ |_ ",
-                " |____/ \\__,_|\\__,_|\\__, |\\___|\\__|",
+                " |____/ \\____|\\____|\\___ |\\___|\\__|",
                 "                     __/ |         ",
                 "                    |___/          "
         );
@@ -172,12 +173,15 @@ public class Budget extends JavaPlugin {
 
         sender.sendMessage(CC.translate(""));
         sender.sendMessage(CC.translate("Budget was initialized successfully!"));
+        sender.sendMessage(CC.translate(""));
+        sender.sendMessage(CC.translate("Version: &b" + this.getDescription().getVersion()));
+        sender.sendMessage(CC.translate("Authors: &b" + this.getDescription().getAuthors()));
+        sender.sendMessage(CC.translate(""));
         sender.sendMessage(CC.translate("Kits: &b" + this.kitStorage.getKits().size()));
         sender.sendMessage(CC.translate("Arenas: &b" + this.arenaStorage.getArenas().size()));
-        sender.sendMessage(CC.translate(""));
-        sender.sendMessage(CC.translate("Lunar Support: &b" + (this.lunarHook ? "Yes (" + this.lunarHookMode + ")" : "No")));
-        sender.sendMessage(CC.translate("Version: &b" + this.getDescription().getVersion()));
         sender.sendMessage(CC.translate("Spigot: &b" + this.getServer().getName()));
+        sender.sendMessage(CC.translate("Lunar Support: &b" + (this.lunarHook ? "Yes (" + this.lunarHookMode + ")" : "No")));
+
         sender.sendMessage(CC.translate(CC.CHAT_BAR));
     }
 
@@ -185,7 +189,7 @@ public class Budget extends JavaPlugin {
     /**
      * Credits to Refine Development.
      */
-    public void disableLogging() {
+    private void disableLogging() {
         Logger mongoLogger = Logger.getLogger("com.mongodb");
         mongoLogger.setLevel(Level.SEVERE);
 
@@ -195,13 +199,13 @@ public class Budget extends JavaPlugin {
 
     private void setupMongo() {
         this.disableLogging();
-        if (mainConfig.getBoolean("mongo.auth.enabled")) {
+        if (this.mainConfig.getBoolean("mongo.auth.enabled")) {
             MongoCredential credential = MongoCredential.createCredential(
-                    mainConfig.getString("mongo.auth.username"), "admin",
-                    mainConfig.getString("mongo.auth.password").toCharArray());
-            mongoDatabase = new MongoClient(new ServerAddress(mainConfig.getString("mongo.ip"), mainConfig.getInt("mongo.port")), credential, MongoClientOptions.builder().build()).getDatabase(mainConfig.getString("mongo.database"));
+                    this.mainConfig.getString("mongo.auth.username"), "admin",
+                    this.mainConfig.getString("mongo.auth.password").toCharArray());
+            this.mongoDatabase = new MongoClient(new ServerAddress(this.mainConfig.getString("mongo.ip"), this.mainConfig.getInt("mongo.port")), credential, MongoClientOptions.builder().build()).getDatabase(this.mainConfig.getString("mongo.database"));
         } else {
-            mongoDatabase = new MongoClient(mainConfig.getString("mongo.ip"), mainConfig.getInt("mongo.port")).getDatabase(mainConfig.getString("mongo.database"));
+            this.mongoDatabase = new MongoClient(this.mainConfig.getString("mongo.ip"), this.mainConfig.getInt("mongo.port")).getDatabase(this.mainConfig.getString("mongo.database"));
         }
     }
 }

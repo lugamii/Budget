@@ -5,22 +5,27 @@ import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.utils.Action;
 import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.DeduplicatingArrayList;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter @Setter
 public class Team {
 
-    private final List<TeamPlayer> members;
+    private final DeduplicatingArrayList<TeamPlayer> members;
     private Player leader;
 
     public Team(Player leader) {
         this.leader = leader;
-        this.members = new ArrayList<>();
+        this.members = new DeduplicatingArrayList<>();
         if (leader != null) this.members.add(new TeamPlayer(leader));
     }
 
@@ -95,12 +100,14 @@ public class Team {
 
         for (TeamPlayer player : this.getMembers()) {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player.getPlayer());
-            if (profile.getMatchState() == MatchPlayerState.ALIVE) {
-                sentPlayers.add(player.getPlayer());
+            if (!sentPlayers.contains(player.getPlayer())) {
+                if (profile.getMatchState() == MatchPlayerState.ALIVE) {
+                    sentPlayers.add(player.getPlayer());
+                }
             }
         }
 
-        return sentPlayers.size() - 1;
+        return sentPlayers.size();
     }
 
 }

@@ -12,7 +12,7 @@ import dev.lugami.practice.menus.settings.SettingsMenu;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.QueueType;
-import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.ActionUtils;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.InventoryWrapper;
@@ -36,7 +36,7 @@ public class HotbarStorage {
             new HotbarItem(new ItemBuilder(Material.NAME_TAG).name("&bParty").build(), player -> player.chat("/party create")),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.EMERALD, true).name("&bLeaderboards").build(), player -> new LeaderboardsMenu().open(player)),
-            new HotbarItem(new ItemBuilder(Material.WATCH, true).name("&bSettings").build(), player -> new SettingsMenu(player).open(player)),
+            new HotbarItem(new ItemBuilder(Material.WATCH, true).name("&bSettings").build(), player -> new SettingsMenu().open(player)),
             new HotbarItem(new ItemBuilder(Material.BOOK).name("&bKit Editor").build(), player -> new EditorSelectKitMenu().open(player))
     );
 
@@ -69,7 +69,7 @@ public class HotbarStorage {
                     player.sendMessage(CC.translate("&cThere are no matches available for you to spectate."));
                     return;
                 }
-                match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
+                match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Settings.SILENT_SPECTATE));
             }),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),
             new HotbarItem(new ItemBuilder(Material.AIR).build(), ActionUtils.UNFINISHED),

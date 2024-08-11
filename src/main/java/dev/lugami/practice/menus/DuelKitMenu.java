@@ -4,7 +4,7 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.duel.DuelRequest;
 import dev.lugami.practice.kit.Kit;
 import dev.lugami.practice.profile.Profile;
-import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
@@ -37,7 +37,7 @@ public class DuelKitMenu extends Menu {
                                 .build(),
                         (player1, clickType) -> {
                             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player1);
-                            if (profile.getProfileOptions().getSettingsMap().get(Setting.ARENA_SELECTOR) && Setting.ARENA_SELECTOR.hasPermission(player1)) {
+                            if (profile.getProfileOptions().getSettingsMap().get(Settings.ARENA_SELECTOR) && Settings.ARENA_SELECTOR.hasPermission(player1)) {
                                 new DuelArenaMenu(kit, target).open(player1);
                             } else {
                                 new DuelRequest(player1, target, kit, Budget.getInstance().getArenaStorage().getRandomArena(kit)).sendDuelRequest();

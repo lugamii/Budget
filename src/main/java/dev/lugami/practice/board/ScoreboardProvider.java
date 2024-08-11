@@ -2,12 +2,11 @@ package dev.lugami.practice.board;
 
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.Match;
-import dev.lugami.practice.match.MatchPlayerState;
-import dev.lugami.practice.match.types.PartyMatch;
+import dev.lugami.practice.match.types.FFAMatch;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.editor.EditingMetadata;
-import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.PlayerUtils;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
 import org.bukkit.Bukkit;
@@ -29,7 +28,7 @@ public class ScoreboardProvider implements AssembleAdapter {
         if (profile == null) {
             lines.add("&fYour profile was not loaded");
         } else {
-            if (!profile.getProfileOptions().getSettingsMap().get(Setting.SCOREBOARD)) {
+            if (!profile.getProfileOptions().getSettingsMap().get(Settings.SCOREBOARD)) {
                 return new ArrayList<>();
             }
             try {
@@ -73,29 +72,48 @@ public class ScoreboardProvider implements AssembleAdapter {
                                     lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WAITING"));
                                     break;
                                 case COUNTDOWN:
-                                    for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-STARTING")) {
-                                        line = line.replace("<opponent>", "" + match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : ""));
-                                        lines.add(line);
+                                    if (match.isPartyMatch()) {
+                                        if (match.isFFAMatch()) {
+                                            for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-STARTING-FFA")) {
+                                                line = line.replace("<size>", "" + ((FFAMatch) match).getFFATeam().getSize());
+                                                lines.add(line);
+                                            }
+                                        } else if (match.isSplitMatch()) {
+                                            for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-STARTING-SPLIT")) {
+                                                line = line.
+                                                        replace("<team1>", match.getTeam1().getLeader().getName()).
+                                                        replace("<team2>", match.getTeam2().getLeader().getName());
+                                                lines.add(line);
+                                            }
+                                        }
+                                    } else {
+                                        for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-STARTING")) {
+                                            line = line.replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : ""));
+                                            lines.add(line);
+                                        }
                                     }
                                     break;
                                 case IN_PROGRESS:
                                     if (match.isPartyMatch()) {
-                                        PartyMatch partyMatch = (PartyMatch) match;
-                                        if (partyMatch.getType() == PartyMatch.MatchType.FFA) {
+                                        if (match.isFFAMatch()) {
+                                            FFAMatch partyMatch = (FFAMatch) match;
+
                                             for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-FFA")) {
                                                 line = line.
-                                                        replace("<remaining>", "" + partyMatch.getFfaTeam().getAlive())
-                                                        .replace("<size>", "" + partyMatch.getFfaTeam().getSize())
+                                                        replace("<remaining>", "" + partyMatch.getFFATeam().getAlive())
+                                                        .replace("<size>", "" + partyMatch.getFFATeam().getSize())
                                                         .replace("<duration>", match.getDuration());
                                                 lines.add(line);
                                             }
-                                        } else {
-                                            for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-ONGOING")) {
+                                        } else if (match.isSplitMatch()) {
+                                            for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-SPLIT")) {
                                                 line = line.
                                                         replace("<opponent>", match.getOpponent(match.getTeam(player)).getLeader().getName() + (match.getOpponent(match.getTeam(player)).getSize() >= 2 ? "'s team" : "")).
                                                         replace("<duration>", match.getDuration()).
-                                                        replace("<own_ping>", "" + PlayerUtils.getPing(player)).
-                                                        replace("<opponent_ping>", "" + PlayerUtils.getPing(match.getOpponent(match.getTeam(player)).getLeader()));
+                                                        replace("<team_remaining>", "" + match.getTeam(player).getAlive()).
+                                                        replace("<team_size>", "" + match.getTeam(player).getSize()).
+                                                        replace("<opponent_remaining>", "" + match.getOpponent(match.getTeam(player)).getAlive()).
+                                                        replace("<opponent_size>", "" + match.getOpponent(match.getTeam(player)).getSize());
                                                 lines.add(line);
                                             }
                                         }
@@ -125,7 +143,7 @@ public class ScoreboardProvider implements AssembleAdapter {
                                     }
                                     break;
                                 case ENDED:
-                                    if (match.getWinnerTeam() == match.getTeam(player) || (match.isPartyMatch() && ((PartyMatch) match).getWinner() == player)) {
+                                    if (match.getWinnerTeam() == match.getTeam(player) || (match.isFFAMatch() && ((FFAMatch) match).getWinner() == player)) {
                                         lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WON"));
                                     } else {
                                         lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-LOST"));

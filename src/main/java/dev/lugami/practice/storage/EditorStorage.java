@@ -19,16 +19,16 @@ public class EditorStorage {
     private Location editorLocation;
 
     /**
-     * Constructor that initializes the lobby location from the configuration.
+     * Constructor that initializes the editor location from the configuration.
      */
     public EditorStorage() {
         this.editorLocation = LocationUtil.stringToLocation(Budget.getInstance().getMainConfig().getString("editorLocation"));
     }
 
     /**
-     * Brings a player to the lobby, resetting their state and inventory, and teleporting them to the lobby location.
+     * Brings a player to the editor.
      *
-     * @param player The player to bring to the lobby.
+     * @param player The player to bring to the editor.
      */
     public void bringToEditor(Player player, Kit kit) {
         TaskUtil.runTaskLater(() -> {

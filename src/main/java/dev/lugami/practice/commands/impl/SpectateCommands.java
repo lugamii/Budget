@@ -4,10 +4,9 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.Language;
 import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.match.Match;
-import dev.lugami.practice.match.types.DefaultMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.settings.Setting;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.command.annotation.Command;
 import dev.lugami.practice.utils.command.annotation.Sender;
@@ -43,7 +42,7 @@ public class SpectateCommands extends CommandBase {
             if (match.getState() == Match.MatchState.ENDED) {
                 player.sendMessage(CC.translate("&cThis match is not available anymore."));
             }
-            match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
+            match.addSpectator(player, profile.getProfileOptions().getSettingsMap().get(Settings.SILENT_SPECTATE));
         }
     }
 
@@ -57,7 +56,7 @@ public class SpectateCommands extends CommandBase {
             if (Budget.getInstance().getMatchStorage().findMatch(player) == null) {
                 Budget.getInstance().getLobbyStorage().bringToLobby(player);
             } else {
-                Budget.getInstance().getMatchStorage().findMatch(player).removeSpectator(player, profile.getProfileOptions().getSettingsMap().get(Setting.SILENT_SPECTATE));
+                Budget.getInstance().getMatchStorage().findMatch(player).removeSpectator(player, profile.getProfileOptions().getSettingsMap().get(Settings.SILENT_SPECTATE));
             }
         }
     }

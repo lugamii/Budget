@@ -29,7 +29,10 @@ public enum Language {
     private final String path;
 
     public String format(String... toFormat) {
-        return new MessageFormat(CC.translate(Budget.getInstance().getLanguageConfig().getString(path))).format(toFormat);
+        if (toFormat.length == 0) {
+            return CC.translate(Budget.getInstance().getLanguageConfig().getString(this.path));
+        }
+        return new MessageFormat(CC.translate(Budget.getInstance().getLanguageConfig().getString(this.path))).format(toFormat);
     }
 
 }

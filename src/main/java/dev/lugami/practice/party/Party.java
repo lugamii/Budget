@@ -3,6 +3,7 @@ package dev.lugami.practice.party;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.profile.Profile;
+import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.CC;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Getter
 public class Party extends Team {
 
-    private final UUID UUID = java.util.UUID.randomUUID();
+    private final UUID uniqueID = UUID.randomUUID();
     private boolean disbanded = false;
 
     public Party(Player leader) {
@@ -28,11 +29,11 @@ public class Party extends Team {
 
     public void disband() {
         Budget.getInstance().getPartyStorage().getParties().remove(this);
+        this.disbanded = true;
         this.doAction(player -> {
             player.sendMessage(CC.translate("&cThe party has been disbanded."));
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player.getUniqueId());
-            if (!profile.isFighting()) Budget.getInstance().getLobbyStorage().bringToLobby(player);
-            this.disbanded = true;
+            if (!profile.isFighting() && profile.getState() != ProfileState.EDITOR) Budget.getInstance().getLobbyStorage().bringToLobby(player);
         });
     }
 
@@ -45,7 +46,7 @@ public class Party extends Team {
            if (!PartyInvite.hasInvite(p)) {
                p.sendMessage(CC.translate("&cYou don't have a invite to this party."));
            } else if (this.contains(p)) {
-               p.sendMessage(CC.translate("&cYou are already in a party."));
+               p.sendMessage(CC.translate("&cYou are already in this party. (?)"));
            }
         }
     }

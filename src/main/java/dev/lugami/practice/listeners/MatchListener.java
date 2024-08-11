@@ -3,11 +3,10 @@ package dev.lugami.practice.listeners;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.Match;
 import dev.lugami.practice.match.MatchPlayerState;
-import dev.lugami.practice.match.event.MatchStartEvent;
-import dev.lugami.practice.match.event.PartyMatchEndEvent;
-import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.match.event.MatchEndEvent;
-import dev.lugami.practice.match.types.PartyMatch;
+import dev.lugami.practice.match.team.Team;
+import dev.lugami.practice.match.types.FFAMatch;
+import dev.lugami.practice.match.types.SplitMatch;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.queue.QueueType;
@@ -16,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftTNTPrimed;
 import org.bukkit.entity.EnderPearl;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
@@ -31,7 +29,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,7 +48,7 @@ public class MatchListener implements Listener {
             if (match.isPartyMatch()) {
                 profile.setMatchState(MatchPlayerState.DEAD);
                 TaskUtil.runTaskLater(() -> {
-                    match.onDeath(player, match.getAlive() == 1);
+                    match.onDeath(player, match.canEnd());
                     if (match.getAlive() > 1) match.addSpectator(player, true);
                 }, 1);
             } else {
@@ -89,7 +86,7 @@ public class MatchListener implements Listener {
             match.sendMessage("&a" + player.getName() + " &7disconnected.");
             if (match.isPartyMatch()) {
                 profile.setMatchState(MatchPlayerState.DEAD);
-                match.onDeath(player, match.getAlive() > 1);
+                match.onDeath(player, match.canEnd());
             } else {
                 match.onDeath(player);
             }
@@ -176,11 +173,9 @@ public class MatchListener implements Listener {
                 return;
             }
             if (match == Budget.getInstance().getMatchStorage().findMatch(damager)) {
-                if (match.isPartyMatch()) {
-                    PartyMatch partyMatch = (PartyMatch) match;
-                    if (partyMatch.getType() == PartyMatch.MatchType.SPLIT) {
-                        event.setCancelled(partyMatch.getTeam(player) == partyMatch.getTeam(damager));
-                    }
+                if (match.isPartyMatch() && match.isSplitMatch()) {
+                    SplitMatch partyMatch = (SplitMatch) match;
+                    event.setCancelled(partyMatch.getTeam(player) == partyMatch.getTeam(damager));
                 }
                 if (!event.isCancelled()) {
                     if (player.isBlocking() && match.getTeam(player).getMember(player).getBlocked() <= 20) {
@@ -198,7 +193,7 @@ public class MatchListener implements Listener {
                     if (match.getTeam(damager).getMember(damager).getHits() == 100 && match.getKit().isBoxing()) {
                         if (match.isPartyMatch()) {
                             profile.setMatchState(MatchPlayerState.DEAD);
-                            match.onDeath(player, match.getAlive() < 1);
+                            match.onDeath(player, match.canEnd());
                         } else {
                             match.onDeath(player);
                         }
@@ -266,14 +261,15 @@ public class MatchListener implements Listener {
     }
 
     @EventHandler
-    public void onPartyMatchEnd(PartyMatchEndEvent event) {
+    public void onPartyMatchEnd(MatchEndEvent event) {
+        if (!event.getMatch().isPartyMatch() || event.getMatch().isSplitMatch()) return;
         Match match = event.getMatch();
         String eloMessage = null;
-        this.handlePartyMatchEnd((PartyMatch) event.getMatch());
+        this.handleFFAMatchEnd((FFAMatch) event.getMatch());
         Clickable inventories = this.getClickable(event);
-        String winnerMessage = CC.translate("&eWinner: " + event.getWinner().getName());
+        String winnerMessage = CC.translate("&eWinner: " + event.getWinnerPlayer().getName());
         List<Player> players = event.getLosers();
-        players.add(event.getWinner());
+        players.add(event.getWinnerPlayer());
         this.sendMatchEndMessages(match, players, winnerMessage, inventories, eloMessage);
     }
 
@@ -311,7 +307,7 @@ public class MatchListener implements Listener {
         profile2.save();
     }
 
-    private void handlePartyMatchEnd(PartyMatch match) {
+    private void handleFFAMatchEnd(FFAMatch match) {
         if (match.isNpcTesting()) {
             return;
         }
@@ -384,9 +380,9 @@ public class MatchListener implements Listener {
     }
 
 
-    private Clickable getClickable(PartyMatchEndEvent event) {
+    private Clickable getClickableFFA(MatchEndEvent event) {
         Clickable inventories = new Clickable("&bInventories: ");
-        inventories.add("&a" + event.getWinner().getName(), "&eClick to view " + event.getWinner().getName() + "'s inventory!", "/match inventory " + event.getWinner().getUniqueId());
+        inventories.add("&a" + event.getWinnerPlayer().getName(), "&eClick to view " + event.getWinnerPlayer().getName() + "'s inventory!", "/match inventory " + event.getWinnerPlayer().getUniqueId());
         inventories.add("&7, ");
         Iterator<Player> iterator = event.getLosers().iterator();
 

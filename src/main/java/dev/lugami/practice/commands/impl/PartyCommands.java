@@ -6,6 +6,7 @@ import dev.lugami.practice.commands.CommandBase;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.party.PartyInvite;
 import dev.lugami.practice.profile.Profile;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.command.annotation.Command;
 import dev.lugami.practice.utils.command.annotation.Sender;
@@ -51,6 +52,11 @@ public class PartyCommands extends CommandBase {
             sender.sendMessage(Language.ALREADY_IN_PARTY.format());
             return;
         }
+
+        if (!profile.getProfileOptions().getSettingsMap().get(Settings.PARTY_REQUESTS)) {
+            sender.sendMessage(CC.translate("You are not accepting party requests!"));
+            return;
+        }
         if (PartyInvite.hasInvite(sender)) {
             PartyInvite invite = PartyInvite.getPartyRequest(sender);
             if (invite == null || invite.getParty() == null) {
@@ -80,9 +86,16 @@ public class PartyCommands extends CommandBase {
                 return;
             }
             Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(target);
-            if (profile1.isInParty()) {
-                sender.sendMessage(CC.translate("&c" + target.getName() + " is already in a party!"));
-                return;
+            if (!profile1.canJoinParties()) {
+                if (profile1.isInParty()) {
+                    sender.sendMessage(CC.translate("&c" + target.getName() + " is already in a party!"));
+                    return;
+                }
+
+                if (!profile1.getProfileOptions().getSettingsMap().get(Settings.PARTY_REQUESTS)) {
+                    sender.sendMessage(CC.translate("&c" + target.getName() + " is not accepting party requests!"));
+                    return;
+                }
             }
             PartyInvite partyInvite = new PartyInvite(profile.getParty(), target);
             partyInvite.send();
