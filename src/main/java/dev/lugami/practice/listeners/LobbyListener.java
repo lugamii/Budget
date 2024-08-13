@@ -9,10 +9,7 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.utils.CC;
-import dev.lugami.practice.utils.NotificationAPI;
-import dev.lugami.practice.utils.TaskUtil;
-import dev.lugami.practice.utils.TitleAPI;
+import dev.lugami.practice.utils.*;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -56,6 +53,7 @@ public class LobbyListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        PlayerUtils.resetPlayer(player);
         Budget.getInstance().getLobbyStorage().bringToLobby(player);
         TaskUtil.runTaskLater(() -> {
             if (Budget.getInstance().getMainConfig().getBoolean("motd.clear-chat")) {

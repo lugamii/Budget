@@ -245,6 +245,8 @@ public class MatchListener implements Listener {
     @EventHandler
     public void onMatchEnd(MatchEndEvent event) {
         Match match = event.getMatch();
+        if (event.getMatch().isPartyMatch() && !event.getMatch().isSplitMatch()) return;
+
         String eloMessage = null;
 
         if (match.getQueueType() == QueueType.RANKED) {
@@ -266,7 +268,7 @@ public class MatchListener implements Listener {
         Match match = event.getMatch();
         String eloMessage = null;
         this.handleFFAMatchEnd((FFAMatch) event.getMatch());
-        Clickable inventories = this.getClickable(event);
+        Clickable inventories = this.getClickableFFA(event);
         String winnerMessage = CC.translate("&eWinner: " + event.getWinnerPlayer().getName());
         List<Player> players = event.getLosers();
         players.add(event.getWinnerPlayer());

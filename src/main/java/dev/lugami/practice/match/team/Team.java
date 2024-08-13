@@ -51,7 +51,7 @@ public class Team {
     }
 
     public int getSize() {
-        return members.size() - 1;
+        return members.size();
     }
 
     public boolean isEmpty() {

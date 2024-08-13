@@ -9,6 +9,7 @@ import dev.lugami.practice.match.MatchSnapshot;
 import dev.lugami.practice.match.event.MatchEndEvent;
 import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.match.team.Team;
+import dev.lugami.practice.match.team.TeamPlayer;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
@@ -57,8 +58,10 @@ public class FFAMatch extends Match {
     }
 
     public void addPlayerToFFA(Player player) {
-        if (this.FFATeam.contains(player)) return;
-        this.FFATeam.addMember(player);
+        if (!this.FFATeam.contains(player) && this.FFATeam.getLeader() != player) {
+            this.FFATeam.addMember(player);
+        }
+
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         profile.setState(ProfileState.FIGHTING);
         profile.setMatchState(MatchPlayerState.ALIVE);
@@ -115,9 +118,9 @@ public class FFAMatch extends Match {
         if (killer != null) {
             Profile killerProfile = Budget.getInstance().getProfileStorage().findProfile(killer);
             if (killerProfile.getProfileOptions().getSettingsMap().get(Settings.LIGHTNING)) {
-                getTeam1().doAction(player1 -> LightningUtil.spawnLighting(player1, location));
-                getTeam2().doAction(player1 -> LightningUtil.spawnLighting(player1, location));
-                getSpectators().forEach(player1 -> LightningUtil.spawnLighting(player1, location));
+                getTeam1().doAction(player1 -> LightningUtil.spawnLightning(player1, location));
+                getTeam2().doAction(player1 -> LightningUtil.spawnLightning(player1, location));
+                getSpectators().forEach(player1 -> LightningUtil.spawnLightning(player1, location));
             }
 
             if (killerProfile.getProfileOptions().getSettingsMap().get(Settings.EXPLOSION)) {
@@ -211,10 +214,10 @@ public class FFAMatch extends Match {
     @Override
     public void teleportTeamsToArena() {
         TaskUtil.runTaskLater(() -> {
-            for (Player player : this.getAllPlayers()) {
+            for (TeamPlayer player : this.getFFATeam().getMembers()) {
                 Location location  = new Location(getArena().getPos1().getWorld(), getArena().getPos1().getX(), getArena().getPos1().getY(), getArena().getPos1().getZ(), getArena().getPos1().getYaw(), getArena().getPos1().getPitch());
                 location.add(0.0, 1.0, 0.0);
-                player.teleport(location);
+                player.getPlayer().teleport(location);
             }
         }, 1L);
     }

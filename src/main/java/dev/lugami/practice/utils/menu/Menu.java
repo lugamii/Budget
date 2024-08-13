@@ -68,7 +68,16 @@ public class Menu {
      */
     public void setButton(int slot, Button button) {
         if (slot > getSize()) slot = inventory.getSize() - 1;
-        if (buttons.get(slot) != null) buttons.remove(slot);
+        if (buttons.get(slot) != null && button != this.placeholderButton) {
+            if (buttons.get(slot) == this.placeholderButton) {
+                while (buttons.get(slot) == this.placeholderButton) {
+                    slot++;
+                }
+            } else {
+                buttons.remove(slot);
+            }
+
+        }
         if (slot < getSize()) {
             if (inventory.getItem(slot) != null) inventory.setItem(slot, null);
             inventory.setItem(slot, button.getItemStack());

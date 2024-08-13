@@ -6,9 +6,11 @@ import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.ItemUtils;
 import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,14 +51,14 @@ public class MatchSnapshotMenu extends Menu {
         MatchSnapshot opp = Budget.getInstance().getMatchStorage().findMatchSnapshot(snapshot.getOpponent());
         setButton(45, new Button(new ItemBuilder(Material.ARROW).name("&bSwitch to " + snapshot.getOpponent().getName() + "'s inventory").build(), (player1, clickType) -> new MatchSnapshotMenu(opp).open(player1)));
         setButton(46, Menu.getPlaceholderButton());
-        setButton(47, new Button(new ItemBuilder(Material.MELON).name("&bHealth: &f" + snapshot.getHealth()).build()));
-        setButton(48, new Button(new ItemBuilder(Material.COOKED_BEEF).name("&bHunger: &f" + snapshot.getHunger()).build()));
+        setButton(47, new Button(new ItemBuilder(Material.MELON).name("&bHealth: &f" + snapshot.getHealth()).amount(snapshot.getHealth() == 0.0 ? 1 : ((Double) snapshot.getHealth()).intValue()).build()));
+        setButton(48, new Button(new ItemBuilder(Material.COOKED_BEEF).name("&bHunger: &f" + snapshot.getHunger()).amount(snapshot.getHunger() == 0.0 ? 1 : ((Double) snapshot.getHunger()).intValue()).build()));
         List<String> lore = new ArrayList<>();
         lore.add("");
         if (snapshot.getEffects().isEmpty()) {
             lore.add("&cNo effects.");
         } else {
-            snapshot.getEffects().forEach(effect -> lore.add("&7- &b" + effect.getType().getName() + " " + effect.getAmplifier()));
+            snapshot.getEffects().forEach(effect -> lore.add("&7- &b" + StringUtils.capitalize(effect.getType().getName().replace("_", " ")) + " " + effect.getAmplifier()));
         }
         setButton(49, new Button(new ItemBuilder(Material.BREWING_STAND_ITEM).name("&bEffects").lore(lore).build()));
         lore.clear();

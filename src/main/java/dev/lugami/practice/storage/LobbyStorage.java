@@ -37,8 +37,8 @@ public class LobbyStorage {
      * @param spectate If we should bring the player to Spectator Mode.
      */
     public void bringToLobby(Player player, boolean spectate) {
-        TaskUtil.runTaskLater(() -> {
-            PlayerUtils.resetPlayer(player);
+        TaskUtil.runTask(() -> {
+            PlayerUtils.resetPlayer(player, true);
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
             profile.setState(spectate ? ProfileState.LOBBY_SPECTATE : ProfileState.LOBBY);
             profile.setMatchState(MatchPlayerState.NONE);
@@ -54,6 +54,6 @@ public class LobbyStorage {
             }
             Budget.getInstance().getHotbarStorage().resetHotbar(player);
             player.teleport(this.lobbyLocation);
-        }, 1L);
+        });
     }
 }

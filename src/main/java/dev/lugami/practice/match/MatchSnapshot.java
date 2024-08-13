@@ -1,6 +1,7 @@
 package dev.lugami.practice.match;
 
 import dev.lugami.practice.Budget;
+import dev.lugami.practice.utils.MathUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -39,8 +40,8 @@ public class MatchSnapshot {
         this.opponent = opponent;
         this.armor = armor;
         this.contents = contents;
-        this.health = target.getHealth();
-        this.hunger = target.getFoodLevel();
+        this.health = MathUtils.roundHalf(target.getHealth());
+        this.hunger = MathUtils.roundHalf(target.getFoodLevel());
         this.effects = new ArrayList<>(target.getActivePotionEffects());
         this.match = Budget.getInstance().getMatchStorage().findMatch(target.getUniqueId());
         if (this.match != null) {

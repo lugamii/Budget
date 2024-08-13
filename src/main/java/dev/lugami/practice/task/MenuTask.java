@@ -11,6 +11,7 @@ public class MenuTask extends BukkitRunnable {
         for (Player p1 : Bukkit.getOnlinePlayers()) {
             if (Menu.getOpenMenus().containsKey(p1)) {
                 Menu menu = Menu.getOpenMenus().get(p1);
+                if (menu == null) continue;
                 menu.updateButtonLore(p1);
                 menu.initialize(p1);
                 p1.updateInventory();

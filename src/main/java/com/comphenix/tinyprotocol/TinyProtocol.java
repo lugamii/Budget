@@ -25,8 +25,6 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.comphenix.tinyprotocol.Reflection.FieldAccessor;
-import com.comphenix.tinyprotocol.Reflection.MethodInvoker;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
@@ -47,20 +45,20 @@ public abstract class TinyProtocol {
     private static final Class<?> networkManagerClass = Reflection.getClass("{nms}.NetworkManager", "net.minecraft.network.NetworkManager");
 
     // Used in order to lookup a channel
-    private static final MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-    private static final FieldAccessor<?> getConnection = Reflection.getField(entityPlayerClass, null, playerConnectionClass);
-    private static final FieldAccessor<?> getManager = Reflection.getField(playerConnectionClass, null, networkManagerClass);
-    private static final FieldAccessor<Channel> getChannel = Reflection.getField(networkManagerClass, Channel.class, 0);
+    private static final Reflection.MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
+    private static final Reflection.FieldAccessor<?> getConnection = Reflection.getField(entityPlayerClass, null, playerConnectionClass);
+    private static final Reflection.FieldAccessor<?> getManager = Reflection.getField(playerConnectionClass, null, networkManagerClass);
+    private static final Reflection.FieldAccessor<Channel> getChannel = Reflection.getField(networkManagerClass, Channel.class, 0);
 
     // Looking up ServerConnection
     private static final Class<Object> minecraftServerClass = Reflection.getUntypedClass("{nms}.MinecraftServer", "net.minecraft.server.MinecraftServer");
     private static final Class<Object> serverConnectionClass = Reflection.getUntypedClass("{nms}.ServerConnection", "net.minecraft.server.network.ServerConnection");
-    private static final FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
-    private static final FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
+    private static final Reflection.FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
+    private static final Reflection.FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
 
     // Packets we have to intercept
     private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getClass("{nms}.PacketLoginInStart", "net.minecraft.network.protocol.login.PacketLoginInStart");
-    private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
+    private static final Reflection.FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
 
     // Speedup channel lookup
     private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
@@ -139,6 +137,8 @@ public abstract class TinyProtocol {
 
         };
 
+
+
         // This is executed before Minecraft's channel handler
         beginInitProtocol = new ChannelInitializer<Channel>() {
 
@@ -207,7 +207,7 @@ public abstract class TinyProtocol {
             networkManagers = (List<Object>) field.get(serverConnection);
         } catch (Exception ex) {
             plugin.getLogger().info("Encountered an exception checking list fields" + ex);
-            MethodInvoker method = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
+            Reflection.MethodInvoker method = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
 
             networkManagers = (List<Object>) method.invoke(null, serverConnection);
         }

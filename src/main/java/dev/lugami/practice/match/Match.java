@@ -45,7 +45,7 @@ public abstract class Match {
     private Long startedAt;
     private boolean npcTesting = false;
     private List<Player> spectators;
-    private List<Player> allPlayers;
+    private DeduplicatingArrayList<Player> allPlayers;
 
     public enum MatchType {
         DEFAULT,
@@ -70,7 +70,7 @@ public abstract class Match {
         this.team1 = new Team(null);
         this.team2 = new Team(null);
         this.spectators = new CopyOnWriteArrayList<>();
-        this.allPlayers = new CopyOnWriteArrayList<>();
+        this.allPlayers = new DeduplicatingArrayList<>();
     }
 
     public enum MatchState {
@@ -233,20 +233,20 @@ public abstract class Match {
     }
 
     public void onDeath(Player player, boolean end) {
+        MatchSnapshot snap = new MatchSnapshot(player, getOpponent(getTeam(player)).getLeader(), player.getInventory().getArmorContents(), player.getInventory().getContents());
+        Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
         player.setHealth(20);
         PlayerUtils.respawnPlayer(player);
         player.setFireTicks(0);
-        MatchSnapshot snap = new MatchSnapshot(player, getOpponent(getTeam(player)).getLeader(), player.getInventory().getArmorContents(), player.getInventory().getContents());
-        Budget.getInstance().getMatchStorage().getSnapshots().add(snap);
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         Location location = player.getLocation().clone();
         Player killer = PlayerUtils.getLastAttacker(player);
         if (killer != null) {
             Profile killerProfile = Budget.getInstance().getProfileStorage().findProfile(killer);
             if (killerProfile.getProfileOptions().getSettingsMap().get(Settings.LIGHTNING)) {
-                getTeam1().doAction(player1 -> LightningUtil.spawnLighting(player1, location));
-                getTeam2().doAction(player1 -> LightningUtil.spawnLighting(player1, location));
-                getSpectators().forEach(player1 -> LightningUtil.spawnLighting(player1, location));
+                getTeam1().doAction(player1 -> LightningUtil.spawnLightning(player1, location));
+                getTeam2().doAction(player1 -> LightningUtil.spawnLightning(player1, location));
+                getSpectators().forEach(player1 -> LightningUtil.spawnLightning(player1, location));
             }
 
             if (killerProfile.getProfileOptions().getSettingsMap().get(Settings.EXPLOSION)) {
