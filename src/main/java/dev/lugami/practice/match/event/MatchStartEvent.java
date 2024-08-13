@@ -13,5 +13,4 @@ public class MatchStartEvent extends BaseEvent {
     private final Team team1;
     private final Team team2;
 
-
 }

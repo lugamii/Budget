@@ -20,6 +20,7 @@ public class ProfileStorage {
      * @param name the name of the player
      * @return the Profile object if found, otherwise null
      */
+    @Deprecated()
     public Profile findProfile(String name) {
         return this.profiles.stream().filter(profile -> profile.getPlayer().getName().equalsIgnoreCase(name)).findFirst().orElse(Bukkit.getPlayer(name) != null ? new Profile(Bukkit.getPlayer(name)) : null);
     }

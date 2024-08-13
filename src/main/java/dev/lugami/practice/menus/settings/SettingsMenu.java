@@ -27,17 +27,22 @@ public class SettingsMenu extends Menu {
     public void initialize(Player player) {
         this.fillBorder();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
-        int slot = 10;
+        int y = 1;
+        int x = 1;
         for (Settings settings : Settings.values()) {
             ItemStack stack = createItem(profile, settings);
-            setButton(slot++, new Button(stack, (player1, clickType) -> {
+            setButton(getSlot(x++, y), new Button(stack, (player1, clickType) -> {
                 if (settings.hasPermission(player1)) {
-                    profile.getProfileOptions().getSettingsMap().put(settings, !profile.getProfileOptions().getSettingsMap().get(settings));
-                    player1.sendMessage(CC.translate(profile.getProfileOptions().getSettingsMap().get(settings) ? "&aEnabled " + settings.getName().toLowerCase() + "." : "&cDisabled " + settings.getName().toLowerCase() + "."));
+                    profile.getProfileOptions().setToggled(settings, !profile.getProfileOptions().isToggled(settings));
+                    player1.sendMessage(CC.translate(profile.getProfileOptions().isToggled(settings) ? "&aEnabled " + settings.getName().toLowerCase() + "." : "&cDisabled " + settings.getName().toLowerCase() + "."));
                 } else {
                     player1.sendMessage(CC.translate("&cYou don't have the required permissions for this."));
                 }
             }));
+            if (x == 8) {
+                y++;
+                x = 1;
+            }
         }
     }
 

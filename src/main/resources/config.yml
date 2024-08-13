@@ -1,6 +1,9 @@
 debug: false
 spawnLocation: world:0.0:0.0:0.0:0.0:0.0
 editorLocation: world:0.0:0.0:0.0:0.0:0.0
+match:
+  enable-cps-alert: true
+  remove-bottle-drop: true
 motd:
   enabled: true
   clear-chat: true

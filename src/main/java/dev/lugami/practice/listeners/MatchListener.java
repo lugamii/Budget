@@ -4,6 +4,7 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.Match;
 import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.match.event.MatchEndEvent;
+import dev.lugami.practice.match.event.MatchStartEvent;
 import dev.lugami.practice.match.team.Team;
 import dev.lugami.practice.match.types.FFAMatch;
 import dev.lugami.practice.match.types.SplitMatch;
@@ -24,6 +25,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -78,6 +80,23 @@ public class MatchListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+        ItemStack item = event.getItem();
+        if (item == null) {
+            return;
+        }
+
+        Material type = item.getType();
+        Player player = event.getPlayer();
+        if (type.getId() == 373 && Budget.getInstance().getMainConfig().getBoolean("match.remove-bottle-drop")) {
+            TaskUtil.runTaskLaterAsynchronously(() -> {
+                player.setItemInHand(new ItemStack(Material.AIR));
+                player.updateInventory();
+            }, 1L);
+        }
+    }
+
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
@@ -97,7 +116,7 @@ public class MatchListener implements Listener {
     public void onItemDrop(PlayerDropItemEvent event) {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
         if (profile.getState() == ProfileState.FIGHTING) {
-            if (event.getItemDrop().getItemStack().getType() == Material.GLASS_BOTTLE) {
+            if (event.getItemDrop().getItemStack().getType() == Material.GLASS_BOTTLE && Budget.getInstance().getMainConfig().getBoolean("match.remove-bottle-drop")) {
                 event.getItemDrop().remove();
                 return;
             }
@@ -221,8 +240,8 @@ public class MatchListener implements Listener {
             if (profile.getState() == ProfileState.FIGHTING) {
                 Match match = Budget.getInstance().getMatchStorage().findMatch(shooter);
                 if (match == null) return;
-                if (match.getState() != Match.MatchState.IN_PROGRESS) event.setCancelled(true);
-                if (event.getEntity() instanceof ThrownPotion) match.getTeam(shooter).getMember(shooter).pot();
+                if (match.getState() == Match.MatchState.WAITING || match.getState() == Match.MatchState.COUNTDOWN) event.setCancelled(true);
+                if (match.getState() == Match.MatchState.IN_PROGRESS) if (event.getEntity() instanceof ThrownPotion) match.getTeam(shooter).getMember(shooter).pot();
             }
         }
     }
@@ -239,6 +258,21 @@ public class MatchListener implements Listener {
                     if (event.getIntensity(shooter) <= 0.5D) match.getTeam(shooter).getMember(shooter).miss();
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onMatchStart(MatchStartEvent event) {
+        Match match = event.getMatch();
+
+        if (Budget.getInstance().getMainConfig().getBoolean("match.enable-cps-alert")) {
+            match.getTeam1().sendMessage("", "&cButterfly clicking is &4strictly prohibited&c, and doing so might result in a &4punishment.", "");
+            match.getTeam2().sendMessage("", "&cButterfly clicking is &4strictly prohibited&c, and doing so might result in a &4punishment.", "");
+        }
+
+        if (match.getKit().isBoxing()) {
+            match.getTeam1().doAction(player -> player.addPotionEffect(PotionEffectType.SPEED.createEffect(Integer.MAX_VALUE, 1)));
+            match.getTeam2().doAction(player -> player.addPotionEffect(PotionEffectType.SPEED.createEffect(Integer.MAX_VALUE, 1)));
         }
     }
 

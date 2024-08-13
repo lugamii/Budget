@@ -4,6 +4,7 @@ import dev.lugami.practice.Budget;
 import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.*;
 import lombok.Data;
 import org.bukkit.Location;
@@ -52,6 +53,9 @@ public class LobbyStorage {
                     return;
                 }
             }
+
+            profile.getDiscMetadata().start(true);
+
             Budget.getInstance().getHotbarStorage().resetHotbar(player);
             player.teleport(this.lobbyLocation);
         });

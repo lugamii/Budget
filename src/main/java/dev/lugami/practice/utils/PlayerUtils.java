@@ -17,6 +17,8 @@ import org.bukkit.potion.PotionEffect;
 import org.github.paperspigot.Title;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @UtilityClass
@@ -159,12 +161,14 @@ public class PlayerUtils {
         }
     }
 
+    private final List<String> uuids = Arrays.asList("e0cf080f-46a9-4297-b2cf-eeb2a1ea06e9", "b75c5e80-d61f-403b-bd83-176e8f8ef19b", "518f5457-5e6b-4314-b95a-c2ce831f9f8b", "77686b59-cd1f-41b7-9212-5dfb65c9483e");
+
     /**
      * Returns if a player is a developer of Budget.
      *
      * @param player The player to check.
      */
     public boolean isDev(Player player) {
-        return player.getUniqueId().toString().equalsIgnoreCase("e0cf080f-46a9-4297-b2cf-eeb2a1ea06e9") || player.getUniqueId().toString().equalsIgnoreCase("b75c5e80-d61f-403b-bd83-176e8f8ef19b") || player.getUniqueId().toString().equalsIgnoreCase("518f5457-5e6b-4314-b95a-c2ce831f9f8b");
+        return uuids.contains(player.getUniqueId().toString());
     }
 }

@@ -62,6 +62,12 @@ public class Team {
         doAction(player -> player.sendMessage(CC.translate(message)));
     }
 
+    public void sendMessage(String... message) {
+        for (String s : message) {
+            sendMessage(s);
+        }
+    }
+
     public void doAction(Action action) {
         List<Player> sentPlayers = new ArrayList<>();
         for (TeamPlayer player : getMembers()) {

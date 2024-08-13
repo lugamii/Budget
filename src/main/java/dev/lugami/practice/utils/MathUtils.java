@@ -22,6 +22,9 @@ public class MathUtils {
     }
 
     public double roundHalf(double d) {
+        if (((Double) d).toString().contains(".0")) {
+            return d;
+        }
         return Math.round(d * 2.0) / 2.0;
     }
 }

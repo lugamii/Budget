@@ -3,25 +3,23 @@ package dev.lugami.practice.utils.menu;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.Language;
 import dev.lugami.practice.profile.ProfileState;
-import dev.lugami.practice.utils.*;
+import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.InventoryWrapper;
+import dev.lugami.practice.utils.ItemBuilder;
+import dev.lugami.practice.utils.TaskUtil;
 import lombok.Getter;
-import net.minecraft.server.v1_8_R3.Container;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.PacketPlayOutSetSlot;
-import net.minecraft.server.v1_8_R3.PacketPlayOutWindowItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class Menu {
@@ -63,26 +61,47 @@ public class Menu {
     /**
      * Sets a button at the specified slot in the menu.
      *
-     * @param slot the slot to place the button in
+     * @param slot   the slot to place the button in
      * @param button the button to be placed
      */
     public void setButton(int slot, Button button) {
         if (slot > getSize()) slot = inventory.getSize() - 1;
-        if (buttons.get(slot) != null && button != this.placeholderButton) {
-            if (buttons.get(slot) == this.placeholderButton) {
-                while (buttons.get(slot) == this.placeholderButton) {
-                    slot++;
-                }
-            } else {
-                buttons.remove(slot);
+        if (getButton(slot) != null && button != this.placeholderButton) {
+            while (getButton(slot) == this.placeholderButton || this.isBorderSlot(slot)) {
+                slot++;
             }
-
         }
         if (slot < getSize()) {
             if (inventory.getItem(slot) != null) inventory.setItem(slot, null);
             inventory.setItem(slot, button.getItemStack());
             buttons.put(slot, button);
         }
+    }
+
+
+    /**
+     * Check if the slot is a border slot (e.g., edge slots).
+     *
+     * @param slot The slot index to check.
+     * @return True if the slot is a border slot, false otherwise.
+     */
+    private boolean isBorderSlot(int slot) {
+        return (slot < 9 || slot % 9 == 0 || slot % 9 == 8);
+    }
+
+    public boolean containsButton(Button button) {
+        return buttons.containsValue(button) || inventory.get().contains(button.getItemStack());
+    }
+
+    /**
+     * Returns the slot for a given X and Y positions.
+     *
+     * @param x The X position.
+     * @param y The Y position.
+     * @return The calculated slot.
+     */
+    public int getSlot(int x, int y) {
+        return ((9 * y) + x);
     }
 
     /**
@@ -121,11 +140,10 @@ public class Menu {
     }
 
 
-
     /**
      * Handles a click event at the specified slot for the given player.
      *
-     * @param slot the slot that was clicked
+     * @param slot   the slot that was clicked
      * @param player the player who clicked the slot
      */
     public void handleClick(int slot, Player player, ClickType clickType) {
@@ -198,7 +216,7 @@ public class Menu {
     /**
      * Override this method in subclasses to provide the updated lore for a button.
      *
-     * @param slot the slot of the button
+     * @param slot      the slot of the button
      * @param itemStack the ItemStack of the button
      * @return the updated lore, or null if no update is needed
      */

@@ -10,6 +10,7 @@ import dev.lugami.practice.match.MatchPlayerState;
 import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.editor.CustomKitLayout;
 import dev.lugami.practice.profile.editor.EditingMetadata;
+import dev.lugami.practice.profile.misc.DiscMetadata;
 import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.fake.FakePlayer;
@@ -38,6 +39,7 @@ public class Profile {
     private Party party = null;
     private Map<Kit, CustomKitLayout[]> kitLayouts;
     private EditingMetadata editingMetadata;
+    private DiscMetadata discMetadata;
 
     public Profile(Player player) {
         this(player, player.getUniqueId());
@@ -53,10 +55,11 @@ public class Profile {
         this.state = ProfileState.LOBBY;
         this.matchState = MatchPlayerState.NONE;
         this.enderpearlCooldown = new Cooldown(0);
-        this.profileOptions = new ProfileSettings();
+        this.profileOptions = new ProfileSettings(this);
         this.kitStats = new ArrayList<>();
         this.kitLayouts = new HashMap<>();
         this.editingMetadata = null;
+        this.discMetadata = new DiscMetadata(this, null);
         Budget.getInstance().getProfileStorage().getProfiles().add(this);
         load();
     }
@@ -68,10 +71,11 @@ public class Profile {
         this.state = ProfileState.LOBBY;
         this.matchState = MatchPlayerState.NONE;
         this.enderpearlCooldown = new Cooldown(0);
-        this.profileOptions = new ProfileSettings();
+        this.profileOptions = new ProfileSettings(this);
         this.kitStats = new ArrayList<>();
         this.kitLayouts = new HashMap<>();
         this.editingMetadata = null;
+        this.discMetadata = new DiscMetadata(this, null);
         Budget.getInstance().getProfileStorage().getProfiles().add(this);
     }
 
@@ -89,6 +93,7 @@ public class Profile {
                 this.profileOptions.getSettingsMap().put(Settings.ARENA_SELECTOR, (boolean) options.getOrDefault("arenaSelector", Settings.ARENA_SELECTOR.isDefaultToggled()));
                 this.profileOptions.getSettingsMap().put(Settings.ALLOW_SPECTATORS, (boolean) options.getOrDefault("allowSpectators", Settings.ALLOW_SPECTATORS.isDefaultToggled()));
                 this.profileOptions.getSettingsMap().put(Settings.SILENT_SPECTATE, (boolean) options.getOrDefault("silentSpectate", Settings.SILENT_SPECTATE.isDefaultToggled()));
+                this.profileOptions.getSettingsMap().put(Settings.LOBBY_MUSIC, (boolean) options.getOrDefault("lobbyMusic", Settings.LOBBY_MUSIC.isDefaultToggled()));
                 this.profileOptions.getSettingsMap().put(Settings.LIGHTNING, (boolean) options.getOrDefault("lightningEffect", Settings.LIGHTNING.isDefaultToggled()));
                 this.profileOptions.getSettingsMap().put(Settings.EXPLOSION, (boolean) options.getOrDefault("explosionEffect", Settings.EXPLOSION.isDefaultToggled()));
 
@@ -144,6 +149,7 @@ public class Profile {
         optionsDocument.put("arenaSelector", this.profileOptions.getSettingsMap().get(Settings.ARENA_SELECTOR));
         optionsDocument.put("allowSpectators", this.profileOptions.getSettingsMap().get(Settings.ALLOW_SPECTATORS));
         optionsDocument.put("silentSpectate", this.profileOptions.getSettingsMap().get(Settings.SILENT_SPECTATE));
+        optionsDocument.put("lobbyMusic", this.profileOptions.getSettingsMap().get(Settings.LOBBY_MUSIC));
         optionsDocument.put("lightningEffect", this.profileOptions.getSettingsMap().get(Settings.LIGHTNING));
         optionsDocument.put("explosionEffect", this.profileOptions.getSettingsMap().get(Settings.EXPLOSION));
 
@@ -234,6 +240,13 @@ public class Profile {
         }
 
         return hotbarItems;
+    }
+
+    public void stopSong() {
+        if (this.discMetadata != null) {
+            this.discMetadata.setDisc(null);
+            this.discMetadata.setFinished(true);
+        }
     }
 
     public boolean isBusy() {

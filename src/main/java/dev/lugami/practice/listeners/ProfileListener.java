@@ -3,8 +3,11 @@ package dev.lugami.practice.listeners;
 import dev.lugami.practice.Budget;
 import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
+import dev.lugami.practice.settings.Settings;
+import dev.lugami.practice.settings.SettingsChangedEvent;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.PlayerUtils;
+import dev.lugami.practice.utils.SoundAPI;
 import dev.lugami.practice.utils.TaskUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -69,6 +72,20 @@ public class ProfileListener implements Listener {
         if (profile.getState() == ProfileState.LOBBY || profile.getState() == ProfileState.FIGHTING && (!Budget.getInstance().getMatchStorage().findMatch(player).getKit().isHunger() || Budget.getInstance().getMatchStorage().findMatch(player).getKit().isBoxing())) {
             event.setFoodLevel(20);
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onSettingsChanged(SettingsChangedEvent event) {
+        if (event.getSettings() == Settings.LOBBY_MUSIC && !event.isToggled()) {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
+            SoundAPI.stopSong(event.getPlayer());
+            profile.getDiscMetadata().stop();
+        } else if (event.getSettings() == Settings.LOBBY_MUSIC && event.isToggled()) {
+            if (Budget.getInstance().getProfileStorage().findProfile(event.getPlayer()).getState() == ProfileState.LOBBY) {
+                Profile profile = Budget.getInstance().getProfileStorage().findProfile(event.getPlayer());
+                profile.getDiscMetadata().start(true);
+            }
         }
     }
 

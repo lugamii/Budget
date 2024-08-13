@@ -161,4 +161,26 @@ public class PracticeCommands extends CommandBase {
         }
     }
 
+    @Command(name = "musictest", desc = "Music API test.")
+    @Require("budget.management.use")
+    public void music(@Sender Player p) {
+        if (PlayerUtils.isDev(p)) {
+            Menu menu = new Menu("&aTest", 27) {
+                @Override
+                public void initialize(Player player) {
+                    this.fillBorder();
+                    Profile profile = Budget.getInstance().getProfileStorage().findProfile(player.getUniqueId());
+                    if (profile.getDiscMetadata().getDisc() != null) {
+                        setButton(10, new Button(new ItemBuilder(Material.JUKEBOX).name("&bCurrent Song: &f" + profile.getDiscMetadata().getDisc().name()).build(), (player1, clickType) -> {}));
+                        setButton(11, new Button(new ItemBuilder(Material.WATCH).name("&bTimer: &f" + profile.getDiscMetadata().getSecondsPassed() + "s").build(), (player1, clickType) -> {}));
+                    } else {
+                        setButton(10, new Button(new ItemBuilder(Material.JUKEBOX).name("&bStopped.").build(), (player1, clickType) -> {}));
+                    }
+                }
+            };
+
+            menu.open(p);
+        }
+    }
+
 }

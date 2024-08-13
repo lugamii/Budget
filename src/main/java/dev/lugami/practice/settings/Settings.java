@@ -15,6 +15,7 @@ public enum Settings {
     ARENA_SELECTOR("Arena Selector", "Toggles selecting arenas in duel requests.", "budget.selector.arena", true, new ItemStack(Material.PAPER)),
     SILENT_SPECTATE("Silent Spectate", "Toggles silently spectating a player.", "budget.spectator.silent", false, new ItemStack(Material.FEATHER)),
     ALLOW_SPECTATORS("Match Spectators", "Toggles people spectating your matches.", "", true, new ItemStack(Material.DIAMOND)),
+    LOBBY_MUSIC("Lobby Music", "Toggles the lobby music for you.", "budget.lobby.music", false, new ItemStack(Material.JUKEBOX)),
     EXPLOSION("Death Explosion", "Toggles a explosion effect when you kill someone.", "", false, new ItemStack(Material.TNT)),
     LIGHTNING("Death Lightning", "Toggles a lightning effect when you kill someone.", "", true, new ItemStack(Material.BLAZE_ROD));
 
