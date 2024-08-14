@@ -118,8 +118,8 @@ public class SoundAPI {
      * @param disc   The disc to play.
      */
     public void playSong(Player player, Disc disc) {
-        player.spigot().playEffect(Budget.getInstance().getLobbyStorage().getLobbyLocation(), Effect.RECORD_PLAY, disc.getId(), 0, 0.0F, 0.0F, 0.0F, 1.0F, 1, 64);
-        players.add(new PlayerDisc(player, player.getLocation(), disc));
+        player.spigot().playEffect(Budget.getInstance().getLobbyStorage().getLobbyLocation(), Effect.RECORD_PLAY, disc.getId(), 0, 0.0F, 0.0F, 0.0F, 1.0F, 1, 256);
+        players.add(new PlayerDisc(player, Budget.getInstance().getLobbyStorage().getLobbyLocation(), disc));
     }
 
     /**
@@ -149,7 +149,7 @@ public class SoundAPI {
 
                 // #type 1
                 for (int i = 0; i < 5; i++) {
-                    player.spigot().playEffect(location, Effect.RECORD_PLAY, Disc.STOP.getId(), 0, 0.0F, 0.0F, 0.0F, 1.0F, 1, 64);
+                    player.spigot().playEffect(location, Effect.RECORD_PLAY, Disc.STOP.getId(), 0, 0.0F, 0.0F, 0.0F, 1.0F, 1, 256);
                 }
 
                 // #type 2

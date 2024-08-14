@@ -28,14 +28,9 @@ public class DiscMetadata {
 
     public void start(boolean skipDelay) {
         if (this.profile != null && this.profile.getProfileOptions().isToggled(Settings.LOBBY_MUSIC)) {
-            // Cancel any existing tasks
             if (task != null) task.cancel();
             if (delayTask != null) delayTask.cancel();
-
-            // Start the playback task
-            this.task = TaskUtil.runTaskTimerAsynchronously(this::handleDiscPlayback, 0, 20); // Run every second
-
-            // Play the disc immediately if specified
+            this.task = TaskUtil.runTaskTimerAsynchronously(this::handleDiscPlayback, 0, 20);
             play(skipDelay);
         }
     }
@@ -44,18 +39,15 @@ public class DiscMetadata {
         if (disc != null) {
             this.secondsPassed++;
             if (this.secondsPassed > this.disc.getLengthInSeconds()) {
-                // Song has finished
                 this.secondsPassed = 0;
                 this.disc = null;
                 this.finished = true;
-                // Schedule the next song to play after a delay
                 scheduleNextSong();
             } else {
                 this.finished = false;
             }
         } else if (this.disc == null && this.finished) {
-            // No disc is playing and previous disc has finished
-            play(false); // Play a new song after the delay
+            play(false);
         }
     }
 
@@ -64,31 +56,20 @@ public class DiscMetadata {
         if (this.finished && this.secondsPassed > this.songSeconds) {
             if (this.delayTask != null) this.delayTask.cancel();
             this.delayTask = TaskUtil.runTaskLater(() -> {
-                play(false); // Play a new song after 5 seconds
-            }, 20 * 5L); // 5-second delay
+                play(false);
+            }, 20 * 5L);
         }
     }
 
     public void play(boolean skipDelay) {
-        // Cancel any scheduled delay
         if (this.delayTask != null) this.delayTask.cancel();
-
-        // Stop the previous song if it’s playing
         if (this.task != null) this.task.cancel();
-
-        // Start a new song
         if (disc == null) this.disc = SoundAPI.Disc.getRandom();
         this.songSeconds = this.disc.getLengthInSeconds();
         SoundAPI.playSong(this.profile.getPlayer(), this.disc);
-
-        // Reset playback state
         this.secondsPassed = 0;
         this.finished = false;
-
-        // Restart the playback task
-        this.task = TaskUtil.runTaskTimerAsynchronously(this::handleDiscPlayback, 0, 20); // Run every second
-
-        // Schedule the next song if not skipping delay
+        this.task = TaskUtil.runTaskTimerAsynchronously(this::handleDiscPlayback, 0, 20);
         if (!skipDelay) {
             scheduleNextSong();
         }
