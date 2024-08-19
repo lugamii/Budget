@@ -148,8 +148,14 @@ public class SoundAPI {
                 }
 
                 // #type 1
+                float offsetX = 0.0F;
+                float offsetY = 0.0F;
+                float offsetZ = 0.0F;
                 for (int i = 0; i < 5; i++) {
-                    player.spigot().playEffect(location, Effect.RECORD_PLAY, Disc.STOP.getId(), 0, 0.0F, 0.0F, 0.0F, 1.0F, 1, 256);
+                    player.spigot().playEffect(location, Effect.RECORD_PLAY, Disc.STOP.getId(), 0, offsetX, offsetY, offsetZ, 1.0F, 1, 256);
+                    offsetZ = offsetZ + 0.1F;
+                    offsetY = offsetY + 0.1F;
+                    offsetX = offsetX + 0.1F;
                 }
 
                 // #type 2

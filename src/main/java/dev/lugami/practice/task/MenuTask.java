@@ -1,11 +1,17 @@
 package dev.lugami.practice.task;
 
+import dev.lugami.practice.utils.CustomBukkitRunnable;
 import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class MenuTask extends BukkitRunnable {
+public class MenuTask extends CustomBukkitRunnable {
+
+    public MenuTask() {
+        super(CustomBukkitRunnable.Mode.TIMER, CustomBukkitRunnable.Type.ASYNC, 2, 0);
+    }
+
     @Override
     public void run() {
         for (Player p1 : Bukkit.getOnlinePlayers()) {

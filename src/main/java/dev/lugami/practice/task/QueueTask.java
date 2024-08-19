@@ -7,13 +7,18 @@ import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.queue.Queue;
 import dev.lugami.practice.queue.QueueType;
 import dev.lugami.practice.utils.CC;
+import dev.lugami.practice.utils.CustomBukkitRunnable;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class QueueTask extends BukkitRunnable {
+public class QueueTask extends CustomBukkitRunnable {
+
+    public QueueTask() {
+        super(CustomBukkitRunnable.Mode.TIMER, CustomBukkitRunnable.Type.ASYNC, 2, 0);
+    }
 
     @Override
     public void run() {

@@ -5,10 +5,16 @@ import dev.lugami.practice.profile.Profile;
 import dev.lugami.practice.profile.ProfileState;
 import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.Cooldown;
+import dev.lugami.practice.utils.CustomBukkitRunnable;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class MatchEnderpearlTask extends BukkitRunnable {
+public class MatchEnderpearlTask extends CustomBukkitRunnable {
+
+    public MatchEnderpearlTask() {
+        super(Mode.TIMER, Type.ASYNC, 2, 0);
+    }
+
     @Override
     public void run() {
         for (Player player : Budget.getInstance().getServer().getOnlinePlayers()) {

@@ -316,11 +316,13 @@ public class MatchListener implements Listener {
         Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(match.getWinnerTeam().getLeader());
         Profile profile2 = Budget.getInstance().getProfileStorage().findProfile(match.getOpponent(match.getWinnerTeam()).getLeader());
 
+        if (profile1 == null || profile2 == null) return null;
+
         int player1ELO = profile1.getStatistics(match.getKit()).getElo();
         int player2ELO = profile2.getStatistics(match.getKit()).getElo();
 
         int[] eloChanges = EloCalculator.calculateElo(player1ELO, player2ELO, match.getWinnerTeam().getLeader() == profile1.getPlayer());
-        profile1.getStatistics(match.getKit()).setElo(eloChanges[0]);
+
         profile2.getStatistics(match.getKit()).setElo(eloChanges[1]);
         profile1.save();
         profile2.save();
@@ -337,10 +339,15 @@ public class MatchListener implements Listener {
         }
         Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(match.getWinnerTeam().getLeader());
         Profile profile2 = Budget.getInstance().getProfileStorage().findProfile(match.getOpponent(match.getWinnerTeam()).getLeader());
-        profile1.getStatistics(match.getKit()).setWon(profile1.getStatistics(match.getKit()).getWon() + 1);
-        profile2.getStatistics(match.getKit()).setLost(profile2.getStatistics(match.getKit()).getLost() + 1);
-        profile1.save();
-        profile2.save();
+        if (profile1 != null) {
+            profile1.getStatistics(match.getKit()).setWon(profile1.getStatistics(match.getKit()).getWon() + 1);
+            profile1.save();
+        }
+
+        if (profile2 != null) {
+            profile2.getStatistics(match.getKit()).setLost(profile2.getStatistics(match.getKit()).getLost() + 1);
+            profile2.save();
+        }
     }
 
     private void handleFFAMatchEnd(FFAMatch match) {
@@ -348,11 +355,17 @@ public class MatchListener implements Listener {
             return;
         }
         Profile profile1 = Budget.getInstance().getProfileStorage().findProfile(match.getWinner());
-        Profile profile2 = Budget.getInstance().getProfileStorage().findProfile(match.getLastHit(match.getWinner()));
-        profile1.getStatistics(match.getKit()).setWon(profile1.getStatistics(match.getKit()).getWon() + 1);
-        profile2.getStatistics(match.getKit()).setLost(profile2.getStatistics(match.getKit()).getLost() + 1);
-        profile1.save();
-        profile2.save();
+        if (profile1 != null) {
+            profile1.getStatistics(match.getKit()).setWon(profile1.getStatistics(match.getKit()).getWon() + 1);
+            profile1.save();
+        }
+        match.getFFATeam().getMembers().forEach(tp -> {
+            Profile profile = Budget.getInstance().getProfileStorage().findProfile(tp.getPlayer());
+            if (profile != null) {
+                profile.getStatistics(match.getKit()).setLost(profile.getStatistics(match.getKit()).getLost() + 1);
+                profile.save();
+            }
+        });
     }
 
     private void sendMatchEndMessages(Match match, Team team, String winnerMessage, Clickable inventories, String eloMessage) {

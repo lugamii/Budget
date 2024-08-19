@@ -22,6 +22,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.AsyncCatcher;
 
 import java.util.ArrayList;
@@ -132,10 +133,17 @@ public class Budget extends JavaPlugin {
     }
 
     private void setupTasks() {
-        TaskUtil.runTaskTimerAsynchronously(new MatchSnapshotTask(), 0, 2);
-        TaskUtil.runTaskTimerAsynchronously(new MatchEnderpearlTask(), 0, 2);
-        TaskUtil.runTaskTimerAsynchronously(new QueueTask(), 0, 2);
-        TaskUtil.runTaskTimerAsynchronously(new MenuTask(), 0, 2);
+        for (Class<?> c : ClassUtils.getClasses(getFile(), "dev.lugami.practice.task")) {
+            if (c.getName().contains("$")) continue;
+            //if (c.getName().contains("AnimationTask") && !getMainConfig().getBoolean("TITLE.ANIMATION.ENABLED")) continue;
+            try {
+                CustomBukkitRunnable task = (CustomBukkitRunnable) c.newInstance();
+                task.execute();
+            } catch (Exception exception) {
+                getLogger().info("Error while starting the task " + c.getSimpleName());
+                exception.printStackTrace();
+            }
+        }
     }
 
     private void setupGameRules() {

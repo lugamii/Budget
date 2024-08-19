@@ -1,9 +1,11 @@
 package dev.lugami.practice.listeners;
 
+import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -30,14 +32,14 @@ public class MenuListener implements Listener {
         Menu menu = Menu.getOpenMenus().get(player);
 
         if (menu != null && menu.getTitle().equals(title)) {
-            if (menu.getButton(event.getSlot()) != null) event.setCancelled(menu.getButton(event.getSlot()).shouldCancel());
-            menu.handleClick(event.getSlot(), player, event.getClick());
-            for (Player player1 : Menu.getOpenMenus().keySet()) {
-                Menu openMenu = Menu.getOpenMenus().get(player1);
-                if (openMenu.getTitle().equals(title)) {
-                    openMenu.updateButtonLore(player1);
-                    player1.updateInventory();
+            if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT || event.getClick() == ClickType.MIDDLE) {
+                Button button = menu.getButton(event.getSlot());
+                if (button != null) {
+                    event.setCancelled(button.shouldCancel());
+                    menu.handleClick(event.getSlot(), player, event.getClick());
                 }
+            } else {
+                event.setCancelled(true);
             }
         }
     }

@@ -49,6 +49,11 @@ public class SettingsMenu extends Menu {
     public ItemStack createItem(Profile profile, Settings settings) {
         List<String> lore = new ArrayList<>();
         lore.add("&7" + settings.getDescription());
+        if (settings.isBeta()) {
+            lore.add("");
+            lore.add("&b&lNOTE: &fThis feature is currently being tested,");
+            lore.add("&fso please report any bugs you find with it!");
+        }
         lore.add("");
         if (settings.hasPermission(profile.getPlayer())) {
             lore.add(profile.getProfileOptions().getSettingsMap().get(settings) ? "&7▶ &aEnable " + settings.getName() : "  &7Enable " + settings.getName());
@@ -56,6 +61,6 @@ public class SettingsMenu extends Menu {
         } else {
             lore.add("&cNo permission.");
         }
-        return new ItemBuilder(settings.getIcon().clone()).name("&b" + settings.getName()).lore(lore).build();
+        return new ItemBuilder(settings.getIcon().clone()).name("&b" + settings.getName() + (settings.isBeta() ? " &7(Unfinished)" : "")).lore(lore).build();
     }
 }

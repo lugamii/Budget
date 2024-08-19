@@ -2,9 +2,11 @@ package dev.lugami.practice.utils;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @UtilityClass
 public class CC {
@@ -56,6 +58,16 @@ public class CC {
             translated[i] = CC.translate(strings[i]);
         }
         return translated;
+    }
+
+    /**
+     * Removes all color from a given string
+     *
+     * @param input the string to strip
+     * @return the translated string array with color codes
+     */
+    public String removeColors(String input) {
+        return input == null ? null : Pattern.compile("(?i)" + '§' + "[0-9A-FK-OR]").matcher(CC.translate(input)).replaceAll("");
     }
 
 }
