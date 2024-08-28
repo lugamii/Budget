@@ -67,15 +67,16 @@ public class MatchSnapshotMenu extends Menu {
         lore.clear();
         lore.add("");
         lore.add("&6" + snapshot.getTarget().getName() + " &fhad &6" + snapshot.getRemainingPots() + " &fpot" + (snapshot.getRemainingPots() <= 1 ? "" : "s") + " left.");
+        lore.add("&6Potions Thrown: &f" + snapshot.getThrownPots());
+        lore.add("&6Potions Missed: &f" + snapshot.getMissedPots());
+        lore.add("&6Potions Accuracy: &f" + snapshot.getPotionAccuracy());
         setButton(50, new Button(new ItemBuilder(Material.POTION).durability(16421).amount(snapshot.getRemainingPots() == 0 ? 1 : snapshot.getRemainingPots()).name("&6Potions").lore(lore).build()));
         lore.clear();
         lore.add("");
         lore.add("&6Total Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getHits());
         lore.add("&6Critical Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getCrits());
         lore.add("&6Blocked Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getBlocked());
-        lore.add("&6Potions Thrown: &f" + snapshot.getThrownPots());
-        lore.add("&6Potions Missed: &f" + snapshot.getMissedPots());
-        lore.add("&6Potions Accuracy: &f" + snapshot.getPotionAccuracy());
+
 
         setButton(51, new Button(new ItemBuilder(Material.PAPER).name("&6Statistics").lore(lore).build()));
 
