@@ -65,7 +65,7 @@ public class LeaderboardsMenu extends Menu {
                         lore.add("&fLoading...");
                     }
                 }
-                setButton(slot++, new Button(new ItemBuilder(kit.getIcon().clone()).name("&b&l" + kit.getName() + " ┃ Top 10").lore(lore).build()));
+                setButton(slot++, new Button(new ItemBuilder(kit.getIcon()).name("&b&l" + kit.getName() + " ┃ Top 10").lore(lore).build()));
             }
         }
     }

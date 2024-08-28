@@ -22,6 +22,10 @@ public class Kit {
     private ItemStack[] inventory = new ItemStack[36];
     private ItemStack[] armor = new ItemStack[4];
 
+    public ItemStack getIcon() {
+        return icon.clone();
+    }
+
     public Kit(String name) {
         this.name = name;
         this.icon = new ItemBuilder(Material.DIAMOND_SWORD).build();

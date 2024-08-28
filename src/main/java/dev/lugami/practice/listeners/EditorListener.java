@@ -14,8 +14,10 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -60,6 +62,27 @@ public class EditorListener implements Listener {
                 event.setCancelled(true);
                 Budget.getInstance().getLobbyStorage().bringToLobby(player);
             }
+        }
+    }
+
+    @EventHandler
+    public void onItemDrop(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (profile.getState() == ProfileState.EDITOR) {
+            event.getItemDrop().remove();
+        }
+    }
+
+    @EventHandler
+    public void onPotion(PotionSplashEvent event) {
+        if (!(event.getPotion().getShooter() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getPotion().getShooter();
+        Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
+        if (profile.getState() == ProfileState.EDITOR) {
+            event.setCancelled(true);
         }
     }
 

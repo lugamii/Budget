@@ -58,7 +58,10 @@ public class MatchSnapshotMenu extends Menu {
         if (snapshot.getEffects().isEmpty()) {
             lore.add("&cNo effects.");
         } else {
-            snapshot.getEffects().forEach(effect -> lore.add("&7- &b" + StringUtils.capitalize(effect.getType().getName().replace("_", " ")) + " " + effect.getAmplifier()));
+            snapshot.getEffects().forEach(effect -> {
+                String name = effect.getType().getName().replace("_", " ");
+                lore.add("&7- &b" + name.substring(0, 1).toUpperCase() + name.substring(1) + " " + effect.getAmplifier());
+            });
         }
         setButton(49, new Button(new ItemBuilder(Material.BREWING_STAND_ITEM).name("&bEffects").lore(lore).build()));
         lore.clear();

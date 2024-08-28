@@ -40,7 +40,7 @@ public class PartySelectKitMenu extends Menu {
         for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
             if (kit.isEnabled() && kit.isParty()) {
 
-                ItemStack itemStack = kit.getIcon().clone();
+                ItemStack itemStack = kit.getIcon();
                 setButton(slot++, new Button(
                         new ItemBuilder(itemStack != null ? itemStack : new ItemBuilder(Material.DIAMOND_SWORD).build())
                                 .name("&b" + kit.getName())

@@ -30,7 +30,7 @@ public class DuelKitMenu extends Menu {
         for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
             if (kit.isEnabled()) {
 
-                ItemStack itemStack = kit.getIcon().clone();
+                ItemStack itemStack = kit.getIcon();
                 setButton(slot++, new Button(
                         new ItemBuilder(itemStack != null ? itemStack : new ItemBuilder(Material.DIAMOND_SWORD).build())
                                 .name("&b" + kit.getName())
