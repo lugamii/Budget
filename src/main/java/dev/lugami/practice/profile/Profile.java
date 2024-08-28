@@ -11,6 +11,7 @@ import dev.lugami.practice.party.Party;
 import dev.lugami.practice.profile.editor.CustomKitLayout;
 import dev.lugami.practice.profile.editor.EditingMetadata;
 import dev.lugami.practice.profile.misc.DiscMetadata;
+import dev.lugami.practice.protocol.VersionFetcher;
 import dev.lugami.practice.settings.Settings;
 import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.fake.FakePlayer;
@@ -40,6 +41,7 @@ public class Profile {
     private Map<Kit, CustomKitLayout[]> kitLayouts;
     private EditingMetadata editingMetadata;
     private DiscMetadata discMetadata;
+    private VersionFetcher.Version version;
 
     public Profile(Player player) {
         this(player, player.getUniqueId());
@@ -60,6 +62,7 @@ public class Profile {
         this.kitLayouts = new HashMap<>();
         this.editingMetadata = null;
         this.discMetadata = new DiscMetadata(this, null);
+        this.version = Budget.getInstance().getVersionFetcher().getVersion(player);
         Budget.getInstance().getProfileStorage().getProfiles().add(this);
         load();
     }

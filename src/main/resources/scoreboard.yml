@@ -128,13 +128,13 @@ MATCH-SPECTATING:
   - "&7&m----------------------"
 MATCH-WON:
   - "&7&m----------------------"
-  - "&aYou won, GGs!"
+  - "&a&lVICTORY!"
   - ""
   - "&blugami.dev/budget"
   - "&7&m----------------------"
 MATCH-LOST:
   - "&7&m----------------------"
-  - "&cYou lost!"
+  - "&c&lDEFEAT!"
   - ""
   - "&blugami.dev/budget"
   - "&7&m----------------------"

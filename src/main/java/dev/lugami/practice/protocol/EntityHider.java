@@ -1,13 +1,11 @@
-package dev.lugami.practice.utils;
+package dev.lugami.practice.protocol;
 
 import com.comphenix.tinyprotocol.TinyProtocol;
 import dev.lugami.practice.Budget;
 import io.netty.channel.Channel;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
 import java.util.*;

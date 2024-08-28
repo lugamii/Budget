@@ -21,7 +21,10 @@ public class Arena {
 
     public Arena(String name) {
         this.name = name;
+    }
 
+    public void updateCuboid() {
+        this.cuboid = new Cuboid(min, max);
     }
 
 }

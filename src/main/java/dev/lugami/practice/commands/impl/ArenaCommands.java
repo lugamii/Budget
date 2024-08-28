@@ -106,6 +106,7 @@ public class ArenaCommands extends CommandBase {
             return;
         }
         arena.setMin(player.getLocation());
+        arena.updateCuboid();
         player.sendMessage(CC.translate("&aSuccessfully set " + name + "'s minimum location!"));
     }
 
@@ -118,6 +119,7 @@ public class ArenaCommands extends CommandBase {
             return;
         }
         arena.setMax(player.getLocation());
+        arena.updateCuboid();
         player.sendMessage(CC.translate("&aSuccessfully set " + name + "'s maximum location!"));
     }
 

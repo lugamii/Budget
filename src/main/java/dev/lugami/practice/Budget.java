@@ -7,8 +7,9 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import dev.lugami.practice.board.ScoreboardProvider;
 import dev.lugami.practice.commands.CommandBase;
+import dev.lugami.practice.protocol.EntityHider;
+import dev.lugami.practice.protocol.VersionFetcher;
 import dev.lugami.practice.storage.*;
-import dev.lugami.practice.task.*;
 import dev.lugami.practice.utils.*;
 import dev.lugami.practice.utils.command.Drink;
 import dev.lugami.practice.utils.command.command.CommandService;
@@ -22,10 +23,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.spigotmc.AsyncCatcher;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,6 +49,7 @@ public class Budget extends JavaPlugin {
     private EditorStorage editorStorage;
     private Assemble assemble;
     private EntityHider entityHider;
+    private VersionFetcher versionFetcher;
     private CommandService drink;
     private MongoDatabase mongoDatabase;
 
@@ -108,6 +108,7 @@ public class Budget extends JavaPlugin {
         this.partyStorage = new PartyStorage();
         this.editorStorage = new EditorStorage();
         this.entityHider = new EntityHider();
+        this.versionFetcher = new VersionFetcher();
         AsyncCatcher.enabled = false;
         this.assemble = new Assemble(this, new ScoreboardProvider());
         this.assemble.setTicks(2);
@@ -154,19 +155,17 @@ public class Budget extends JavaPlugin {
     }
 
     private void setupHooks() {
-        SimplePluginManager pluginManager = (SimplePluginManager) Bukkit.getPluginManager();
-        if (pluginManager.isPluginEnabled("LunarClientAPI")) {
+        if (Bukkit.getPluginManager().isPluginEnabled("LunarClientAPI")) {
             this.lunarHook = true;
             this.lunarHookMode = "Legacy";
-        } else if (pluginManager.isPluginEnabled("Apollo-Bukkit")) {
+        } else if (Bukkit.getPluginManager().isPluginEnabled("Apollo-Bukkit")) {
             this.lunarHook = true;
             this.lunarHookMode = "Modern";
         }
     }
 
     private void startupMessage() {
-        CommandSender sender = Bukkit.getConsoleSender();
-        sender.sendMessage(CC.translate(CC.CHAT_BAR));
+        Bukkit.getConsoleSender().sendMessage(CC.translate(CC.CHAT_BAR));
         List<String> logo = Arrays.asList(
                 "  ____            _            _   ",
                 " |  _ \\          | |          | |  ",
@@ -177,20 +176,20 @@ public class Budget extends JavaPlugin {
                 "                     __/ |         ",
                 "                    |___/          "
         );
-        logo.forEach(msg -> sender.sendMessage(CC.translate("&b" + msg)));
+        logo.forEach(msg -> Bukkit.getConsoleSender().sendMessage(CC.translate("&b" + msg)));
 
-        sender.sendMessage(CC.translate(""));
-        sender.sendMessage(CC.translate("Budget was initialized successfully!"));
-        sender.sendMessage(CC.translate(""));
-        sender.sendMessage(CC.translate("Version: &b" + this.getDescription().getVersion()));
-        sender.sendMessage(CC.translate("Authors: &b" + this.getDescription().getAuthors()));
-        sender.sendMessage(CC.translate(""));
-        sender.sendMessage(CC.translate("Kits: &b" + this.kitStorage.getKits().size()));
-        sender.sendMessage(CC.translate("Arenas: &b" + this.arenaStorage.getArenas().size()));
-        sender.sendMessage(CC.translate("Spigot: &b" + this.getServer().getName()));
-        sender.sendMessage(CC.translate("Lunar Support: &b" + (this.lunarHook ? "Yes (" + this.lunarHookMode + ")" : "No")));
+        Bukkit.getConsoleSender().sendMessage(CC.translate(""));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Budget was initialized successfully!"));
+        Bukkit.getConsoleSender().sendMessage(CC.translate(""));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Version: &b" + this.getDescription().getVersion()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Authors: &b" + this.getDescription().getAuthors()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate(""));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Kits: &b" + this.kitStorage.getKits().size()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Arenas: &b" + this.arenaStorage.getArenas().size()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Spigot: &b" + this.getServer().getName()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Lunar Support: &b" + (this.lunarHook ? "Yes (" + this.lunarHookMode + ")" : "No")));
 
-        sender.sendMessage(CC.translate(CC.CHAT_BAR));
+        Bukkit.getConsoleSender().sendMessage(CC.translate(CC.CHAT_BAR));
     }
 
 

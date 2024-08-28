@@ -24,7 +24,7 @@ public class TitleAPI {
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         title = CC.translate(title);
         subtitle = CC.translate(subtitle);
-        player.sendTitle(new org.github.paperspigot.Title(title, subtitle, fadeIn, stay, fadeOut));
+        player.sendTitle(new org.github.paperspigot.Title(title, subtitle, fadeIn / 10, stay / 10, fadeOut / 10));
 
         if (Budget.getInstance().isLunarHook()) {
             if (Budget.getInstance().getLunarHookMode().equalsIgnoreCase("Legacy")) {

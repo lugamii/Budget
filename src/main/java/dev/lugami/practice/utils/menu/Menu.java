@@ -126,10 +126,6 @@ public class Menu {
         }
         this.initialize(player);
         TaskUtil.runTaskLater(() -> {
-            if (!player.hasPermission("budget.menu.bypass") && Budget.getInstance().getProfileStorage().findProfile(player).getState() != ProfileState.LOBBY) {
-                player.sendMessage(Language.CANNOT_DO_ACTION.format());
-                return;
-            }
             if (this.openMenus.get(player) != null) {
                 ((CraftPlayer) player).getHandle().p();
                 this.openMenus.remove(player);

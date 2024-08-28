@@ -66,7 +66,6 @@ public class EditorMenu extends Menu {
         CustomKitLayout finalSavedKitLayout = savedKitLayout;
         CustomKitLayout[] finalKitLayouts = kitLayouts;
         return new Button(new ItemBuilder(Material.ENCHANTED_BOOK).name("&bKit #" + id).lore(lore).build(), (p1, clickType) -> {
-
             if (clickType == ClickType.LEFT) {
                 if ((finalSavedKitLayout == null || !areInventoriesEqual(finalSavedKitLayout, p1)) && !isInventoryEmpty(p1)) {
                     CustomKitLayout newKitLayout = new CustomKitLayout();

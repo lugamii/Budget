@@ -1,20 +1,17 @@
 package dev.lugami.practice.utils;
 
-import com.mojang.authlib.GameProfile;
 import dev.lugami.practice.Budget;
 import lombok.experimental.UtilityClass;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.PacketPlayInClientCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
-import org.github.paperspigot.Title;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -31,6 +28,25 @@ public class PlayerUtils {
      */
     public void resetPlayer(Player player) {
         resetPlayer(player, true);
+    }
+
+    /**
+     * Checks if the block the player is in or one block below is of a given block type.
+     *
+     * @param player the player to check
+     * @param blockType the block type to check for
+     * @return true if the player is in or one block below the block type, false otherwise
+     */
+    public boolean isInBlock(Player player, Material blockType) {
+        Location loc = player.getLocation();
+
+        // Get the block the player is in
+        Block blockAtPlayerFeet = loc.getBlock();
+        // Get the block one block below the player
+        Block blockBelowPlayer = loc.clone().add(0, -1, 0).getBlock();
+
+        // Check if either block matches the given block type
+        return blockAtPlayerFeet.getType() == blockType || blockBelowPlayer.getType() == blockType;
     }
 
     /**
