@@ -466,7 +466,8 @@ public abstract class Match {
                 case IN_PROGRESS:
                     return TimeUtils.formatTime(System.currentTimeMillis() - getStartedAt());
                 case ENDED:
-                    return "Ended";
+                    return TimeUtils.formatTime(System.currentTimeMillis() - getStartedAt());
+
                 default:
                     return "Waiting";
             }

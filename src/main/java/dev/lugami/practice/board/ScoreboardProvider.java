@@ -143,10 +143,18 @@ public class ScoreboardProvider implements AssembleAdapter {
                                     }
                                     break;
                                 case ENDED:
+                                    String matchDuration = match.getDuration();
+
                                     if (match.getWinnerTeam() == match.getTeam(player) || (match.isFFAMatch() && ((FFAMatch) match).getWinner() == player)) {
-                                        lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WON"));
+                                        for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-WON")) {
+                                            line = line.replace("<duration>", matchDuration); // Substitui <duration> pela duração da partida
+                                            lines.add(line);
+                                        }
                                     } else {
-                                        lines.addAll(Budget.getInstance().getScoreboardConfig().getStringList("MATCH-LOST"));
+                                        for (String line : Budget.getInstance().getScoreboardConfig().getStringList("MATCH-LOST")) {
+                                            line = line.replace("<duration>", matchDuration); // Substitui <duration> pela duração da partida
+                                            lines.add(line);
+                                        }
                                     }
                                     break;
                             }
