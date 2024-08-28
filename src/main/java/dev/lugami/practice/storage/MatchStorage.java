@@ -206,9 +206,9 @@ public class MatchStorage {
     }
 
     // TODO: Method comment
-    public void sendMatchEndMessages(Match match, Team team, String winnerMessage, Clickable inventories, String eloMessage) {
+    public void sendMatchEndMessages(Match match, Team team, Clickable inventories, String eloMessage) {
         team.sendMessage("");
-        team.sendMessage(winnerMessage);
+       // team.sendMessage(winnerMessage);
         team.doAction(inventories::sendToPlayer);
 
         if (eloMessage != null) {
@@ -232,12 +232,21 @@ public class MatchStorage {
 
     // TODO: Method comment
     public Clickable getClickable(MatchEndEvent event) {
-        Clickable inventories = new Clickable("&6Inventories: ");
-        inventories.add("&a" + event.getWinner().getLeader().getName(), "&eClick to view " + event.getWinner().getLeader().getName() + "'s inventory!", "/match inventory " + event.getWinner().getLeader().getUniqueId());
-        inventories.add("&7, ");
-        inventories.add("&c" + event.getLoser().getLeader().getName(), "&eClick to view " + event.getLoser().getLeader().getName() + "'s inventory!", "/match inventory " + event.getLoser().getLeader().getUniqueId());
-        return inventories;
+        Clickable clickableMessage = new Clickable("&6Match Overview &7&o(Click to view inventories)\n");
+
+        clickableMessage.add("&aWinner: &e" + event.getWinner().getLeader().getName(),
+                "&eClick to view " + event.getWinner().getLeader().getName() + "'s inventory!",
+                "/match inventory " + event.getWinner().getLeader().getUniqueId());
+
+        clickableMessage.add(" &7| ");
+
+        clickableMessage.add("&cLoser: &e" + event.getLoser().getLeader().getName(),
+                "&eClick to view " + event.getLoser().getLeader().getName() + "'s inventory!",
+                "/match inventory " + event.getLoser().getLeader().getUniqueId());
+
+        return clickableMessage;
     }
+
 
     // TODO: Method comment
     public void sendMatchEndMessages(Match match, List<Player> players, String winnerMessage, Clickable inventories, String eloMessage) {

@@ -285,10 +285,10 @@ public class MatchListener implements Listener {
         String eloMessage = matches.matchEnd(match);
 
         Clickable inventories = matches.getClickable(event);
-        String winnerMessage = CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : ""));
+//        String winnerMessage = CC.translate("&eWinner: " + event.getWinner().getLeader().getName() + (event.getWinner().getSize() >= 2 ? "'s team" : ""));
 
-        matches.sendMatchEndMessages(match, event.getWinner(), winnerMessage, inventories, eloMessage);
-        matches.sendMatchEndMessages(match, event.getLoser(), winnerMessage, inventories, eloMessage);
+        matches.sendMatchEndMessages(match, event.getWinner(), inventories, eloMessage);
+        matches.sendMatchEndMessages(match, event.getLoser(), inventories, eloMessage);
     }
 
     @EventHandler
