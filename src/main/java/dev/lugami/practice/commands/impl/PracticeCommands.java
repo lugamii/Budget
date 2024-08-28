@@ -39,11 +39,11 @@ public class PracticeCommands extends CommandBase {
     @Command(name = "", aliases = {"about", "ver", "version"}, desc = "The main command for Budget.")
     public void default1(@Sender Player player) {
         player.sendMessage(CC.CHAT_BAR);
-        player.sendMessage(CC.translate("&b&lBudget Practice"));
+        player.sendMessage(CC.translate("&6&lBudget Practice"));
         player.sendMessage(CC.translate(""));
-        player.sendMessage(CC.translate("&fVersion: &b" + Budget.getInstance().getDescription().getVersion()));
-        player.sendMessage(CC.translate("&fAuthors: &bLugami, hitblocking"));
-        player.sendMessage(CC.translate("&fGitHub: &bhttps://github.com/lugamii/Budget"));
+        player.sendMessage(CC.translate("&fVersion: &6" + Budget.getInstance().getDescription().getVersion()));
+        player.sendMessage(CC.translate("&fAuthors: &6Lugami, hitblocking"));
+        player.sendMessage(CC.translate("&fGitHub: &6https://github.com/lugamii/Budget"));
         player.sendMessage(CC.CHAT_BAR);
     }
 
@@ -117,7 +117,7 @@ public class PracticeCommands extends CommandBase {
 
     @Command(name = "titletest", desc = "Title API test")
     public void titleTest(@Sender Player player) {
-        TitleAPI.sendTitle(player, "&bfortnite", "&7balls");
+        TitleAPI.sendTitle(player, "&6fortnite", "&7balls");
         player.sendMessage(CC.translate("&aSent a test title!"));
     }
 
@@ -171,10 +171,10 @@ public class PracticeCommands extends CommandBase {
                     this.fillBorder();
                     Profile profile = Budget.getInstance().getProfileStorage().findProfile(player.getUniqueId());
                     if (profile.getDiscMetadata().getDisc() != null) {
-                        setButton(10, new Button(new ItemBuilder(Material.JUKEBOX).name("&bCurrent Song: &f" + profile.getDiscMetadata().getDisc().name()).build(), (player1, clickType) -> {}));
-                        setButton(11, new Button(new ItemBuilder(Material.WATCH).name("&bTimer: &f" + profile.getDiscMetadata().getSecondsPassed() + "s").build(), (player1, clickType) -> {}));
+                        setButton(10, new Button(new ItemBuilder(Material.JUKEBOX).name("&6Current Song: &f" + profile.getDiscMetadata().getDisc().name()).build(), (player1, clickType) -> {}));
+                        setButton(11, new Button(new ItemBuilder(Material.WATCH).name("&6Timer: &f" + profile.getDiscMetadata().getSecondsPassed() + "s").build(), (player1, clickType) -> {}));
                     } else {
-                        setButton(10, new Button(new ItemBuilder(Material.JUKEBOX).name("&bStopped.").build(), (player1, clickType) -> {}));
+                        setButton(10, new Button(new ItemBuilder(Material.JUKEBOX).name("&6Stopped.").build(), (player1, clickType) -> {}));
                     }
                 }
             };

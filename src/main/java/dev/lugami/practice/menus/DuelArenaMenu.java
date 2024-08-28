@@ -18,7 +18,7 @@ public class DuelArenaMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public DuelArenaMenu(Kit kit, Player target) {
-        super("&bSelect an arena", 36);
+        super("&6Select an arena", 36);
         this.kit = kit;
         this.target = target;
     }
@@ -31,7 +31,7 @@ public class DuelArenaMenu extends Menu {
             if (arena.isEnabled() && arena.getWhitelistedKits().contains(kit.getName())) {
                 setButton(slot++, new Button(
                         new ItemBuilder(Material.PAPER)
-                                .name("&b" + arena.getName())
+                                .name("&6" + arena.getName())
                                 .build(),
                         (player1, c) -> {
                             new DuelRequest(player1, target, kit, arena).sendDuelRequest();

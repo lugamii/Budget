@@ -15,13 +15,13 @@ public class PartyEventsMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public PartyEventsMenu() {
-        super("&bParty Events", 27);
+        super("&6Party Events", 27);
     }
 
     @Override
     public void initialize(Player player) {
         this.fillBorder();
-        setButton(12, new Button(new ItemBuilder(Material.DIAMOND_AXE).name("&bSplit").lore("&7Split your party into 2 teams and fight!").build(), (player1, clickType) -> {
+        setButton(12, new Button(new ItemBuilder(Material.DIAMOND_AXE).name("&6Split").lore("&7Split your party into 2 teams and fight!").build(), (player1, clickType) -> {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player1);
             if (profile.getParty() == null) {
                 player1.sendMessage(CC.translate("&cYou do not have a party!"));
@@ -34,7 +34,7 @@ public class PartyEventsMenu extends Menu {
             }
         }));
 
-        setButton(14, new Button(new ItemBuilder(Material.GOLD_SWORD).name("&bFFA").lore("&7Your party will fight in a free-for-all mode!").build(), (player1, clickType) -> {
+        setButton(14, new Button(new ItemBuilder(Material.GOLD_SWORD).name("&6FFA").lore("&7Your party will fight in a free-for-all mode!").build(), (player1, clickType) -> {
             Profile profile = Budget.getInstance().getProfileStorage().findProfile(player1);
             if (profile.getParty() == null) {
                 player1.sendMessage(CC.translate("&cYou do not have a party!"));

@@ -176,18 +176,18 @@ public class Budget extends JavaPlugin {
                 "                     __/ |         ",
                 "                    |___/          "
         );
-        logo.forEach(msg -> Bukkit.getConsoleSender().sendMessage(CC.translate("&b" + msg)));
+        logo.forEach(msg -> Bukkit.getConsoleSender().sendMessage(CC.translate("&6" + msg)));
 
         Bukkit.getConsoleSender().sendMessage(CC.translate(""));
         Bukkit.getConsoleSender().sendMessage(CC.translate("Budget was initialized successfully!"));
         Bukkit.getConsoleSender().sendMessage(CC.translate(""));
-        Bukkit.getConsoleSender().sendMessage(CC.translate("Version: &b" + this.getDescription().getVersion()));
-        Bukkit.getConsoleSender().sendMessage(CC.translate("Authors: &b" + this.getDescription().getAuthors()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Version: &6" + this.getDescription().getVersion()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Authors: &6" + this.getDescription().getAuthors()));
         Bukkit.getConsoleSender().sendMessage(CC.translate(""));
-        Bukkit.getConsoleSender().sendMessage(CC.translate("Kits: &b" + this.kitStorage.getKits().size()));
-        Bukkit.getConsoleSender().sendMessage(CC.translate("Arenas: &b" + this.arenaStorage.getArenas().size()));
-        Bukkit.getConsoleSender().sendMessage(CC.translate("Spigot: &b" + this.getServer().getName()));
-        Bukkit.getConsoleSender().sendMessage(CC.translate("Lunar Support: &b" + (this.lunarHook ? "Yes (" + this.lunarHookMode + ")" : "No")));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Kits: &6" + this.kitStorage.getKits().size()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Arenas: &6" + this.arenaStorage.getArenas().size()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Spigot: &6" + this.getServer().getName()));
+        Bukkit.getConsoleSender().sendMessage(CC.translate("Lunar Support: &6" + (this.lunarHook ? "Yes (" + this.lunarHookMode + ")" : "No")));
 
         Bukkit.getConsoleSender().sendMessage(CC.translate(CC.CHAT_BAR));
     }

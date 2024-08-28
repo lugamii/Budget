@@ -7,7 +7,6 @@ import dev.lugami.practice.utils.CC;
 import dev.lugami.practice.utils.ItemBuilder;
 import dev.lugami.practice.utils.menu.Button;
 import dev.lugami.practice.utils.menu.Menu;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,7 +19,7 @@ public class SettingsMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public SettingsMenu() {
-        super("&bSettings", 9 * 4);
+        super("&6Settings", 9 * 4);
     }
 
     @Override
@@ -30,8 +29,17 @@ public class SettingsMenu extends Menu {
         int y = 1;
         int x = 1;
         for (Settings settings : Settings.values()) {
+            if (settings == Settings.EXPLOSION || settings == Settings.LIGHTNING) {
+                continue;
+            }
+
             ItemStack stack = createItem(profile, settings);
             setButton(getSlot(x++, y), new Button(stack, (player1, clickType) -> {
+                if (settings == Settings.DEATHEFFECT) {
+                    new DeathEffectMenu().open(player1);
+                    return;
+                }
+
                 if (settings.hasPermission(player1)) {
                     profile.getProfileOptions().setToggled(settings, !profile.getProfileOptions().isToggled(settings));
                     player1.sendMessage(CC.translate(profile.getProfileOptions().isToggled(settings) ? "&aEnabled " + settings.getName().toLowerCase() + "." : "&cDisabled " + settings.getName().toLowerCase() + "."));
@@ -39,6 +47,7 @@ public class SettingsMenu extends Menu {
                     player1.sendMessage(CC.translate("&cYou don't have the required permissions for this."));
                 }
             }));
+
             if (x == 8) {
                 y++;
                 x = 1;
@@ -51,16 +60,18 @@ public class SettingsMenu extends Menu {
         lore.add("&7" + settings.getDescription());
         if (settings.isBeta()) {
             lore.add("");
-            lore.add("&b&lNOTE: &fThis feature is currently being tested,");
+            lore.add("&6&lNOTE: &fThis feature is currently being tested,");
             lore.add("&fso please report any bugs you find with it!");
         }
         lore.add("");
-        if (settings.hasPermission(profile.getPlayer())) {
-            lore.add(profile.getProfileOptions().getSettingsMap().get(settings) ? "&7▶ &aEnable " + settings.getName() : "  &7Enable " + settings.getName());
-            lore.add(!profile.getProfileOptions().getSettingsMap().get(settings) ? "&7▶ &cDisable " + settings.getName() : "  &7Disable " + settings.getName());
+        if (settings == Settings.DEATHEFFECT) {
+            lore.add("&7➜ &eClick to view!");
+        } else if (settings.hasPermission(profile.getPlayer())) {
+            lore.add(profile.getProfileOptions().getSettingsMap().get(settings) ? "&7➜ &aEnabled" : "  &7Enabled");
+            lore.add(!profile.getProfileOptions().getSettingsMap().get(settings) ? "&7➜ &cDisabled" : "  &7Disabled");
         } else {
             lore.add("&cNo permission.");
         }
-        return new ItemBuilder(settings.getIcon().clone()).name("&b" + settings.getName() + (settings.isBeta() ? " &7(Unfinished)" : "")).lore(lore).build();
+        return new ItemBuilder(settings.getIcon().clone()).name("&6" + settings.getName() + (settings.isBeta() ? " &7(Unfinished)" : "")).lore(lore).build();
     }
 }

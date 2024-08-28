@@ -40,7 +40,7 @@ public class DuelRequest {
         DuelRequest duelRequest = new DuelRequest(requester, target, kit, arena);
         duelRequests.put(target.getUniqueId(), duelRequest);
         requester.sendMessage(CC.translate("&aDuel request sent successfully to " + target.getName() + " on arena " + arena.getName() + " with kit " + kit.getName() + "!"));
-        target.sendMessage(CC.translate("&b" + requester.getName() + " &fhas challenged you to a duel with kit &b" + kit.getName() + " &fin arena &b" + arena.getName() + "."));
+        target.sendMessage(CC.translate("&6" + requester.getName() + " &fhas challenged you to a duel with kit &6" + kit.getName() + " &fin arena &6" + arena.getName() + "."));
         Clickable clickable = new Clickable();
         clickable.add("&a[Click to accept]", "&aClick to accept " + requester.getName() + "'s duel!", "/duel accept");
         clickable.add(" &for ");

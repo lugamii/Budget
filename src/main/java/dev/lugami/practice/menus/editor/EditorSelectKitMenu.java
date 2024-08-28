@@ -15,7 +15,7 @@ public class EditorSelectKitMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public EditorSelectKitMenu() {
-        super("&bSelect a kit", 36);
+        super("&6Select a kit", 36);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class EditorSelectKitMenu extends Menu {
                 ItemStack itemStack = kit.getIcon();
                 setButton(slot++, new Button(
                         new ItemBuilder(itemStack != null ? itemStack : new ItemBuilder(Material.DIAMOND_SWORD).build())
-                                .name("&b" + kit.getName())
+                                .name("&6" + kit.getName())
                                 .build(),
                         (player1, clickType) -> Budget.getInstance().getEditorStorage().bringToEditor(player1, kit)
                 ));

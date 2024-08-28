@@ -19,7 +19,7 @@ public class LeaderboardsMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public LeaderboardsMenu() {
-        super("&bLeaderboards", 36);
+        super("&6Leaderboards", 36);
     }
 
     private final Map<Kit, List<LeaderboardsEntry>> cachedLeaderboards = new HashMap<>();
@@ -40,11 +40,11 @@ public class LeaderboardsMenu extends Menu {
                         if (leaderboardsEntry.getName() == null || (Integer) leaderboardsEntry.getElo() == null) {
                             continue;
                         }
-                        lore.add("&b#" + pos + ": &f" + leaderboardsEntry.getName() + "&7 - &f" + leaderboardsEntry.getElo());
+                        lore.add("&6#" + pos + ": &f" + leaderboardsEntry.getName() + "&7 - &f" + leaderboardsEntry.getElo());
                         pos++;
                     }
                     while (pos <= 10) {
-                        lore.add("&b#" + pos + ": &fNone");
+                        lore.add("&6#" + pos + ": &fNone");
                         pos++;
                     }
                 } catch (Exception e) {
@@ -54,18 +54,18 @@ public class LeaderboardsMenu extends Menu {
                             if (leaderboardsEntry.getName() == null || (Integer) leaderboardsEntry.getElo() == null) {
                                 continue;
                             }
-                            lore.add("&b#" + pos + ": &f" + leaderboardsEntry.getName() + "&7 - &f" + leaderboardsEntry.getElo());
+                            lore.add("&6#" + pos + ": &f" + leaderboardsEntry.getName() + "&7 - &f" + leaderboardsEntry.getElo());
                             pos++;
                         }
                         while (pos <= 10) {
-                            lore.add("&b#" + pos + ": &fNone");
+                            lore.add("&6#" + pos + ": &fNone");
                             pos++;
                         }
                     } else {
                         lore.add("&fLoading...");
                     }
                 }
-                setButton(slot++, new Button(new ItemBuilder(kit.getIcon()).name("&b&l" + kit.getName() + " ┃ Top 10").lore(lore).build()));
+                setButton(slot++, new Button(new ItemBuilder(kit.getIcon()).name("&6&l" + kit.getName() + " ┃ Top 10").lore(lore).build()));
             }
         }
     }

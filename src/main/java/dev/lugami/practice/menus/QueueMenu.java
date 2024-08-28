@@ -24,7 +24,7 @@ public class QueueMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public QueueMenu() {
-        super("&bQueues", 36);
+        super("&6Queues", 36);
         this.queueType = QueueType.UNRANKED;
     }
 
@@ -34,7 +34,7 @@ public class QueueMenu extends Menu {
      * @param queueType The queue type you're joining.
      */
     public QueueMenu(QueueType queueType) {
-        super("&bQueues", 36);
+        super("&6Queues", 36);
         this.queueType = queueType;
     }
 
@@ -47,7 +47,7 @@ public class QueueMenu extends Menu {
             ItemStack itemStack = queue.getKit().getIcon().clone();
             if (queueType == QueueType.RANKED && !queue.isRanked() || queueType == QueueType.UNRANKED && queue.isRanked()) continue;
             else {
-                setButton(slot++, new Button(new ItemBuilder(itemStack).name("&b" + queue.getKit().getName() + (queueType == QueueType.RANKED ? " (Ranked)" : "")).lore(lore).build(), (p1, clickType) -> {
+                setButton(slot++, new Button(new ItemBuilder(itemStack).name("&6" + queue.getKit().getName() + (queueType == QueueType.RANKED ? " (Ranked)" : "")).lore(lore).build(), (p1, clickType) -> {
                     if (queueType == QueueType.RANKED && !queue.isRanked() || queueType == QueueType.UNRANKED && queue.isRanked()) {
                         Queue queue1 = Budget.getInstance().getQueueStorage().findQueue(queue.getKit(), queueType);
                         queue1.add(p1, queueType);
@@ -62,8 +62,8 @@ public class QueueMenu extends Menu {
 
     private List<String> getQueueLore(Queue queue) {
         List<String> lore = new ArrayList<>();
-        lore.add(CC.translate("&fFighting: &b" + Budget.getInstance().getMatchStorage().getInFights(queue.getKit())));
-        lore.add(CC.translate("&fQueueing: &b" + Budget.getInstance().getQueueStorage().getInQueue(queue.getKit(), queueType)));
+        lore.add(CC.translate("&fFighting: &6" + Budget.getInstance().getMatchStorage().getInFights(queue.getKit())));
+        lore.add(CC.translate("&fQueueing: &6" + Budget.getInstance().getQueueStorage().getInQueue(queue.getKit(), queueType)));
         lore.add("");
         lore.add(CC.translate("&eClick to queue!"));
         return lore;
@@ -76,7 +76,7 @@ public class QueueMenu extends Menu {
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null && meta.hasDisplayName()) {
                 String displayName = meta.getDisplayName();
-                Queue queue = Budget.getInstance().getQueueStorage().findQueue(Budget.getInstance().getKitStorage().getByName(displayName.replace("&b", "").replace(" (Ranked)", "")), queueType);
+                Queue queue = Budget.getInstance().getQueueStorage().findQueue(Budget.getInstance().getKitStorage().getByName(displayName.replace("&6", "").replace(" (Ranked)", "")), queueType);
                 if (queue != null) {
                     return getQueueLore(queue);
                 }

@@ -2,22 +2,22 @@ LUNAR-NOTIFICATIONS:
   JOIN:
     ENABLED: true
     DURATION: 5
-    TITLE: "&b&lBudget Practice &7- &fApollo Support :)"
+    TITLE: "&6&lBudget Practice &7- &fApollo Support :)"
     LINES:
-      - "&bBudget supports Apollo (Lunar Client API)"
-      - "&bSo we can display fun notifications like this!"
+      - "&6Budget supports Apollo (Lunar Client API)"
+      - "&6So we can display fun notifications like this!"
 
 TITLES:
   JOIN:
     ENABLED: true
-    TITLE: "&b&lBudget Practice"
+    TITLE: "&6&lBudget Practice"
     SUBTITLE: "&7We hope you enjoy your stay!"
     FADE-IN: 200
     STAY: 1000
     FADE-OUT: 500
   MATCH-STARTING:
     ENABLED: true
-    TITLE: "&b&lMatch Starting"
+    TITLE: "&6&lMatch Starting"
     SUBTITLE: "&7Starting in <countdown>..."
     FADE-IN: 100
     STAY: 1000

@@ -166,7 +166,7 @@ public abstract class Match {
                 PlayerUtils.joinSpectator(player);
                 this.getSpectators().add(player);
                 Budget.getInstance().getHotbarStorage().resetHotbar(player);
-                if (!silent) sendMessage("&b" + player.getName() + " &eis spectating the match.");
+                if (!silent) sendMessage("&6" + player.getName() + " &eis spectating the match.");
             } else {
                 player.sendMessage(Language.CANNOT_DO_ACTION.format());
                 return;
@@ -179,7 +179,7 @@ public abstract class Match {
         if (this.getSpectators().contains(player) && profile.getState() == ProfileState.SPECTATING) {
             Budget.getInstance().getLobbyStorage().bringToLobby(player);
             this.getSpectators().remove(player);
-            if (!silent) sendMessage("&b" + player.getName() + " &cis no longer spectating the match.");
+            if (!silent) sendMessage("&6" + player.getName() + " &cis no longer spectating the match.");
         }
     }
 

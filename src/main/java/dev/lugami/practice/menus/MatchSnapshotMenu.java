@@ -23,7 +23,7 @@ public class MatchSnapshotMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public MatchSnapshotMenu(MatchSnapshot matchSnapshot) {
-        super("&b" + matchSnapshot.getTarget().getName() + "'s inventory", 54);
+        super("&6" + matchSnapshot.getTarget().getName() + "'s inventory", 54);
         this.snapshot = matchSnapshot;
     }
 
@@ -49,10 +49,10 @@ public class MatchSnapshotMenu extends Menu {
         }
 
         MatchSnapshot opp = Budget.getInstance().getMatchStorage().findMatchSnapshot(snapshot.getOpponent());
-        setButton(45, new Button(new ItemBuilder(Material.ARROW).name("&bSwitch to " + snapshot.getOpponent().getName() + "'s inventory").build(), (player1, clickType) -> new MatchSnapshotMenu(opp).open(player1)));
+        setButton(45, new Button(new ItemBuilder(Material.ARROW).name("&6Switch to " + snapshot.getOpponent().getName() + "'s inventory").build(), (player1, clickType) -> new MatchSnapshotMenu(opp).open(player1)));
         setButton(46, Menu.getPlaceholderButton());
-        setButton(47, new Button(new ItemBuilder(Material.MELON).name("&bHealth: &f" + snapshot.getHealth()).amount(snapshot.getHealth() == 0.0 ? 1 : ((Double) snapshot.getHealth()).intValue()).build()));
-        setButton(48, new Button(new ItemBuilder(Material.COOKED_BEEF).name("&bHunger: &f" + snapshot.getHunger()).amount(snapshot.getHunger() == 0.0 ? 1 : ((Double) snapshot.getHunger()).intValue()).build()));
+        setButton(47, new Button(new ItemBuilder(Material.MELON).name("&6Health: &f" + snapshot.getHealth()).amount(snapshot.getHealth() == 0.0 ? 1 : ((Double) snapshot.getHealth()).intValue()).build()));
+        setButton(48, new Button(new ItemBuilder(Material.COOKED_BEEF).name("&6Hunger: &f" + snapshot.getHunger()).amount(snapshot.getHunger() == 0.0 ? 1 : ((Double) snapshot.getHunger()).intValue()).build()));
         List<String> lore = new ArrayList<>();
         lore.add("");
         if (snapshot.getEffects().isEmpty()) {
@@ -60,26 +60,26 @@ public class MatchSnapshotMenu extends Menu {
         } else {
             snapshot.getEffects().forEach(effect -> {
                 String name = effect.getType().getName().replace("_", " ");
-                lore.add("&7- &b" + name.substring(0, 1).toUpperCase() + name.substring(1) + " " + effect.getAmplifier());
+                lore.add("&7- &6" + name.substring(0, 1).toUpperCase() + name.substring(1) + " " + effect.getAmplifier());
             });
         }
-        setButton(49, new Button(new ItemBuilder(Material.BREWING_STAND_ITEM).name("&bEffects").lore(lore).build()));
+        setButton(49, new Button(new ItemBuilder(Material.BREWING_STAND_ITEM).name("&6Effects").lore(lore).build()));
         lore.clear();
         lore.add("");
-        lore.add("&b" + snapshot.getTarget().getName() + " &fhad &b" + snapshot.getRemainingPots() + " &fpot" + (snapshot.getRemainingPots() <= 1 ? "" : "s") + " left.");
-        setButton(50, new Button(new ItemBuilder(Material.POTION).durability(16421).amount(snapshot.getRemainingPots() == 0 ? 1 : snapshot.getRemainingPots()).name("&bPotions").lore(lore).build()));
+        lore.add("&6" + snapshot.getTarget().getName() + " &fhad &6" + snapshot.getRemainingPots() + " &fpot" + (snapshot.getRemainingPots() <= 1 ? "" : "s") + " left.");
+        setButton(50, new Button(new ItemBuilder(Material.POTION).durability(16421).amount(snapshot.getRemainingPots() == 0 ? 1 : snapshot.getRemainingPots()).name("&6Potions").lore(lore).build()));
         lore.clear();
         lore.add("");
-        lore.add("&bTotal Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getHits());
-        lore.add("&bCritical Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getCrits());
-        lore.add("&bBlocked Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getBlocked());
-        lore.add("&bPotions Thrown: &f" + snapshot.getThrownPots());
-        lore.add("&bPotions Missed: &f" + snapshot.getMissedPots());
-        lore.add("&bPotions Accuracy: &f" + snapshot.getPotionAccuracy());
+        lore.add("&6Total Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getHits());
+        lore.add("&6Critical Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getCrits());
+        lore.add("&6Blocked Hits: &f" + snapshot.getMatch().getTeam(snapshot.getTarget()).getMember(snapshot.getTarget()).getBlocked());
+        lore.add("&6Potions Thrown: &f" + snapshot.getThrownPots());
+        lore.add("&6Potions Missed: &f" + snapshot.getMissedPots());
+        lore.add("&6Potions Accuracy: &f" + snapshot.getPotionAccuracy());
 
-        setButton(51, new Button(new ItemBuilder(Material.PAPER).name("&bStatistics").lore(lore).build()));
+        setButton(51, new Button(new ItemBuilder(Material.PAPER).name("&6Statistics").lore(lore).build()));
 
         setButton(52, Menu.getPlaceholderButton());
-        setButton(53, new Button(new ItemBuilder(Material.ARROW).name("&bSwitch to " + snapshot.getOpponent().getName() + "'s inventory").build(), (player1, clickType) -> new MatchSnapshotMenu(opp).open(player1)));
+        setButton(53, new Button(new ItemBuilder(Material.ARROW).name("&6Switch to " + snapshot.getOpponent().getName() + "'s inventory").build(), (player1, clickType) -> new MatchSnapshotMenu(opp).open(player1)));
     }
 }

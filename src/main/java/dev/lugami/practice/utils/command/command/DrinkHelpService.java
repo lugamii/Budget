@@ -43,7 +43,7 @@ public class DrinkHelpService {
                 }
 
                 for (DrinkCommand c : commands) {
-                    sender.sendMessage(CC.translate(" &7* &b/" + container.getName() + (!c.getName().isEmpty() ? " &b" + c.getName() : "") + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)"));
+                    sender.sendMessage(CC.translate(" &7* &6/" + container.getName() + (!c.getName().isEmpty() ? " &6" + c.getName() : "") + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)"));
                 }
 
                 return;
@@ -67,7 +67,7 @@ public class DrinkHelpService {
             for (DrinkCommand c : commands) {
                 Player player = (Player) sender;
                 TextComponent msg = new TextComponent(net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&',
-                        " &7* &b/" + container.getName() + (!c.getName().isEmpty() || !c.getName().equalsIgnoreCase("") ? " &b" + c.getName() + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)" : " &8(&7&o" + c.getDescription() + "&8)") ));
+                        " &7* &6/" + container.getName() + (!c.getName().isEmpty() || !c.getName().equalsIgnoreCase("") ? " &6" + c.getName() + " &8" + c.getMostApplicableUsage() + "&8 &8(&7&o" + c.getDescription() + "&8)" : " &8(&7&o" + c.getDescription() + "&8)") ));
                 msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.GRAY + "/" + container.getName() + " " + c.getName() + " - " + ChatColor.WHITE + c.getDescription())));
                 msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + container.getName() + " " + c.getName()));
                 player.spigot().sendMessage(msg);

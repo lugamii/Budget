@@ -225,14 +225,14 @@ public class MatchStorage {
                     builder.append(", ");
                 }
             }
-            team.sendMessage(CC.translate("&6Spectators &7(&b" + match.getSpectators().size() + "): " + builder));
+            team.sendMessage(CC.translate("&6Spectators &7(&6" + match.getSpectators().size() + "): " + builder));
         }
         team.sendMessage("");
     }
 
     // TODO: Method comment
     public Clickable getClickable(MatchEndEvent event) {
-        Clickable inventories = new Clickable("&bInventories: ");
+        Clickable inventories = new Clickable("&6Inventories: ");
         inventories.add("&a" + event.getWinner().getLeader().getName(), "&eClick to view " + event.getWinner().getLeader().getName() + "'s inventory!", "/match inventory " + event.getWinner().getLeader().getUniqueId());
         inventories.add("&7, ");
         inventories.add("&c" + event.getLoser().getLeader().getName(), "&eClick to view " + event.getLoser().getLeader().getName() + "'s inventory!", "/match inventory " + event.getLoser().getLeader().getUniqueId());
@@ -260,7 +260,7 @@ public class MatchStorage {
                         builder.append(", ");
                     }
                 }
-                player.sendMessage(CC.translate("&6Spectators &7(&b" + match.getSpectators().size() + "): " + builder));
+                player.sendMessage(CC.translate("&6Spectators &7(&6" + match.getSpectators().size() + "): " + builder));
             }
             player.sendMessage("");
         });
@@ -269,7 +269,7 @@ public class MatchStorage {
 
     // TODO: Method comment
     public Clickable getClickableFFA(MatchEndEvent event) {
-        Clickable inventories = new Clickable("&bInventories: ");
+        Clickable inventories = new Clickable("&6Inventories: ");
         inventories.add("&a" + event.getWinnerPlayer().getName(), "&eClick to view " + event.getWinnerPlayer().getName() + "'s inventory!", "/match inventory " + event.getWinnerPlayer().getUniqueId());
         inventories.add("&7, ");
         Iterator<Player> iterator = event.getLosers().iterator();

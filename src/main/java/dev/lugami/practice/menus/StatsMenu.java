@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 public class StatsMenu extends Menu {
 
     public StatsMenu() {
-        super("&bStatistics", 36);
+        super("&6Statistics", 36);
     }
 
     @Override
@@ -21,9 +21,9 @@ public class StatsMenu extends Menu {
         Profile profile = Budget.getInstance().getProfileStorage().findProfile(player);
         for (Kit kit : Budget.getInstance().getKitStorage().getKits()) {
             if (kit.isEnabled() && kit.isRanked()) {
-                setButton(slot++, new Button(new ItemBuilder(kit.getIcon()).name("&b" + kit.getName()).lore("", "&fWon: &b" + profile.getStatistics(kit).getWon(), "&fLost: &b" + profile.getStatistics(kit).getLost(), "&fELO: &b" + profile.getStatistics(kit).getElo()).build()));
+                setButton(slot++, new Button(new ItemBuilder(kit.getIcon()).name("&6" + kit.getName()).lore("", "&fWon: &6" + profile.getStatistics(kit).getWon(), "&fLost: &6" + profile.getStatistics(kit).getLost(), "&fELO: &6" + profile.getStatistics(kit).getElo()).build()));
             } else if (kit.isEnabled()){
-                setButton(slot++, new Button(new ItemBuilder(kit.getIcon()).name("&b" + kit.getName()).lore("", "&fWon: &b" + profile.getStatistics(kit).getWon(), "&fLost: &b" + profile.getStatistics(kit).getLost()).build()));
+                setButton(slot++, new Button(new ItemBuilder(kit.getIcon()).name("&6" + kit.getName()).lore("", "&fWon: &6" + profile.getStatistics(kit).getWon(), "&fLost: &6" + profile.getStatistics(kit).getLost()).build()));
             }
         }
     }

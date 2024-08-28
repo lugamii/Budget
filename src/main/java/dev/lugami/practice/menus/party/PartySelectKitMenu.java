@@ -29,7 +29,7 @@ public class PartySelectKitMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public PartySelectKitMenu(Match.MatchType type) {
-        super("&bSelect a kit", 36);
+        super("&6Select a kit", 36);
         this.type = type;
     }
 
@@ -43,7 +43,7 @@ public class PartySelectKitMenu extends Menu {
                 ItemStack itemStack = kit.getIcon();
                 setButton(slot++, new Button(
                         new ItemBuilder(itemStack != null ? itemStack : new ItemBuilder(Material.DIAMOND_SWORD).build())
-                                .name("&b" + kit.getName())
+                                .name("&6" + kit.getName())
                                 .build(),
                         (p1, clickType) -> {
                             Profile profile = Budget.getInstance().getProfileStorage().findProfile(p1);

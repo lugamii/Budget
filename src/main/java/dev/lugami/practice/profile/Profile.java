@@ -206,7 +206,7 @@ public class Profile {
         InventoryWrapper wrapper = new InventoryWrapper(player.getInventory());
         HotbarItem defaultKitItem = new HotbarItem(
                 new ItemBuilder(Material.BOOK)
-                        .name("&bDefault Kit")
+                        .name("&6Default Kit")
                         .build(),
                 player1 -> {
                     wrapper.clear();
@@ -230,7 +230,7 @@ public class Profile {
             }
             HotbarItem hotbarItem = new HotbarItem(
                     new ItemBuilder(Material.BOOK)
-                            .name("&bKit " + (i + 1))
+                            .name("&6Kit " + (i + 1))
                             .build(),
                     player1 -> {
                         wrapper.clear();

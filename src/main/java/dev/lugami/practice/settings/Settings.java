@@ -18,7 +18,8 @@ public enum Settings {
     ALLOW_SPECTATORS("Match Spectators", "Toggles people spectating your matches.", "", true, new ItemStack(Material.DIAMOND)),
     LOBBY_MUSIC("Lobby Music", "Toggles the lobby music for you.", "budget.lobby.music", false, new ItemStack(Material.JUKEBOX), true),
     EXPLOSION("Death Explosion", "Toggles a explosion effect when you kill someone.", "", false, new ItemStack(Material.TNT)),
-    LIGHTNING("Death Lightning", "Toggles a lightning effect when you kill someone.", "", true, new ItemStack(Material.BLAZE_ROD));
+    LIGHTNING("Death Lightning", "Toggles a lightning effect when you kill someone.", "", true, new ItemStack(Material.BLAZE_ROD)),
+    DEATHEFFECT("Death Effect", "Toggles a death effect when you kill someone.", "", true, new ItemStack(Material.SKULL_ITEM));
 
     @Getter
     private final String name;

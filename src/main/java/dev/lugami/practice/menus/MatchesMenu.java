@@ -19,7 +19,7 @@ public class MatchesMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public MatchesMenu() {
-        super("&bMatches", 36);
+        super("&6Matches", 36);
     }
 
     @Override
@@ -34,9 +34,9 @@ public class MatchesMenu extends Menu {
             if (match.getState() != Match.MatchState.IN_PROGRESS) continue;
             List<String> lore = new ArrayList<>();
             lore.add("");
-            lore.add("&fDuration: &b" + match.getDuration());
-            lore.add("&fKit: &b" + match.getKit().getName());
-            lore.add("&fType: &b" + getMatchType(match));
+            lore.add("&fDuration: &6" + match.getDuration());
+            lore.add("&fKit: &6" + match.getKit().getName());
+            lore.add("&fType: &6" + getMatchType(match));
             lore.add("");
             lore.add("&eClick to spectate!");
             setButton(slot++, new Button(new ItemBuilder(match.getKit().getIcon().clone()).name("&a" + match.getTeam1().getLeader().getName() + " &7vs. &c" + match.getTeam2().getLeader().getName()).lore(lore).build(), (player1, clickType) -> {

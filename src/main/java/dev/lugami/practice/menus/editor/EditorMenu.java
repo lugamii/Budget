@@ -28,7 +28,7 @@ public class EditorMenu extends Menu {
      * Constructs a new Menu with the specified title and size.
      */
     public EditorMenu(Kit kit) {
-        super("&bEditing kits", 9);
+        super("&6Editing kits", 9);
         this.kit = kit;
     }
 
@@ -65,7 +65,7 @@ public class EditorMenu extends Menu {
         lore.add(CC.translate("&eRight-Click to load this kit."));
         CustomKitLayout finalSavedKitLayout = savedKitLayout;
         CustomKitLayout[] finalKitLayouts = kitLayouts;
-        return new Button(new ItemBuilder(Material.ENCHANTED_BOOK).name("&bKit #" + id).lore(lore).build(), (p1, clickType) -> {
+        return new Button(new ItemBuilder(Material.ENCHANTED_BOOK).name("&6Kit #" + id).lore(lore).build(), (p1, clickType) -> {
             if (clickType == ClickType.LEFT) {
                 if ((finalSavedKitLayout == null || !areInventoriesEqual(finalSavedKitLayout, p1)) && !isInventoryEmpty(p1)) {
                     CustomKitLayout newKitLayout = new CustomKitLayout();
