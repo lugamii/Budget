@@ -18,10 +18,8 @@ import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spigotmc.AsyncCatcher;
 
@@ -30,6 +28,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * November 13th, 2024.
+ * Development is no longer active, Budget is no longer maintained.
+ *
+ * My beloved plugin, I'll never forget you...
+ * - Lugami
+ */
 @Getter
 @Setter
 public class Budget extends JavaPlugin {

@@ -1,6 +1,7 @@
 # BudgetPractice
 
-Simple practice core for Spigot 1.8.8
+Simple practice core for Spigot 1.8.8</br>
+**My once beloved plugin, now fully discontinued.**
 
 ## Context
 
@@ -9,7 +10,7 @@ I then created a simple practice core named BudgetPractice using Skript, and it 
 And eventually, I gave up and moved on from Skript.</br>
 But now, as of 15/06/24, I decided to try making it on Java, and seeing if this actually turns up nice or something like that.
 
-## QnA
+## QnA (Deprecated as of 13/11/2024)
 
 ## Q: Do you plan on constantly trying to update this?
 ### A: No. This will be a project for me to code stuff when I'm bored, so don't expect updates.
@@ -27,3 +28,7 @@ But now, as of 15/06/24, I decided to try making it on Java, and seeing if this 
 ### UPDATE: 03/08/2024
 
 - Not a **REQUIRED** dependency, but Apollo and BukkitAPI (Lunar Client APIs) are currently supported.
+
+### UPDATE: 13/11/2024
+
+- Will no longer be updated.
